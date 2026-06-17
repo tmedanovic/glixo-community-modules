@@ -1,0 +1,11 @@
+{
+  "id": "glixo.messaging.teams",
+  "name": "Microsoft Teams",
+  "description": "Teams messaging sync, send, presence (extract from genie-server)",
+  "version": "0.0.0-extract",
+  "protocolVersion": "0",
+  "runtime": { "kind": "node", "version": "20" },
+  "requires": ["logging", "relationalDb", "events", "secrets", "jobs"],
+  "capabilities": ["messages.read", "messages.send"],
+  "entry": { "command": "node", "args": ["dist/index.js"] }
+}

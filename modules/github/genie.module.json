@@ -1,0 +1,9 @@
+﻿{
+  "id": "glixo.work.github",
+  "name": "GitHub",
+  "version": "0.0.0-extract",
+  "protocolVersion": "0",
+  "runtime": { "kind": "node", "version": "20" },
+  "requires": ["logging", "relationalDb", "events", "secrets"],
+  "capabilities": []
+}
