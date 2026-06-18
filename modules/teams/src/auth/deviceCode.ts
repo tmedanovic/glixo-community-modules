@@ -1,5 +1,15 @@
 import { randomUUID } from 'node:crypto';
+import {
+  MICROSOFT_NATIVE_AUTH_KIND,
+  MICROSOFT_NATIVE_CLIENTS,
+  decodeIdTokenClaims,
+  fetchUserRegion,
+  pollDeviceCodeToken,
+  requestDeviceCode,
+  type MicrosoftNativeClient,
+} from '@glixo/microsoft-native-auth';
 import type { TeamsDb } from '../db/openDb.js';
+import { saveCredentials, getAuthStatus as readAuthStatus } from '../credentials/store.js';
 
 export type AuthStatus = 'disconnected' | 'pending' | 'connected' | 'error';
 
@@ -7,65 +17,153 @@ export type DeviceCodeSession = {
   sessionId: string;
   userCode: string;
   verificationUri: string;
+  verificationUriComplete?: string;
   expiresAt: number;
   status: AuthStatus;
   detail?: string;
 };
 
-const pending = new Map<string, DeviceCodeSession>();
+type PendingFlow = {
+  userId: string;
+  tenant: string;
+  client: MicrosoftNativeClient;
+  deviceCode: string;
+  intervalMs: number;
+  expiresAt: number;
+  userCode: string;
+  verificationUri: string;
+  verificationUriComplete?: string;
+};
 
-/** Microsoft device-code flow — production path matches genie-server teamsRoutes. */
-export async function startDeviceCodeFlow(userId: string, opts?: { mock?: boolean }): Promise<DeviceCodeSession> {
+const pending = new Map<string, PendingFlow>();
+
+export const DEFAULT_USER = 'playground-user';
+
+export async function startDeviceCodeFlow(
+  userId: string,
+  opts?: { tenant?: string; client?: MicrosoftNativeClient; mock?: boolean },
+): Promise<DeviceCodeSession> {
   const sessionId = randomUUID();
-  if (opts?.mock !== false && process.env.TEAMS_AUTH_MOCK !== '0') {
-    const session: DeviceCodeSession = {
+  const useMock = opts?.mock === true || process.env.TEAMS_AUTH_MOCK === '1';
+  if (useMock) {
+    pending.set(sessionId, {
+      userId,
+      tenant: 'common',
+      client: 'teamsDesktop',
+      deviceCode: 'mock',
+      intervalMs: 5000,
+      expiresAt: Date.now() + 15 * 60_000,
+      userCode: 'ABCD-EFGH',
+      verificationUri: 'https://microsoft.com/devicelogin',
+    });
+    return {
       sessionId,
       userCode: 'ABCD-EFGH',
       verificationUri: 'https://microsoft.com/devicelogin',
       expiresAt: Date.now() + 15 * 60_000,
       status: 'pending',
     };
-    pending.set(sessionId, session);
-    return session;
   }
-  // Real flow: POST to login.microsoftonline.com/.../devicecode (extract from genie-server)
-  throw new Error('Native device-code flow not wired in this alpha — set TEAMS_AUTH_MOCK=1 for dev');
+
+  const tenant = opts?.tenant ?? process.env.TEAMS_AUTH_TENANT ?? 'common';
+  const client = opts?.client ?? 'teamsDesktop';
+  const dc = await requestDeviceCode(tenant, client);
+  pending.set(sessionId, {
+    userId,
+    tenant,
+    client,
+    deviceCode: dc.deviceCode,
+    intervalMs: dc.intervalMs,
+    expiresAt: dc.expiresAt,
+    userCode: dc.userCode,
+    verificationUri: dc.verificationUri,
+    verificationUriComplete: dc.verificationUriComplete,
+  });
+  return {
+    sessionId,
+    userCode: dc.userCode,
+    verificationUri: dc.verificationUri,
+    verificationUriComplete: dc.verificationUriComplete,
+    expiresAt: dc.expiresAt,
+    status: 'pending',
+  };
 }
 
-export function pollDeviceCode(sessionId: string, db: TeamsDb, userId: string): DeviceCodeSession {
-  const session = pending.get(sessionId);
-  if (!session) {
+export async function pollDeviceCode(
+  sessionId: string,
+  db: TeamsDb,
+  userId: string,
+  onConnected?: () => void,
+): Promise<DeviceCodeSession> {
+  const flow = pending.get(sessionId);
+  if (!flow) {
     return { sessionId, userCode: '', verificationUri: '', expiresAt: 0, status: 'error', detail: 'Unknown session' };
   }
-  if (session.status === 'connected') return session;
-  if (Date.now() > session.expiresAt) {
-    session.status = 'error';
-    session.detail = 'Expired';
-    return session;
+  if (Date.now() > flow.expiresAt) {
+    pending.delete(sessionId);
+    return { sessionId, userCode: flow.userCode, verificationUri: flow.verificationUri, expiresAt: flow.expiresAt, status: 'error', detail: 'Expired' };
   }
-  // Mock: auto-connect after first poll in dev
-  if (process.env.TEAMS_AUTH_MOCK !== '0') {
-    session.status = 'connected';
+
+  if (process.env.TEAMS_AUTH_MOCK === '1' && flow.deviceCode === 'mock') {
     storeMockCredentials(db, userId);
-    pending.set(sessionId, session);
+    pending.delete(sessionId);
+    onConnected?.();
+    return { sessionId, userCode: flow.userCode, verificationUri: flow.verificationUri, expiresAt: flow.expiresAt, status: 'connected' };
   }
-  return session;
+
+  const result = await pollDeviceCodeToken(flow.tenant, flow.client, flow.deviceCode);
+  if (result.status === 'pending') {
+    return {
+      sessionId,
+      userCode: flow.userCode,
+      verificationUri: flow.verificationUri,
+      verificationUriComplete: flow.verificationUriComplete,
+      expiresAt: flow.expiresAt,
+      status: 'pending',
+    };
+  }
+  if (result.status === 'error') {
+    pending.delete(sessionId);
+    return { sessionId, userCode: flow.userCode, verificationUri: flow.verificationUri, expiresAt: flow.expiresAt, status: 'error', detail: result.detail };
+  }
+
+  const claims = decodeIdTokenClaims(result.idToken);
+  const clientId = MICROSOFT_NATIVE_CLIENTS[flow.client];
+  const accountHandle = claims?.preferred_username ?? claims?.upn ?? claims?.name ?? null;
+  const payload = {
+    refreshToken: result.refreshToken,
+    idToken: result.idToken,
+    tenantId: claims?.tid ?? flow.tenant,
+    accountOid: claims?.oid ?? null,
+    authKind: MICROSOFT_NATIVE_AUTH_KIND,
+    clientId,
+    accountHandle,
+  };
+  const accountId = saveCredentials(db, userId, payload, { accountHandle });
+  const creds = { accountId, userId, payload };
+  const region = await fetchUserRegion(creds, () => {});
+  if (region) saveCredentials(db, userId, { ...payload, region }, { accountHandle });
+
+  pending.delete(sessionId);
+  onConnected?.();
+  return { sessionId, userCode: flow.userCode, verificationUri: flow.verificationUri, expiresAt: flow.expiresAt, status: 'connected' };
 }
 
 function storeMockCredentials(db: TeamsDb, userId: string): void {
-  const now = Date.now();
-  db.prepare(`
-    insert into auth_account (id, user_id, tenant_id, account_oid, client_id, refresh_token_cipher, health_status, connected_at, updated_at)
-    values (?, ?, ?, ?, ?, ?, 'ok', ?, ?)
-    on conflict(id) do update set health_status='ok', connected_at=excluded.connected_at, updated_at=excluded.updated_at
-  `).run('default', userId, 'mock-tenant', 'mock-oid', 'mock-client', 'mock-cipher', now, now);
+  saveCredentials(db, userId, {
+    refreshToken: 'mock-refresh',
+    tenantId: 'mock-tenant',
+    accountOid: 'mock-oid',
+    clientId: MICROSOFT_NATIVE_CLIENTS.teamsDesktop,
+    authKind: 'mock',
+    accountHandle: 'mock@example.com',
+  });
 }
 
 export function getAuthStatus(db: TeamsDb, userId: string): { status: AuthStatus; detail?: string } {
-  const row = db.prepare('select health_status, health_detail from auth_account where user_id = ?').get(userId) as
-    | { health_status: string; health_detail: string | null }
-    | undefined;
-  if (!row) return { status: 'disconnected' };
-  if (row.health_status === 'ok') return { status: 'connected' };
-  return { status: 'error', detail: row.health_detail ?? undefined };
+  return readAuthStatus(db, userId) as { status: AuthStatus; detail?: string };
+}
+
+export function disconnectAuth(db: TeamsDb, userId: string): void {
+  db.prepare('delete from auth_account where user_id = ?').run(userId);
 }

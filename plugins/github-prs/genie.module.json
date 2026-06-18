@@ -1,0 +1,10 @@
+{
+  "id": "glixo.plugin.github-prs",
+  "name": "GitHub PRs",
+  "kind": "plugin",
+  "version": "0.1.0-alpha",
+  "description": "Pull request list wired to glixo.work.github HTTP API.",
+  "entry": "plugin-bundled-in-app",
+  "requires": ["glixo.work.github"],
+  "routes": [{ "path": "/github", "screen": "GithubPrs" }]
+}

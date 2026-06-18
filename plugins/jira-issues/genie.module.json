@@ -1,0 +1,10 @@
+{
+  "id": "glixo.plugin.jira-issues",
+  "name": "Jira issues",
+  "kind": "plugin",
+  "version": "0.1.0-alpha",
+  "description": "Issue list/detail UI wired to glixo.work.jira HTTP API.",
+  "entry": "plugin-bundled-in-app",
+  "requires": ["glixo.work.jira"],
+  "routes": [{ "path": "/jira", "screen": "JiraIssues" }]
+}

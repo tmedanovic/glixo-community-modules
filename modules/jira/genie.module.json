@@ -1,9 +1,32 @@
 ﻿{
   "id": "glixo.work.jira",
   "name": "Jira",
-  "version": "0.0.0-extract",
+  "description": "Jira work items — issues, sync, host work.item.changed events (alpha).",
+  "kind": "service",
+  "version": "0.1.0-alpha",
   "protocolVersion": "0",
   "runtime": { "kind": "node", "version": "20" },
-  "requires": ["logging", "relationalDb", "events", "secrets"],
-  "capabilities": []
+  "entry": { "command": "node", "args": ["dist/index.js"], "workingDirectory": "." },
+  "capabilities": ["work.issues", "work.sync"],
+  "requires": [
+    "logging",
+    "health",
+    "relationalDb.module",
+    "config",
+    "secrets.jira",
+    "jobs",
+    "events",
+    "capability.genie.work.items.upsert"
+  ],
+  "permissions": ["network.jira-api"],
+  "health": { "path": "/health", "intervalSeconds": 60 },
+  "config": {
+    "fields": [
+      { "key": "siteUrl", "label": "Jira site URL", "type": "text", "required": true },
+      { "key": "email", "label": "Account email", "type": "text", "required": true },
+      { "key": "port", "label": "HTTP port", "type": "number", "defaultValue": "6130" }
+    ]
+  },
+  "artifacts": [{ "rid": "any", "url": "glixo-work-jira", "sha256": "dev-placeholder" }],
+  "updateChannels": ["stable", "beta"]
 }

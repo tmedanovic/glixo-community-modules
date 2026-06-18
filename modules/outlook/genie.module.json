@@ -1,9 +1,19 @@
 ﻿{
   "id": "glixo.messaging.outlook",
   "name": "Microsoft Outlook",
-  "version": "0.0.0-extract",
+  "description": "Outlook mail service — OWA polling sync (alpha scaffold).",
+  "kind": "service",
+  "version": "0.1.0-alpha",
   "protocolVersion": "0",
   "runtime": { "kind": "node", "version": "20" },
-  "requires": ["logging", "relationalDb", "events", "secrets"],
-  "capabilities": []
+  "entry": { "command": "node", "args": ["dist/index.js"], "workingDirectory": "." },
+  "capabilities": ["message.sync", "message.send", "glixo.outlook.conversations"],
+  "requires": ["logging", "health", "relationalDb.module", "secrets.outlook", "events"],
+  "health": { "path": "/health", "intervalSeconds": 60 },
+  "config": {
+    "fields": [
+      { "key": "port", "label": "HTTP port", "type": "number", "defaultValue": "6121" }
+    ]
+  },
+  "artifacts": [{ "rid": "any", "url": "glixo-messaging-outlook", "sha256": "dev-placeholder" }]
 }

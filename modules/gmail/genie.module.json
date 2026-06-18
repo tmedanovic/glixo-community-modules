@@ -1,9 +1,21 @@
 ﻿{
   "id": "glixo.messaging.gmail",
   "name": "Gmail",
-  "version": "0.0.0-extract",
+  "kind": "service",
+  "version": "0.1.0-alpha",
   "protocolVersion": "0",
   "runtime": { "kind": "node", "version": "20" },
-  "requires": ["logging", "relationalDb", "events", "secrets"],
-  "capabilities": []
+  "entry": { "command": "node", "args": ["dist/index.js"], "workingDirectory": "." },
+  "capabilities": ["message.sync", "message.send"],
+  "requires": ["logging", "health", "relationalDb.module", "config", "secrets.google", "events"],
+  "permissions": ["network.google-api"],
+  "health": { "path": "/health", "intervalSeconds": 60 },
+  "config": {
+    "fields": [
+      { "key": "clientId", "label": "Google OAuth client ID", "type": "text", "required": true },
+      { "key": "clientSecret", "label": "Google OAuth client secret", "type": "secret", "required": true },
+      { "key": "port", "label": "HTTP port", "type": "number", "defaultValue": "6122" }
+    ]
+  },
+  "artifacts": [{ "rid": "any", "url": "glixo-messaging-gmail", "sha256": "dev-placeholder" }]
 }

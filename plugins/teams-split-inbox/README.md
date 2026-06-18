@@ -1,16 +1,18 @@
 # Teams split inbox plugin
 
-**Kind:** `plugin` — UI only. Requires **`glixo.messaging.teams`** service running.
+**Id:** `glixo.plugin.teams-split-inbox`
 
-## What it provides
+UI plugin — consumes `glixo.messaging.teams` HTTP API. No standalone OS process.
 
-- Route: `/teams-live` (bundled in app, see `glixo-playground-app`)
-- Uses `@glixo/ui` `SplitInboxView` + `TeamsServiceClient`
+## Implementation reference
+
+Production screen lives in **glixo-playground-app**:
+
+- `standalone/src/plugins/TeamsSplitInboxScreen.tsx`
+- Route: `/teams-live` (also registered in `glixo-app.config.json`)
 
 ## Install model
 
-1. Manager installs **service** `glixo.messaging.teams` → starts on `:6120`
-2. App bundles or Manager installs **plugin** `glixo.plugin.teams-split-inbox`
-3. Plugin reads `teamsServiceUrl` from module config
+Plugins bundle **inside the app repo**, not via Manager. Declare in `glixo-app.config.json` and register screens in `PluginRegistry` (`@glixo/sdk`).
 
-Third-party apps can skip this plugin and build their own UI against the same service HTTP API.
+Services install separately via Manager → `glixo.messaging.teams`.

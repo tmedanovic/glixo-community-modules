@@ -17,11 +17,15 @@
     "migrate": "node dist/db/migrate.js"
   },
   "dependencies": {
-    "better-sqlite3": "^11.8.1"
+    "@glixo/microsoft-native-auth": "file:../../packages/microsoft-native-auth",
+    "@glixo/sdk": "file:../../../glixo-sdk/packages/nodejs",
+    "better-sqlite3": "^11.8.1",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.12",
     "@types/node": "^22.10.0",
+    "@types/ws": "^8.5.13",
     "typescript": "5.9.3"
   },
   "packageManager": "yarn@1.22.22"

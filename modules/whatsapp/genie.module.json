@@ -1,9 +1,18 @@
 ﻿{
   "id": "glixo.messaging.whatsapp",
   "name": "WhatsApp",
-  "version": "0.0.0-extract",
+  "description": "WhatsApp messaging via daemon bridge (alpha scaffold).",
+  "kind": "service",
+  "version": "0.1.0-alpha",
   "protocolVersion": "0",
   "runtime": { "kind": "node", "version": "20" },
-  "requires": ["logging", "relationalDb", "events", "secrets"],
-  "capabilities": []
+  "entry": { "command": "node", "args": ["dist/index.js"], "workingDirectory": "." },
+  "capabilities": ["message.sync", "message.send"],
+  "requires": ["logging", "health", "daemon.bridge", "secrets.whatsapp"],
+  "permissions": ["network.whatsapp-bridge"],
+  "health": { "path": "/health", "intervalSeconds": 60 },
+  "config": {
+    "fields": [{ "key": "port", "label": "HTTP port", "type": "number", "defaultValue": "6132" }]
+  },
+  "artifacts": [{ "rid": "any", "url": "glixo-messaging-whatsapp", "sha256": "dev-placeholder" }]
 }
