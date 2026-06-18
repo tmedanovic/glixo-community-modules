@@ -1,0 +1,39 @@
+{
+  "id": "glixo.plugin.teams-split-inbox",
+  "name": "Teams split inbox",
+  "description": "Default split conversations screen — consumes glixo.messaging.teams service API.",
+  "kind": "plugin",
+  "version": "0.1.0-alpha",
+  "protocolVersion": "0",
+  "runtime": { "kind": "node", "version": "20" },
+  "entry": {
+    "command": "echo",
+    "args": ["plugin-bundled-in-app"]
+  },
+  "capabilities": ["ui.route.teams"],
+  "requires": [
+    "ui",
+    "logging",
+    "capability.glixo.teams.conversations"
+  ],
+  "config": {
+    "fields": [
+      {
+        "key": "teamsServiceUrl",
+        "label": "Teams service URL",
+        "type": "text",
+        "defaultValue": "http://127.0.0.1:6120",
+        "helpText": "Loopback URL of glixo.messaging.teams module process."
+      }
+    ]
+  },
+  "ui": {
+    "routes": [
+      { "path": "/teams-live", "component": "TeamsSplitInboxPlugin" }
+    ]
+  },
+  "artifacts": [
+    { "rid": "any", "url": "glixo-plugin-teams-split-inbox", "sha256": "dev-placeholder" }
+  ],
+  "updateChannels": ["stable"]
+}

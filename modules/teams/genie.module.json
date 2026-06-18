@@ -1,11 +1,65 @@
 {
   "id": "glixo.messaging.teams",
   "name": "Microsoft Teams",
-  "description": "Teams messaging sync, send, presence (extract from genie-server)",
-  "version": "0.0.0-extract",
+  "description": "Teams messaging service — native OAuth, module DB, sync, contract events. UI is a separate plugin.",
+  "kind": "service",
+  "version": "0.1.0-alpha",
   "protocolVersion": "0",
   "runtime": { "kind": "node", "version": "20" },
-  "requires": ["logging", "relationalDb", "events", "secrets", "jobs"],
-  "capabilities": ["messages.read", "messages.send"],
-  "entry": { "command": "node", "args": ["dist/index.js"] }
+  "entry": {
+    "command": "node",
+    "args": ["dist/index.js"],
+    "workingDirectory": "."
+  },
+  "capabilities": [
+    "message.sync",
+    "message.send",
+    "presence.track",
+    "glixo.teams.conversations"
+  ],
+  "requires": [
+    "logging",
+    "health",
+    "storage",
+    "relationalDb.module",
+    "config",
+    "secrets.teams",
+    "jobs",
+    "notifications",
+    "events",
+    "capability.genie.messages.ingest"
+  ],
+  "permissions": ["network.microsoft-graph"],
+  "health": { "path": "/health", "intervalSeconds": 60 },
+  "config": {
+    "fields": [
+      {
+        "key": "realtimeEnabled",
+        "label": "Realtime sync (Trouter)",
+        "type": "checkbox",
+        "defaultValue": "true",
+        "helpText": "Subscribe to Microsoft Trouter for live messages."
+      },
+      {
+        "key": "backfillOnConnect",
+        "label": "Backfill history on connect",
+        "type": "checkbox",
+        "defaultValue": "true"
+      },
+      {
+        "key": "port",
+        "label": "HTTP port",
+        "type": "number",
+        "defaultValue": "6120"
+      }
+    ]
+  },
+  "ui": {
+    "settingsComponent": "TeamsAuthSettings",
+    "schema": "settings/auth.schema.json"
+  },
+  "artifacts": [
+    { "rid": "any", "url": "glixo-messaging-teams", "sha256": "dev-placeholder" }
+  ],
+  "updateChannels": ["stable", "beta"]
 }

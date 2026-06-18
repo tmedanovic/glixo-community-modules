@@ -1,0 +1,28 @@
+{
+  "name": "@glixo/community-teams",
+  "version": "0.1.0-alpha",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./client": "./dist/client/TeamsServiceClient.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc && node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "migrate": "node dist/db/migrate.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.8.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/node": "^22.10.0",
+    "typescript": "5.9.3"
+  },
+  "packageManager": "yarn@1.22.22"
+}

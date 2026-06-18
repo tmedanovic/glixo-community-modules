@@ -1,49 +1,41 @@
 # glixo-community-modules
 
-Community **integration modules** extracted from `genie-server` monolith adapters.
-Each module is a installable service with its own storage scope — **no shared central DB**.
+Community **services** and **UI plugins** extracted from `genie-server`.
 
-Naming: **`glixo-community-modules`** (catalog uses `genie.module.json` ids like `glixo.messaging.teams`).
+## Service vs plugin
+
+| Kind | Example | Owns |
+|------|---------|------|
+| **service** | `glixo.messaging.teams` | DB, auth, sync, events, HTTP API |
+| **plugin** | `glixo.plugin.teams-split-inbox` | App routes + `@glixo/ui` screens |
+
+See `genie-platform/docs/architecture/glixo-services-vs-plugins.md`.
 
 ## Modules
 
-| Module | Status | Source in genie monorepo |
-|--------|--------|--------------------------|
-| [teams](./modules/teams/) | extract pending | `packages/genie-server/sources/modules/integrations/teams/` |
-| [whatsapp](./modules/whatsapp/) | extract pending | `packages/genie-agent-vm/whatsapp-bridge/` + server relay |
-| [outlook](./modules/outlook/) | extract pending | `integrations/outlook/` |
-| [gmail](./modules/gmail/) | extract pending | `integrations/email/gmail*` |
-| [google-contacts](./modules/google-contacts/) | extract pending | `integrations/contacts/googleContactsAdapter.ts` |
-| [jira](./modules/jira/) | extract pending | `integrations/jira/` |
-| [confluence](./modules/confluence/) | extract pending | `integrations/confluence/` |
-| [figma](./modules/figma/) | partial | `integrations/figma/httpFigmaAdapter.ts` |
-| [github](./modules/github/) | extract pending | `integrations/git/httpGithubAdapter.ts` |
-| [gitlab](./modules/gitlab/) | extract pending | `integrations/git/httpGitlabAdapter.ts` |
+| Service | Plugin | Status |
+|---------|--------|--------|
+| [teams](./modules/teams/) | [teams-split-inbox](./plugins/teams-split-inbox/) | **alpha scaffold** — SQLite, auth mock, replay, playground `/teams-live` |
+| whatsapp | — | extract pending |
+| outlook | — | extract pending |
+| … | — | stub manifests |
 
-## Architecture
+## Manager install (target)
 
-```text
-App (glixo-playground-app)
-  └── custom UI (@glixo/ui)
-  └── core cell (genie-platform: auth, health, machines, daemon)
-  └── installed modules (this repo) — each declares requires: [relationalDb, events, …]
+1. Catalog source → this repo
+2. Install `glixo.messaging.teams` → `{GENIE_HOME}/modules/...`
+3. Start module process (Manager `ModuleRuntimeSupervisor`)
+4. App installs plugin or bundles route
+
+**Gaps today:** real zip artifacts, health polling, migration hook on start, update runner.
+
+## Dev — Teams
+
+```powershell
+# Terminal 1 — service
+cd modules/teams && yarn install && yarn build && yarn start
+
+# Terminal 2 — playground (expo already running is fine)
+cd D:/Projects/glixo-playground-app/standalone
+# open /teams-live
 ```
-
-Modules talk to the host via **`@glixo/sdk`** (`message.send`, `work.items.*`, events).
-Host owns credential vault + capability routing — not a monolith Prisma schema.
-
-## Install into an app (target)
-
-1. Manager catalog scans Git source pointing at this repo
-2. Module install runner copies artifact + registers capabilities (WIP in genie-platform)
-3. App HomeScreen shows module tile when `status: ok`
-
-See `genie-platform/docs/architecture/MODULE_LIFECYCLE.md`.
-
-## Dev
-
-Each `modules/<name>/` contains:
-
-- `genie.module.json` — manifest stub
-- `EXTRACTION.md` — file cut list from genie-server
-- `package.json` — Node module entry (to be filled on extract)
