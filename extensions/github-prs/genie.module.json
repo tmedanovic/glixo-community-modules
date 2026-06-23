@@ -1,7 +1,7 @@
 {
-  "id": "glixo.plugin.github-prs",
+  "id": "glixo.extension.github-prs",
   "name": "GitHub PRs",
-  "kind": "plugin",
+  "kind": "extension",
   "version": "0.1.0-alpha",
   "protocolVersion": "0",
   "description": "Pull request list wired to glixo.work.github HTTP API.",
@@ -11,7 +11,7 @@
   },
   "entry": {
     "command": "echo",
-    "args": ["plugin-bundled-in-app"]
+    "args": ["extension-bundled-in-app"]
   },
   "capabilities": [
     "glixo.ui.route.github",
@@ -29,7 +29,7 @@
       "runtime": "node",
       "entry": {
         "command": "echo",
-        "args": ["plugin-bundled-in-app"]
+        "args": ["extension-bundled-in-app"]
       },
       "requires": ["capability.glixo.github.activity"],
       "capabilities": ["glixo.ui.route.github"],
@@ -85,7 +85,7 @@
   "artifacts": [
     {
       "rid": "any",
-      "url": "glixo-plugin-github-prs",
+      "url": "glixo-extension-github-prs",
       "sha256": "dev-placeholder"
     }
   ],

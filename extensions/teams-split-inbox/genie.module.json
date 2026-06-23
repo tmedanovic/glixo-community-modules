@@ -1,14 +1,14 @@
 {
-  "id": "glixo.plugin.teams-split-inbox",
+  "id": "glixo.extension.teams-split-inbox",
   "name": "Teams split inbox",
-  "description": "Default split conversations screen — consumes glixo.messaging.teams service API.",
-  "kind": "plugin",
+  "description": "Default split conversations screen - consumes glixo.messaging.teams service API.",
+  "kind": "extension",
   "version": "0.1.0-alpha",
   "protocolVersion": "0",
   "runtime": { "kind": "node", "version": "20" },
   "entry": {
     "command": "echo",
-    "args": ["plugin-bundled-in-app"]
+    "args": ["extension-bundled-in-app"]
   },
   "capabilities": ["glixo.ui.route.teams"],
   "requires": [
@@ -29,7 +29,7 @@
   },
   "ui": {
     "routes": [
-      { "path": "/teams-live", "component": "TeamsSplitInboxPlugin" }
+      { "path": "/teams-live", "component": "TeamsSplitInboxExtension" }
     ]
   },
   "components": [
@@ -40,7 +40,7 @@
       "runtime": "node",
       "entry": {
         "command": "echo",
-        "args": ["plugin-bundled-in-app"]
+        "args": ["extension-bundled-in-app"]
       },
       "requires": ["capability.glixo.teams.conversations"],
       "capabilities": ["glixo.ui.route.teams"],
@@ -60,7 +60,7 @@
         "id": "glixo.teams.splitInbox.route",
         "path": "/teams-live",
         "title": "Teams split inbox",
-        "component": "TeamsSplitInboxPlugin"
+        "component": "TeamsSplitInboxExtension"
       }
     ],
     "sidebarViews": [
@@ -69,7 +69,7 @@
         "slot": "infostream.sidebar",
         "title": "Teams",
         "icon": "chatbubbles-outline",
-        "component": "TeamsSplitInboxPlugin"
+        "component": "TeamsSplitInboxExtension"
       }
     ],
     "dataSources": [
@@ -103,7 +103,7 @@
     ]
   },
   "artifacts": [
-    { "rid": "any", "url": "glixo-plugin-teams-split-inbox", "sha256": "dev-placeholder" }
+    { "rid": "any", "url": "glixo-extension-teams-split-inbox", "sha256": "dev-placeholder" }
   ],
   "updateChannels": ["stable"]
 }

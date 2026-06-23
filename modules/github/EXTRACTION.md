@@ -1,4 +1,4 @@
-﻿# GitHub service extraction
+# GitHub service extraction
 
 ## Source (genie-server)
 
@@ -19,6 +19,6 @@
 
 Default port: **6131**.
 
-## Plugin
+## Extension
 
-`glixo.plugin.github-prs` in playground — lists PRs from service HTTP.
+`glixo.extension.github-prs` in playground - lists PRs from service HTTP.

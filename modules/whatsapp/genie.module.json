@@ -1,4 +1,4 @@
-﻿{
+{
   "id": "glixo.messaging.whatsapp",
   "name": "WhatsApp",
   "description": "WhatsApp messaging via daemon bridge (alpha scaffold).",

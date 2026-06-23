@@ -22,7 +22,7 @@ cd modules/teams
 yarn start
 ```
 
-1. POST `/v1/auth/device-code/start` → open verification URI, enter user code
+1. POST `/v1/auth/device-code/start` -> open verification URI, enter user code
 2. POST `/v1/auth/device-code/poll` until `connected`
 3. Service backfills chats and starts Trouter realtime (unless `TEAMS_REALTIME=0`)
 
@@ -34,7 +34,7 @@ cd modules/teams/scripts
 ```
 
 1. Add catalog source: `D:\Projects\glixo-community-modules\modules\teams` (or repo root with manifest path)
-2. Manager → Install `glixo.messaging.teams` → accept runtime policy → Start
+2. Manager -> Install `glixo.messaging.teams` -> accept runtime policy -> Start
 3. Playground `/teams-live` talks to `:6120`
 
 ## Environment
@@ -50,6 +50,6 @@ cd modules/teams/scripts
 
 ## Architecture
 
-- **`@glixo/microsoft-native-auth`** — shared device-code + token refresh (Outlook can reuse)
-- **Trouter** — stays inside this service (Outlook uses OWA polling, not Trouter)
-- **Plugin** — `plugins/teams-split-inbox` is UI-only; consumes this HTTP API + event replay
+- **`@glixo/microsoft-native-auth`** - shared device-code + token refresh (Outlook can reuse)
+- **Trouter** - stays inside this service (Outlook uses OWA polling, not Trouter)
+- **Extension** - `extensions/teams-split-inbox` is UI-only; consumes this HTTP API + event replay

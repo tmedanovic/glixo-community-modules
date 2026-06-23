@@ -9,6 +9,6 @@
 | Implemented | Pending |
 |-------------|---------|
 | `/v1/contacts` (People API connections) | Sync worker, contact merge |
-| SQLite cache | App plugin screens |
+| SQLite cache | App extension screens |
 
 Port **6133**.

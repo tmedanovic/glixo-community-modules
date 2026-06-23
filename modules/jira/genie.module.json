@@ -1,4 +1,4 @@
-﻿{
+{
   "id": "glixo.work.jira",
   "name": "Jira",
   "description": "Jira work items — issues, sync, host work.item.changed events (alpha).",

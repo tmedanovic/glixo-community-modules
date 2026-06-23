@@ -1,4 +1,4 @@
-﻿{
+{
   "id": "glixo.messaging.outlook",
   "name": "Microsoft Outlook",
   "description": "Outlook mail service — OWA polling sync (alpha scaffold).",

@@ -1,7 +1,7 @@
 {
-  "id": "glixo.plugin.jira-issues",
+  "id": "glixo.extension.jira-issues",
   "name": "Jira issues",
-  "kind": "plugin",
+  "kind": "extension",
   "version": "0.1.0-alpha",
   "protocolVersion": "0",
   "description": "Issue list/detail UI wired to glixo.work.jira HTTP API.",
@@ -11,7 +11,7 @@
   },
   "entry": {
     "command": "echo",
-    "args": ["plugin-bundled-in-app"]
+    "args": ["extension-bundled-in-app"]
   },
   "capabilities": [
     "glixo.ui.route.jira",
@@ -29,7 +29,7 @@
       "runtime": "node",
       "entry": {
         "command": "echo",
-        "args": ["plugin-bundled-in-app"]
+        "args": ["extension-bundled-in-app"]
       },
       "requires": ["capability.glixo.jira.issues"],
       "capabilities": ["glixo.ui.route.jira"],
@@ -85,7 +85,7 @@
   "artifacts": [
     {
       "rid": "any",
-      "url": "glixo-plugin-jira-issues",
+      "url": "glixo-extension-jira-issues",
       "sha256": "dev-placeholder"
     }
   ],

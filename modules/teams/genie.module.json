@@ -1,7 +1,7 @@
 {
   "id": "glixo.messaging.teams",
   "name": "Microsoft Teams",
-  "description": "Teams messaging service — native OAuth, module DB, sync, contract events. UI is a separate plugin.",
+  "description": "Teams messaging service - native OAuth, module DB, sync, contract events. UI is a separate extension.",
   "kind": "service",
   "version": "0.1.0-alpha",
   "protocolVersion": "0",
