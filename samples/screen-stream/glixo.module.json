@@ -8,7 +8,7 @@
   "runtime": { "kind": "node", "version": "20" },
   "entry": { "command": "node", "args": ["dist/server.js"], "workingDirectory": "." },
   "capabilities": ["glixo.machine.screen.stream", "glixo.machine.input.forward"],
-  "requires": ["logging", "health", "events", "capability.genie.machine.v1"],
+  "requires": ["logging", "health", "events", "capability.glixo.machine.v1"],
   "components": [
     {
       "id": "relay",
@@ -25,7 +25,7 @@
       "scope": "machine",
       "runtime": "dotnet",
       "entry": { "command": "genie-cli", "args": ["screen", "stream"] },
-      "requires": ["logging", "health", "capability.genie.machine.v1"],
+      "requires": ["logging", "health", "capability.glixo.machine.v1"],
       "capabilities": ["glixo.machine.screen.stream", "glixo.machine.input.forward"],
       "placement": { "kind": "selectedMachines", "required": true, "defaultEnabled": false }
     },

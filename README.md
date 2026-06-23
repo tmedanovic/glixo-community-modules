@@ -2,7 +2,7 @@
 
 Community **extensions** for Glixo. Public product language is "extensions";
 `service`, `extension`, and `component` are implementation roles declared inside
-`genie.module.json`.
+`glixo.module.json`.
 
 See `genie-platform/docs/architecture/GLIXO_PLATFORM_EXTENSION_SYSTEM.md`.
 

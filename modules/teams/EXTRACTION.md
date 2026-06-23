@@ -71,7 +71,7 @@
 
 - Presence worker (`teamsPresenceWorker.ts`) - optional
 
-- Call events / `Event/Call` -> coordinated with `genie.teams.recorder` in genie-platform (not this service)
+- Call events / `Event/Call` -> coordinated with `glixo.teams.recorder` in genie-platform (not this service)
 
 
 
@@ -79,7 +79,7 @@
 
 
 
-`genie.teams.recorder` stays in **genie-platform** (machine audio), not this Node service.
+`glixo.teams.recorder` stays in **genie-platform** (machine audio), not this Node service.
 
 
 

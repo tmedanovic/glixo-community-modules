@@ -8,7 +8,7 @@
   "runtime": { "kind": "dotnet", "version": "10.0" },
   "entry": { "command": "dotnet", "args": ["Glixo.SampleVpnHelper.dll"] },
   "capabilities": ["glixo.machine.vpn.connect", "glixo.machine.vpn.status"],
-  "requires": ["logging", "health", "config", "secrets.vpn", "capability.genie.machine.v1"],
+  "requires": ["logging", "health", "config", "secrets.vpn", "capability.glixo.machine.v1"],
   "components": [
     {
       "id": "vpn-client-helper",
