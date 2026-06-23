@@ -1,0 +1,53 @@
+{
+  "id": "glixo.samples.screen-stream",
+  "name": "Screen Stream",
+  "description": "Reference multi-component extension for streaming a target machine screen to Glixo clients.",
+  "kind": "extension",
+  "version": "0.0.0-stub",
+  "protocolVersion": "0",
+  "runtime": { "kind": "node", "version": "20" },
+  "entry": { "command": "node", "args": ["dist/server.js"], "workingDirectory": "." },
+  "capabilities": ["glixo.machine.screen.stream", "glixo.machine.input.forward"],
+  "requires": ["logging", "health", "events", "capability.genie.machine.v1"],
+  "components": [
+    {
+      "id": "relay",
+      "cell": "server",
+      "scope": "server",
+      "runtime": "node",
+      "entry": { "command": "node", "args": ["dist/server.js"], "workingDirectory": "." },
+      "requires": ["logging", "health", "events"],
+      "capabilities": ["glixo.machine.screen.stream"]
+    },
+    {
+      "id": "capture-agent",
+      "cell": "target",
+      "scope": "machine",
+      "runtime": "dotnet",
+      "entry": { "command": "genie-cli", "args": ["screen", "stream"] },
+      "requires": ["logging", "health", "capability.genie.machine.v1"],
+      "capabilities": ["glixo.machine.screen.stream", "glixo.machine.input.forward"],
+      "placement": { "kind": "selectedMachine", "required": true }
+    },
+    {
+      "id": "viewer",
+      "cell": "client",
+      "scope": "user",
+      "runtime": "node",
+      "entry": { "command": "echo", "args": ["client-bundled-in-app"] },
+      "requires": ["ui", "capability.glixo.machine.screen.stream"],
+      "capabilities": ["glixo.machine.screen.viewer"]
+    }
+  ],
+  "contributes": {
+    "routes": [
+      {
+        "id": "glixo.samples.screenStream.route",
+        "path": "/screen-stream",
+        "title": "Screen stream",
+        "component": "ScreenStreamViewer"
+      }
+    ]
+  },
+  "artifacts": [{ "rid": "any", "url": "glixo-samples-screen-stream", "sha256": "dev-placeholder" }]
+}

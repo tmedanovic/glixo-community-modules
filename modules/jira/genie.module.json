@@ -7,7 +7,7 @@
   "protocolVersion": "0",
   "runtime": { "kind": "node", "version": "20" },
   "entry": { "command": "node", "args": ["dist/index.js"], "workingDirectory": "." },
-  "capabilities": ["work.issues", "work.sync"],
+  "capabilities": ["glixo.work.issues", "glixo.work.sync"],
   "requires": [
     "logging",
     "health",
@@ -16,7 +16,7 @@
     "secrets.jira",
     "jobs",
     "events",
-    "capability.genie.work.items.upsert"
+    "capability.glixo.work.items.upsert"
   ],
   "permissions": ["network.jira-api"],
   "health": { "path": "/health", "intervalSeconds": 60 },

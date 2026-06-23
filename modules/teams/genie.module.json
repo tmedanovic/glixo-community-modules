@@ -12,9 +12,9 @@
     "workingDirectory": "."
   },
   "capabilities": [
-    "message.sync",
-    "message.send",
-    "presence.track",
+    "glixo.message.sync",
+    "glixo.message.send",
+    "glixo.presence.track",
     "glixo.teams.conversations"
   ],
   "requires": [
@@ -27,7 +27,7 @@
     "jobs",
     "notifications",
     "events",
-    "capability.genie.messages.ingest"
+    "capability.glixo.messages.ingest"
   ],
   "permissions": ["network.microsoft-graph"],
   "health": { "path": "/health", "intervalSeconds": 60 },

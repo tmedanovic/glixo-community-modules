@@ -3,8 +3,91 @@
   "name": "GitHub PRs",
   "kind": "plugin",
   "version": "0.1.0-alpha",
+  "protocolVersion": "0",
   "description": "Pull request list wired to glixo.work.github HTTP API.",
-  "entry": "plugin-bundled-in-app",
-  "requires": ["glixo.work.github"],
-  "routes": [{ "path": "/github", "screen": "GithubPrs" }]
+  "runtime": {
+    "kind": "node",
+    "version": "20"
+  },
+  "entry": {
+    "command": "echo",
+    "args": ["plugin-bundled-in-app"]
+  },
+  "capabilities": [
+    "glixo.ui.route.github",
+    "glixo.github.pullRequests"
+  ],
+  "requires": [
+    "ui",
+    "capability.glixo.github.activity"
+  ],
+  "components": [
+    {
+      "id": "prs-view",
+      "cell": "client",
+      "scope": "user",
+      "runtime": "node",
+      "entry": {
+        "command": "echo",
+        "args": ["plugin-bundled-in-app"]
+      },
+      "requires": ["capability.glixo.github.activity"],
+      "capabilities": ["glixo.ui.route.github"],
+      "placement": {
+        "kind": "user",
+        "required": true
+      }
+    }
+  ],
+  "contributes": {
+    "capabilities": [
+      "glixo.ui.route.github",
+      "glixo.github.pullRequests"
+    ],
+    "routes": [
+      {
+        "id": "glixo.github.prs.route",
+        "path": "/github",
+        "title": "GitHub PRs",
+        "component": "GithubPrs"
+      }
+    ],
+    "sidebarViews": [
+      {
+        "id": "glixo.github.prs.sidebar",
+        "slot": "infostream.sidebar",
+        "title": "GitHub PRs",
+        "icon": "git-pull-request-outline",
+        "component": "GithubPrs"
+      }
+    ],
+    "dataSources": [
+      {
+        "id": "glixo.github.pullRequests.source",
+        "title": "GitHub pull requests",
+        "scopes": ["user", "workspace"],
+        "capability": "glixo.github.pullRequests",
+        "icon": "git-pull-request-outline",
+        "sync": "realtime"
+      }
+    ],
+    "aiContextProviders": [
+      {
+        "id": "glixo.github.pullRequests.context",
+        "title": "GitHub pull requests",
+        "scopes": ["user", "workspace", "session"],
+        "capability": "glixo.github.pullRequests",
+        "icon": "git-pull-request-outline",
+        "description": "Adds pull request activity, review state, and release context to agent runs."
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "rid": "any",
+      "url": "glixo-plugin-github-prs",
+      "sha256": "dev-placeholder"
+    }
+  ],
+  "updateChannels": ["stable"]
 }

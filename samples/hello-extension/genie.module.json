@@ -1,0 +1,42 @@
+{
+  "id": "glixo.samples.hello-extension",
+  "name": "Hello Extension",
+  "description": "Minimal client contribution sample with a settings panel and command.",
+  "kind": "extension",
+  "version": "0.0.0-stub",
+  "protocolVersion": "0",
+  "runtime": { "kind": "node", "version": "20" },
+  "entry": { "command": "echo", "args": ["client-bundled-in-app"] },
+  "capabilities": ["glixo.samples.hello"],
+  "requires": ["ui"],
+  "components": [
+    {
+      "id": "hello-panel",
+      "cell": "client",
+      "scope": "user",
+      "runtime": "node",
+      "entry": { "command": "echo", "args": ["client-bundled-in-app"] },
+      "requires": ["ui"],
+      "capabilities": ["glixo.samples.hello"],
+      "placement": { "kind": "user", "required": true }
+    }
+  ],
+  "contributes": {
+    "settingsPanels": [
+      {
+        "id": "glixo.samples.hello.settings",
+        "slot": "settings",
+        "title": "Hello Extension",
+        "component": "HelloExtensionSettings"
+      }
+    ],
+    "commands": [
+      {
+        "id": "glixo.samples.hello.sayHello",
+        "title": "Say hello",
+        "placement": "commandPalette"
+      }
+    ]
+  },
+  "artifacts": [{ "rid": "any", "url": "glixo-samples-hello-extension", "sha256": "dev-placeholder" }]
+}

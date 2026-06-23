@@ -1,0 +1,35 @@
+{
+  "id": "glixo.samples.interactive-os-video-export",
+  "name": "Interactive OS Video Export",
+  "description": "Client action sample that adds a download-as-video command to Interactive OS sessions.",
+  "kind": "extension",
+  "version": "0.0.0-stub",
+  "protocolVersion": "0",
+  "runtime": { "kind": "node", "version": "20" },
+  "entry": { "command": "echo", "args": ["client-bundled-in-app"] },
+  "capabilities": ["glixo.interactiveOs.video.export"],
+  "requires": ["ui", "capability.glixo.interactiveOs.timeline"],
+  "components": [
+    {
+      "id": "video-export-action",
+      "cell": "client",
+      "scope": "session",
+      "runtime": "node",
+      "entry": { "command": "echo", "args": ["client-bundled-in-app"] },
+      "requires": ["ui", "capability.glixo.interactiveOs.timeline"],
+      "capabilities": ["glixo.interactiveOs.video.export"],
+      "placement": { "kind": "session", "required": false }
+    }
+  ],
+  "contributes": {
+    "buttons": [
+      {
+        "id": "glixo.interactiveOs.video.export.button",
+        "slot": "interactiveOs.toolbar",
+        "title": "Download video",
+        "command": "glixo.interactiveOs.video.export"
+      }
+    ]
+  },
+  "artifacts": [{ "rid": "any", "url": "glixo-samples-interactive-os-video-export", "sha256": "dev-placeholder" }]
+}

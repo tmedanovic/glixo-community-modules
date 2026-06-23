@@ -6,7 +6,7 @@
   "protocolVersion": "0",
   "runtime": { "kind": "node", "version": "20" },
   "entry": { "command": "node", "args": ["dist/index.js"], "workingDirectory": "." },
-  "capabilities": ["message.sync", "message.send"],
+  "capabilities": ["glixo.message.sync", "glixo.message.send"],
   "requires": ["logging", "health", "relationalDb.module", "config", "secrets.google", "events"],
   "permissions": ["network.google-api"],
   "health": { "path": "/health", "intervalSeconds": 60 },

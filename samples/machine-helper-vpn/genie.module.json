@@ -1,0 +1,50 @@
+{
+  "id": "glixo.samples.machine-helper-vpn",
+  "name": "Machine Helper VPN",
+  "description": "Selected-machine target component sample for VPN/client-helper style extensions.",
+  "kind": "extension",
+  "version": "0.0.0-stub",
+  "protocolVersion": "0",
+  "runtime": { "kind": "dotnet", "version": "10.0" },
+  "entry": { "command": "dotnet", "args": ["Glixo.SampleVpnHelper.dll"] },
+  "capabilities": ["glixo.machine.vpn.connect", "glixo.machine.vpn.status"],
+  "requires": ["logging", "health", "config", "secrets.vpn", "capability.genie.machine.v1"],
+  "components": [
+    {
+      "id": "vpn-client-helper",
+      "cell": "target",
+      "scope": "machine",
+      "runtime": "dotnet",
+      "entry": { "command": "dotnet", "args": ["Glixo.SampleVpnHelper.dll"] },
+      "requires": ["logging", "health", "config", "secrets.vpn"],
+      "capabilities": ["glixo.machine.vpn.connect", "glixo.machine.vpn.status"],
+      "placement": { "kind": "selectedMachine", "required": true }
+    },
+    {
+      "id": "vpn-settings",
+      "cell": "client",
+      "scope": "user",
+      "runtime": "node",
+      "entry": { "command": "echo", "args": ["client-bundled-in-app"] },
+      "requires": ["ui", "capability.glixo.machine.vpn.status"],
+      "capabilities": ["glixo.machine.vpn.configure"]
+    }
+  ],
+  "config": {
+    "fields": [
+      { "key": "profileName", "label": "VPN profile", "type": "text", "required": true },
+      { "key": "serverUrl", "label": "VPN server URL", "type": "text", "required": true }
+    ]
+  },
+  "contributes": {
+    "settingsPanels": [
+      {
+        "id": "glixo.samples.machineVpn.settings",
+        "slot": "settings",
+        "title": "Machine VPN",
+        "component": "MachineVpnSettings"
+      }
+    ]
+  },
+  "artifacts": [{ "rid": "any", "url": "glixo-samples-machine-helper-vpn", "sha256": "dev-placeholder" }]
+}

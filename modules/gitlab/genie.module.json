@@ -1,9 +1,14 @@
-﻿{
+{
   "id": "glixo.work.gitlab",
   "name": "GitLab",
-  "version": "0.0.0-extract",
+  "description": "GitLab project and merge-request source scaffold for Infostream workspaces.",
+  "kind": "service",
+  "version": "0.0.0-stub",
   "protocolVersion": "0",
   "runtime": { "kind": "node", "version": "20" },
-  "requires": ["logging", "relationalDb", "events", "secrets"],
-  "capabilities": []
+  "entry": { "command": "node", "args": ["dist/index.js"], "workingDirectory": "." },
+  "requires": ["logging", "health", "relationalDb.module", "events", "secrets.gitlab"],
+  "capabilities": ["glixo.work.gitlab.projects", "glixo.work.gitlab.mergeRequests"],
+  "health": { "path": "/health", "intervalSeconds": 60 },
+  "artifacts": [{ "rid": "any", "url": "glixo-work-gitlab", "sha256": "dev-placeholder" }]
 }

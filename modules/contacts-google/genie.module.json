@@ -7,9 +7,9 @@
   "protocolVersion": "0",
   "runtime": { "kind": "node", "version": "20" },
   "entry": { "command": "node", "args": ["dist/index.js"], "workingDirectory": "." },
-  "capabilities": ["contacts.sync", "contacts.read"],
+  "capabilities": ["glixo.contacts.sync", "glixo.contacts.read"],
   "requires": ["logging", "health", "secrets.google", "relationalDb.module"],
   "health": { "path": "/health", "intervalSeconds": 60 },
-  "config": { "fields": [{ "key": "port", "type": "number", "defaultValue": "6133" }] },
+  "config": { "fields": [{ "key": "port", "label": "Service port", "type": "number", "defaultValue": "6133" }] },
   "artifacts": [{ "rid": "any", "url": "glixo-contacts-google", "sha256": "dev-placeholder" }]
 }

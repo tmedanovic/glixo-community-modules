@@ -1,9 +1,14 @@
-﻿{
+{
   "id": "glixo.integrations.google-contacts",
-  "name": "Google Contacts",
-  "version": "0.0.0-extract",
+  "name": "Google Contacts Preview",
+  "description": "Preview-only Google Contacts source scaffold kept separate from the installable alpha module.",
+  "kind": "service",
+  "version": "0.0.0-stub",
   "protocolVersion": "0",
   "runtime": { "kind": "node", "version": "20" },
-  "requires": ["logging", "relationalDb", "events", "secrets"],
-  "capabilities": []
+  "entry": { "command": "node", "args": ["dist/index.js"], "workingDirectory": "." },
+  "requires": ["logging", "health", "relationalDb.module", "events", "secrets.google"],
+  "capabilities": ["glixo.contacts.google.preview"],
+  "health": { "path": "/health", "intervalSeconds": 60 },
+  "artifacts": [{ "rid": "any", "url": "glixo-google-contacts-preview", "sha256": "dev-placeholder" }]
 }

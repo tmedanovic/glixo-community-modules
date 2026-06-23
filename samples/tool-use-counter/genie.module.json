@@ -1,0 +1,43 @@
+{
+  "id": "glixo.samples.tool-use-counter",
+  "name": "Tool Use Counter",
+  "description": "Client/context sample that counts tool usage by tool name for the current workspace.",
+  "kind": "extension",
+  "version": "0.0.0-stub",
+  "protocolVersion": "0",
+  "runtime": { "kind": "node", "version": "20" },
+  "entry": { "command": "echo", "args": ["client-bundled-in-app"] },
+  "capabilities": ["glixo.toolUsage.stats"],
+  "requires": ["ui", "events", "capability.glixo.session.events"],
+  "components": [
+    {
+      "id": "tool-use-counter-view",
+      "cell": "client",
+      "scope": "workspace",
+      "runtime": "node",
+      "entry": { "command": "echo", "args": ["client-bundled-in-app"] },
+      "requires": ["ui", "events", "capability.glixo.session.events"],
+      "capabilities": ["glixo.toolUsage.stats"],
+      "placement": { "kind": "workspace", "required": false }
+    }
+  ],
+  "contributes": {
+    "sidebarViews": [
+      {
+        "id": "glixo.toolUsage.sidebar",
+        "slot": "session.sidebar",
+        "title": "Tool usage",
+        "component": "ToolUseCounter"
+      }
+    ],
+    "aiContextProviders": [
+      {
+        "id": "glixo.toolUsage.context",
+        "title": "Tool usage stats",
+        "scopes": ["workspace", "session"],
+        "capability": "glixo.toolUsage.stats"
+      }
+    ]
+  },
+  "artifacts": [{ "rid": "any", "url": "glixo-samples-tool-use-counter", "sha256": "dev-placeholder" }]
+}

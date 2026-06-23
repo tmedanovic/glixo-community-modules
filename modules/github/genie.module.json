@@ -7,7 +7,7 @@
   "protocolVersion": "0",
   "runtime": { "kind": "node", "version": "20" },
   "entry": { "command": "node", "args": ["dist/index.js"], "workingDirectory": "." },
-  "capabilities": ["vcs.repos", "vcs.pullRequests", "vcs.sync"],
+  "capabilities": ["glixo.vcs.repos", "glixo.vcs.pullRequests", "glixo.vcs.sync"],
   "requires": [
     "logging",
     "health",
@@ -16,7 +16,7 @@
     "secrets.github",
     "jobs",
     "events",
-    "capability.genie.work.items.upsert"
+    "capability.glixo.work.items.upsert"
   ],
   "permissions": ["network.github-api"],
   "health": { "path": "/health", "intervalSeconds": 60 },

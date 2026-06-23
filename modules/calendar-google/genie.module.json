@@ -7,7 +7,7 @@
   "protocolVersion": "0",
   "runtime": { "kind": "node", "version": "20" },
   "entry": { "command": "node", "args": ["dist/index.js"], "workingDirectory": "." },
-  "capabilities": ["calendar.sync", "calendar.read"],
+  "capabilities": ["glixo.calendar.sync", "glixo.calendar.read"],
   "requires": ["logging", "health", "storage", "relationalDb.module", "config", "secrets.google", "jobs"],
   "permissions": ["network.google-apis"],
   "health": { "path": "/health", "intervalSeconds": 60 },
