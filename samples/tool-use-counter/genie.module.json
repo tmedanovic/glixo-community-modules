@@ -3,7 +3,7 @@
   "name": "Tool Use Counter",
   "description": "Client/context sample that counts tool usage by tool name for the current workspace.",
   "kind": "extension",
-  "version": "0.0.0-stub",
+  "version": "0.1.0",
   "protocolVersion": "0",
   "runtime": { "kind": "node", "version": "20" },
   "entry": { "command": "echo", "args": ["client-bundled-in-app"] },
@@ -39,5 +39,11 @@
       }
     ]
   },
-  "artifacts": [{ "rid": "any", "url": "glixo-samples-tool-use-counter", "sha256": "dev-placeholder" }]
+  "artifacts": [
+    {
+      "rid": "any",
+      "url": "artifacts/tool-use-counter-0.1.0.zip",
+      "sha256": "e4ef0e9d40df6eae0a9f8b3c558fc9ddbf7f8c1c7fc1bc0312a54cca3384bd67"
+    }
+  ]
 }

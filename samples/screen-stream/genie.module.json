@@ -3,7 +3,7 @@
   "name": "Screen Stream",
   "description": "Reference multi-component extension for streaming a target machine screen to Glixo clients.",
   "kind": "extension",
-  "version": "0.0.0-stub",
+  "version": "0.1.0",
   "protocolVersion": "0",
   "runtime": { "kind": "node", "version": "20" },
   "entry": { "command": "node", "args": ["dist/server.js"], "workingDirectory": "." },
@@ -49,5 +49,11 @@
       }
     ]
   },
-  "artifacts": [{ "rid": "any", "url": "glixo-samples-screen-stream", "sha256": "dev-placeholder" }]
+  "artifacts": [
+    {
+      "rid": "any",
+      "url": "artifacts/screen-stream-0.1.0.zip",
+      "sha256": "3c82b89b16abecd4374e3b006e5179aef291fe6b78a4bb1f51fadf72e091f1d0"
+    }
+  ]
 }

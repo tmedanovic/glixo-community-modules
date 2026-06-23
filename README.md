@@ -22,10 +22,14 @@ See `genie-platform/docs/architecture/GLIXO_PLATFORM_PLUGIN_SYSTEM.md`.
 3. Start module process (Manager `ModuleRuntimeSupervisor`)
 4. App reads client contributions through the shared extension manager screen
 
-`samples/hello-extension` is the first real installable sample artifact:
-`artifacts/hello-extension-0.1.0.zip` has a real SHA-256 and should preview and
-install from a local folder, zip-backed source, or Git checkout without stub
-gating.
+These samples now have real zip artifacts and SHA-256 values, so they should
+preview and install from a local folder, hosted catalog zip, or Git checkout
+without stub gating:
+
+- `samples/hello-extension`
+- `samples/tool-use-counter`
+- `samples/interactive-os-video-export`
+- `samples/screen-stream`
 
 Target-machine samples such as Screen Stream and Machine Helper VPN install at
 the extension/account level, then enable their target component on selected
@@ -35,8 +39,8 @@ Enabling a selected-machine target now materializes a package and
 `target-deployment.json` descriptor in the Glixo home; cross-machine transport
 and remote process start are still pending.
 
-**Gaps today:** production signing/CDN publishing for all samples, update runner,
-and remote target-cell transport/start orchestration.
+**Gaps today:** production signing for third-party releases, update runner, and
+remote target-cell transport/start orchestration.
 
 ## Dev — Teams
 

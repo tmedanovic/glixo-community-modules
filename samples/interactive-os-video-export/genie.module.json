@@ -3,7 +3,7 @@
   "name": "Interactive OS Video Export",
   "description": "Client action sample that adds a download-as-video command to Interactive OS sessions.",
   "kind": "extension",
-  "version": "0.0.0-stub",
+  "version": "0.1.0",
   "protocolVersion": "0",
   "runtime": { "kind": "node", "version": "20" },
   "entry": { "command": "echo", "args": ["client-bundled-in-app"] },
@@ -31,5 +31,11 @@
       }
     ]
   },
-  "artifacts": [{ "rid": "any", "url": "glixo-samples-interactive-os-video-export", "sha256": "dev-placeholder" }]
+  "artifacts": [
+    {
+      "rid": "any",
+      "url": "artifacts/interactive-os-video-export-0.1.0.zip",
+      "sha256": "05a8b03f3bb44c0ced1c0c759637e7cadfb99807e13f581c4df94c966c5013d6"
+    }
+  ]
 }
