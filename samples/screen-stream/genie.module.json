@@ -27,7 +27,7 @@
       "entry": { "command": "genie-cli", "args": ["screen", "stream"] },
       "requires": ["logging", "health", "capability.genie.machine.v1"],
       "capabilities": ["glixo.machine.screen.stream", "glixo.machine.input.forward"],
-      "placement": { "kind": "selectedMachine", "required": true }
+      "placement": { "kind": "selectedMachine", "required": true, "defaultEnabled": false }
     },
     {
       "id": "viewer",

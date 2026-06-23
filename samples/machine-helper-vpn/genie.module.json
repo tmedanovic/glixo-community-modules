@@ -18,7 +18,7 @@
       "entry": { "command": "dotnet", "args": ["Glixo.SampleVpnHelper.dll"] },
       "requires": ["logging", "health", "config", "secrets.vpn"],
       "capabilities": ["glixo.machine.vpn.connect", "glixo.machine.vpn.status"],
-      "placement": { "kind": "selectedMachine", "required": true }
+      "placement": { "kind": "selectedMachine", "required": true, "defaultEnabled": false }
     },
     {
       "id": "vpn-settings",
