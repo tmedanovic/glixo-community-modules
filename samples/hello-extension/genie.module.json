@@ -3,10 +3,10 @@
   "name": "Hello Extension",
   "description": "Minimal client contribution sample with a settings panel and command.",
   "kind": "extension",
-  "version": "0.0.0-stub",
+  "version": "0.1.0",
   "protocolVersion": "0",
   "runtime": { "kind": "node", "version": "20" },
-  "entry": { "command": "echo", "args": ["client-bundled-in-app"] },
+  "entry": { "command": "node", "args": ["hello-panel/index.js"] },
   "capabilities": ["glixo.samples.hello"],
   "requires": ["ui"],
   "components": [
@@ -15,7 +15,7 @@
       "cell": "client",
       "scope": "user",
       "runtime": "node",
-      "entry": { "command": "echo", "args": ["client-bundled-in-app"] },
+      "entry": { "command": "node", "args": ["index.js"] },
       "requires": ["ui"],
       "capabilities": ["glixo.samples.hello"],
       "placement": { "kind": "user", "required": true }
@@ -38,5 +38,11 @@
       }
     ]
   },
-  "artifacts": [{ "rid": "any", "url": "glixo-samples-hello-extension", "sha256": "dev-placeholder" }]
+  "artifacts": [
+    {
+      "rid": "any",
+      "url": "artifacts/hello-extension-0.1.0.zip",
+      "sha256": "4b5df9be80b97f38b080badc9e02748d897d664cc9a8e868fe00125910812376"
+    }
+  ]
 }
