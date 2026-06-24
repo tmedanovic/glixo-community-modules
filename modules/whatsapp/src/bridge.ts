@@ -1,8 +1,8 @@
 import { fetchWithTimeout } from '@glixo/google-native-auth';
 
 export function readBridgeUrl(): string {
-  return process.env.GENIE_DAEMON_URL?.trim()
-    ?? process.env.GENIE_MODULE_CONFIG_BRIDGEURL?.trim()
+  return process.env.GLIXO_DAEMON_URL?.trim()
+    ?? process.env.GLIXO_MODULE_CONFIG_BRIDGEURL?.trim()
     ?? process.env.WHATSAPP_BRIDGE_URL?.trim()
     ?? 'http://127.0.0.1:13050';
 }

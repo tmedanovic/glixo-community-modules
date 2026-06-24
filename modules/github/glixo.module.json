@@ -1,7 +1,7 @@
 {
   "id": "glixo.work.github",
   "name": "GitHub",
-  "description": "GitHub repos and pull requests — alpha service extracted from genie-server github sync.",
+  "description": "GitHub repos and pull requests — alpha service extracted from glixo-server github sync.",
   "kind": "service",
   "version": "0.1.0-alpha",
   "protocolVersion": "0",

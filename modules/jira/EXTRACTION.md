@@ -1,6 +1,6 @@
 ﻿# Jira service extraction
 
-## Source (genie-server)
+## Source (glixo-server)
 
 | File | Role |
 |------|------|
@@ -15,11 +15,11 @@
 |-------------|---------|
 | Health, `/v1/issues` (assigned JQL live fetch) | Background sync worker |
 | Module SQLite cache | `work.item.changed` host upsert |
-| Config via `GENIE_MODULE_CONFIG_*` + `secrets.jira` | Daemon proxy transport |
+| Config via `GLIXO_MODULE_CONFIG_*` + `secrets.jira` | Daemon proxy transport |
 | | Comment/update issue APIs |
 
 ## Config
 
-Manager sets `siteUrl`, `email` in module-config; API token via `{GENIE_HOME}/secrets/jira.secret` → `GENIE_MODULE_SECRET_JIRA`.
+Manager sets `siteUrl`, `email` in module-config; API token via `{GLIXO_HOME}/secrets/jira.secret` → `GLIXO_MODULE_SECRET_JIRA`.
 
 Default port: **6130**.

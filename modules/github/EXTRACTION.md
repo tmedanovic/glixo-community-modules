@@ -1,6 +1,6 @@
 # GitHub service extraction
 
-## Source (genie-server)
+## Source (glixo-server)
 
 | File | Role |
 |------|------|

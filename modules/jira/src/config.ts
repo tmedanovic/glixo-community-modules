@@ -6,13 +6,13 @@ export type JiraConfig = {
 
 export function readJiraConfig(): JiraConfig {
   return {
-    siteUrl: process.env.GENIE_MODULE_CONFIG_SITEURL?.trim()
+    siteUrl: process.env.GLIXO_MODULE_CONFIG_SITEURL?.trim()
       ?? process.env.JIRA_SITE_URL?.trim()
       ?? null,
-    email: process.env.GENIE_MODULE_CONFIG_EMAIL?.trim()
+    email: process.env.GLIXO_MODULE_CONFIG_EMAIL?.trim()
       ?? process.env.JIRA_EMAIL?.trim()
       ?? null,
-    apiToken: process.env.GENIE_MODULE_SECRET_JIRA?.trim()
+    apiToken: process.env.GLIXO_MODULE_SECRET_JIRA?.trim()
       ?? process.env.JIRA_API_TOKEN?.trim()
       ?? null,
   };

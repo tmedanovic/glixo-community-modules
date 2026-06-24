@@ -1,7 +1,7 @@
 /** Best-effort relay of message.ingested pointer events to the host capability endpoint. */
 export async function relayMessageIngestedToHost(payload: Record<string, unknown>): Promise<void> {
-  const url = process.env.GENIE_HOST_MESSAGE_INGEST_URL
-    ?? process.env.GENIE_CAPABILITY_MESSAGE_INGEST_URL;
+  const url = process.env.GLIXO_HOST_MESSAGE_INGEST_URL
+    ?? process.env.GLIXO_CAPABILITY_MESSAGE_INGEST_URL;
   if (!url?.trim()) return;
 
   try {

@@ -54,7 +54,7 @@ const server = http.createServer(async (req, res) => {
 
   if (url.pathname === '/v1/issues') {
     if (!configured) {
-      return json(res, 200, { issues: [], configured: false, hint: 'Set GENIE_MODULE_CONFIG_SITEURL, EMAIL, and secrets.jira' });
+      return json(res, 200, { issues: [], configured: false, hint: 'Set GLIXO_MODULE_CONFIG_SITEURL, EMAIL, and secrets.jira' });
     }
     const live = await searchAssignedIssues(cfg);
     if (live) {

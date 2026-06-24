@@ -1,6 +1,6 @@
 ﻿# Gmail service extraction
 
-## Source (genie-server)
+## Source (glixo-server)
 
 | File | Role |
 |------|------|
@@ -13,11 +13,11 @@
 |-------------|---------|
 | Health, auth status, `/v1/summary`, `/v1/conversations` (INBOX live) | Send/draft, sync worker |
 | SQLite cache | `message.ingested` host relay |
-| `@glixo/google-native-auth` in **community-modules/packages** | Full parity with genie-server |
+| `@glixo/google-native-auth` in **community-modules/packages** | Full parity with glixo-server |
 
 ## Config
 
-- `GENIE_MODULE_CONFIG_CLIENTID`, `GENIE_MODULE_CONFIG_CLIENTSECRET`
-- `secrets.google` → `GENIE_MODULE_SECRET_GOOGLE` (refresh token)
+- `GLIXO_MODULE_CONFIG_CLIENTID`, `GLIXO_MODULE_CONFIG_CLIENTSECRET`
+- `secrets.google` → `GLIXO_MODULE_SECRET_GOOGLE` (refresh token)
 
 Port **6122**.

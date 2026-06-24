@@ -1,3 +1,3 @@
 ﻿# Google Contacts
 
-Extract from genie-server: `integrations/contacts/googleContactsAdapter.ts`
+Extract from glixo-server: `integrations/contacts/googleContactsAdapter.ts`

@@ -1,3 +1,3 @@
 ﻿# Figma
 
-Extract from genie-server: `integrations/figma/httpFigmaAdapter.ts`
+Extract from glixo-server: `integrations/figma/httpFigmaAdapter.ts`

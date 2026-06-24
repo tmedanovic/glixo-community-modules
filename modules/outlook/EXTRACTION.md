@@ -1,3 +1,3 @@
 ﻿# Microsoft Outlook
 
-Extract from genie-server: `integrations/outlook/`
+Extract from glixo-server: `integrations/outlook/`

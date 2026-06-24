@@ -16,7 +16,7 @@ export function parseTeamsChannelThreadId(threadId: string | null | undefined): 
   return { channelId: match[1], rootMessageId };
 }
 
-/** Stable thread key for channel root posts and replies (matches genie-server shape). */
+/** Stable thread key for channel root posts and replies (matches glixo-server shape). */
 export function teamsChannelThreadId(parts: TeamsChannelThreadParts, messageId: string): string {
   return `teams:${parts.channelId}:${parts.rootMessageId ?? messageId}`;
 }

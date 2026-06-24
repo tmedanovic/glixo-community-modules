@@ -2,7 +2,7 @@
 
 ## Source
 
-`integrations/contacts/*` (genie-server)
+`integrations/contacts/*` (glixo-server)
 
 ## Target (`glixo.contacts.google`)
 

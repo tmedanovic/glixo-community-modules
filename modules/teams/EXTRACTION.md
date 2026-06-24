@@ -2,7 +2,7 @@
 
 
 
-**Service + extension split** - see `genie-platform/docs/architecture/glixo-extension-components.md`.
+**Service + extension split** - see `glixo-platform/docs/architecture/glixo-extension-components.md`.
 
 
 
@@ -16,7 +16,7 @@
 
 
 
-## Service source (genie monorepo)
+## Service source (glixo monorepo)
 
 
 
@@ -24,9 +24,9 @@
 
 |------|------|
 
-| Sync + realtime | `packages/genie-server/sources/modules/integrations/teams/` |
+| Sync + realtime | `packages/glixo-server/sources/modules/integrations/teams/` |
 
-| OAuth routes | `packages/genie-server/sources/app/api/routes/teamsRoutes.ts` |
+| OAuth routes | `packages/glixo-server/sources/app/api/routes/teamsRoutes.ts` |
 
 | Token refresh | `httpTeamsAdapter.ts` -> `getAccessToken(creds, audience)` |
 
@@ -52,7 +52,7 @@
 
 - `src/events/outbox.ts` - `message.ingested` + `teams.conversation.updated` + replay API
 
-- `src/credentials/store.ts` - SQLite credential persistence (encrypt when host injects `GENIE_MODULE_SECRET`)
+- `src/credentials/store.ts` - SQLite credential persistence (encrypt when host injects `GLIXO_MODULE_SECRET`)
 
 - `src/client/TeamsServiceClient.ts` - HTTP client for extensions
 
@@ -65,13 +65,13 @@
 
 
 - Channel threads (`@thread.tacv2`) - realtime + persistence via `channelThreads.ts` (Graph channel backfill deferred)
-- Host `message.ingest` relay when `GENIE_HOST_MESSAGE_INGEST_URL` set
+- Host `message.ingest` relay when `GLIXO_HOST_MESSAGE_INGEST_URL` set
 
-- `genie.messages.ingest` host capability call on persist (when host routing exists)
+- `glixo.messages.ingest` host capability call on persist (when host routing exists)
 
 - Presence worker (`teamsPresenceWorker.ts`) - optional
 
-- Call events / `Event/Call` -> coordinated with `glixo.teams.recorder` in genie-platform (not this service)
+- Call events / `Event/Call` -> coordinated with `glixo.teams.recorder` in glixo-platform (not this service)
 
 
 
@@ -79,7 +79,7 @@
 
 
 
-`glixo.teams.recorder` stays in **genie-platform** (machine audio), not this Node service.
+`glixo.teams.recorder` stays in **glixo-platform** (machine audio), not this Node service.
 
 
 

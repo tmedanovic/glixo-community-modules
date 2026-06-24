@@ -1,7 +1,7 @@
 {
   "id": "glixo.calendar.google",
   "name": "Google Calendar",
-  "description": "Google Calendar sync service — alpha extracted from genie-server googleCalendarAdapter.",
+  "description": "Google Calendar sync service — alpha extracted from glixo-server googleCalendarAdapter.",
   "kind": "service",
   "version": "0.1.0-alpha",
   "protocolVersion": "0",

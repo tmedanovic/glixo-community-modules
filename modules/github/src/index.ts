@@ -53,7 +53,7 @@ const server = http.createServer(async (req, res) => {
 
   if (url.pathname === '/v1/pull-requests' || url.pathname === '/v1/pullRequests') {
     if (!token) {
-      return json(res, 200, { pullRequests: [], configured: false, hint: 'Set GENIE_MODULE_SECRET_GITHUB or GITHUB_TOKEN' });
+      return json(res, 200, { pullRequests: [], configured: false, hint: 'Set GLIXO_MODULE_SECRET_GITHUB or GITHUB_TOKEN' });
     }
     const live = await searchInvolvedPullRequests(token);
     if (live) {

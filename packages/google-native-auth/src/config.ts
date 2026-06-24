@@ -6,14 +6,14 @@ export type GoogleOAuthConfig = {
 
 export function readGoogleOAuthConfig(): GoogleOAuthConfig {
   return {
-    clientId: process.env.GENIE_MODULE_CONFIG_CLIENTID?.trim()
+    clientId: process.env.GLIXO_MODULE_CONFIG_CLIENTID?.trim()
       ?? process.env.GOOGLE_CLIENT_ID?.trim()
       ?? null,
-    clientSecret: process.env.GENIE_MODULE_CONFIG_CLIENTSECRET?.trim()
+    clientSecret: process.env.GLIXO_MODULE_CONFIG_CLIENTSECRET?.trim()
       ?? process.env.GOOGLE_CLIENT_SECRET?.trim()
       ?? null,
-    refreshToken: process.env.GENIE_MODULE_SECRET_GOOGLE?.trim()
-      ?? process.env.GENIE_MODULE_SECRET_GMAIL?.trim()
+    refreshToken: process.env.GLIXO_MODULE_SECRET_GOOGLE?.trim()
+      ?? process.env.GLIXO_MODULE_SECRET_GMAIL?.trim()
       ?? process.env.GOOGLE_REFRESH_TOKEN?.trim()
       ?? null,
   };

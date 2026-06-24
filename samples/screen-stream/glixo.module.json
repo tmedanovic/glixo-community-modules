@@ -24,7 +24,7 @@
       "cell": "target",
       "scope": "machine",
       "runtime": "dotnet",
-      "entry": { "command": "genie-cli", "args": ["screen", "stream"] },
+      "entry": { "command": "glixo-cli", "args": ["screen", "stream"] },
       "requires": ["logging", "health", "capability.glixo.machine.v1"],
       "capabilities": ["glixo.machine.screen.stream", "glixo.machine.input.forward"],
       "placement": { "kind": "selectedMachines", "required": true, "defaultEnabled": false }

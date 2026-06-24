@@ -4,9 +4,9 @@
 
 | Location | Role |
 |----------|------|
-| `genie-server/integrations/whatsapp/outgoing.ts` | Send path |
-| `genie-agent-vm/whatsapp-bridge` | Native/daemon bridge |
-| genie-server reply routes | Inbound ingest |
+| `glixo-server/integrations/whatsapp/outgoing.ts` | Send path |
+| `glixo-agent-vm/whatsapp-bridge` | Native/daemon bridge |
+| glixo-server reply routes | Inbound ingest |
 
 ## Target (`glixo.messaging.whatsapp`)
 

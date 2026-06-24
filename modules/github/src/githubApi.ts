@@ -1,5 +1,5 @@
 export function readGithubToken(): string | null {
-  return process.env.GENIE_MODULE_SECRET_GITHUB?.trim()
+  return process.env.GLIXO_MODULE_SECRET_GITHUB?.trim()
     ?? process.env.GITHUB_TOKEN?.trim()
     ?? null;
 }

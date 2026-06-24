@@ -61,7 +61,7 @@ http.createServer(async (req, res) => {
     const unread = (db.prepare('select coalesce(sum(unread_count),0) as c from conversations').get() as { c: number }).c;
     return json(res, 200, {
       unreadCount: unread,
-      preview: bridge.ok ? 'Daemon bridge reachable — ingest pending' : 'Start genie-cli daemon / bridge',
+      preview: bridge.ok ? 'Daemon bridge reachable — ingest pending' : 'Start glixo-cli daemon / bridge',
       service: 'whatsapp',
     });
   }

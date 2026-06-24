@@ -1,3 +1,3 @@
 ﻿# Confluence
 
-Extract from genie-server: `integrations/confluence/`
+Extract from glixo-server: `integrations/confluence/`
