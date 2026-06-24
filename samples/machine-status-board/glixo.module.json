@@ -1,0 +1,129 @@
+{
+  "id": "glixo.samples.machine-status-board",
+  "name": "Machine Status Board",
+  "description": "Client UI plus selected-machine target helper that reports heartbeat, health, and log state for machines.",
+  "kind": "extension",
+  "version": "0.1.0",
+  "protocolVersion": "0",
+  "runtime": { "kind": "node", "version": "20" },
+  "entry": { "command": "node", "args": ["machine-status-agent/index.js"] },
+  "capabilities": [
+    "glixo.machine.status.board",
+    "glixo.machine.status.heartbeat"
+  ],
+  "requires": [
+    "ui",
+    "logging",
+    "health",
+    "config",
+    "capability.glixo.machine.v1"
+  ],
+  "permissions": [
+    "machine.read",
+    "logs.read"
+  ],
+  "health": { "path": "/health", "intervalSeconds": 15 },
+  "components": [
+    {
+      "id": "status-board-panel",
+      "cell": "client",
+      "scope": "user",
+      "runtime": "node",
+      "entry": { "command": "node", "args": ["index.js"] },
+      "requires": [
+        "ui",
+        "logging",
+        "capability.glixo.machine.status.heartbeat"
+      ],
+      "capabilities": [
+        "glixo.machine.status.board"
+      ],
+      "placement": {
+        "kind": "user",
+        "required": true,
+        "prompt": "Show the machine status board in Glixo apps."
+      }
+    },
+    {
+      "id": "machine-status-agent",
+      "cell": "target",
+      "scope": "machine",
+      "runtime": "node",
+      "entry": { "command": "node", "args": ["index.js"] },
+      "requires": [
+        "logging",
+        "health",
+        "config",
+        "capability.glixo.machine.v1"
+      ],
+      "capabilities": [
+        "glixo.machine.status.heartbeat"
+      ],
+      "placement": {
+        "kind": "selectedMachines",
+        "required": true,
+        "defaultEnabled": false,
+        "prompt": "Choose machines that should publish heartbeat and health status.",
+        "minTargets": 1
+      }
+    }
+  ],
+  "config": {
+    "fields": [
+      {
+        "key": "label",
+        "label": "Board label",
+        "type": "text",
+        "required": true,
+        "defaultValue": "Local machine status"
+      },
+      {
+        "key": "heartbeatSeconds",
+        "label": "Heartbeat seconds",
+        "type": "number",
+        "required": true,
+        "defaultValue": "15"
+      },
+      {
+        "key": "includeEnvironment",
+        "label": "Include environment summary",
+        "type": "checkbox",
+        "defaultValue": "true"
+      }
+    ]
+  },
+  "contributes": {
+    "settingsPanels": [
+      {
+        "id": "glixo.samples.machineStatus.settings",
+        "slot": "settings",
+        "title": "Machine Status Board",
+        "component": "MachineStatusBoardSettings"
+      }
+    ],
+    "sidebarViews": [
+      {
+        "id": "glixo.samples.machineStatus.sidebar",
+        "slot": "workspace.sidebar",
+        "title": "Machine Status",
+        "component": "MachineStatusBoardPanel"
+      }
+    ],
+    "actions": [
+      {
+        "id": "glixo.samples.machineStatus.refresh",
+        "slot": "machine.contextMenu",
+        "title": "Refresh machine status",
+        "command": "glixo.samples.machineStatus.refresh"
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "rid": "any",
+      "url": "artifacts/machine-status-board-0.1.0.zip",
+      "sha256": "457fc3f7175a46e56d745e3c08425388d88d0befc4177f4cb4f0ef367eeafe18"
+    }
+  ],
+  "updateChannels": ["stable"]
+}
