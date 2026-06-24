@@ -6,16 +6,18 @@
   "version": "0.1.0",
   "protocolVersion": "0",
   "runtime": { "kind": "node", "version": "20" },
-  "entry": { "command": "node", "args": ["dist/server.js"], "workingDirectory": "." },
+  "entry": { "command": "node", "args": ["server.js"], "workingDirectory": "relay/dist" },
   "capabilities": ["glixo.machine.screen.stream", "glixo.machine.input.forward"],
   "requires": ["logging", "health", "events", "capability.glixo.machine.v1"],
+  "permissions": ["screen.capture", "input.forward"],
+  "health": { "path": "/health", "intervalSeconds": 30 },
   "components": [
     {
       "id": "relay",
       "cell": "server",
       "scope": "server",
       "runtime": "node",
-      "entry": { "command": "node", "args": ["dist/server.js"], "workingDirectory": "." },
+      "entry": { "command": "node", "args": ["server.js"], "workingDirectory": "relay/dist" },
       "requires": ["logging", "health", "events"],
       "capabilities": ["glixo.machine.screen.stream"]
     },
@@ -27,7 +29,13 @@
       "entry": { "command": "glixo-cli", "args": ["screen", "stream"] },
       "requires": ["logging", "health", "capability.glixo.machine.v1"],
       "capabilities": ["glixo.machine.screen.stream", "glixo.machine.input.forward"],
-      "placement": { "kind": "selectedMachines", "required": true, "defaultEnabled": false }
+      "placement": {
+        "kind": "selectedMachines",
+        "required": true,
+        "defaultEnabled": false,
+        "prompt": "Choose machines that may publish a screen stream.",
+        "minTargets": 1
+      }
     },
     {
       "id": "viewer",
@@ -55,5 +63,6 @@
       "url": "artifacts/screen-stream-0.1.0.zip",
       "sha256": "3c82b89b16abecd4374e3b006e5179aef291fe6b78a4bb1f51fadf72e091f1d0"
     }
-  ]
+  ],
+  "updateChannels": ["stable"]
 }

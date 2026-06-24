@@ -9,6 +9,8 @@
   "entry": { "command": "echo", "args": ["client-bundled-in-app"] },
   "capabilities": ["glixo.toolUsage.stats"],
   "requires": ["ui", "events", "capability.glixo.session.events"],
+  "permissions": ["events.read"],
+  "health": { "path": "/health", "intervalSeconds": 30 },
   "components": [
     {
       "id": "tool-use-counter-view",
@@ -18,7 +20,11 @@
       "entry": { "command": "echo", "args": ["client-bundled-in-app"] },
       "requires": ["ui", "events", "capability.glixo.session.events"],
       "capabilities": ["glixo.toolUsage.stats"],
-      "placement": { "kind": "workspace", "required": false }
+      "placement": {
+        "kind": "workspace",
+        "required": false,
+        "prompt": "Enable the session sidebar view for workspaces where tool usage should be visible."
+      }
     }
   ],
   "contributes": {
@@ -27,7 +33,7 @@
         "id": "glixo.toolUsage.sidebar",
         "slot": "session.sidebar",
         "title": "Tool usage",
-        "component": "ToolUseCounter"
+        "component": "ToolUseCounterPanel"
       }
     ],
     "aiContextProviders": [
@@ -45,5 +51,6 @@
       "url": "artifacts/tool-use-counter-0.1.0.zip",
       "sha256": "e4ef0e9d40df6eae0a9f8b3c558fc9ddbf7f8c1c7fc1bc0312a54cca3384bd67"
     }
-  ]
+  ],
+  "updateChannels": ["stable"]
 }

@@ -8,15 +8,28 @@
   "runtime": { "kind": "node", "version": "20" },
   "entry": { "command": "node", "args": ["hello-panel/index.js"] },
   "capabilities": ["glixo.samples.hello"],
-  "requires": ["ui"],
+  "requires": ["ui", "logging", "health", "config"],
+  "permissions": ["logs.read"],
+  "health": { "path": "/health", "intervalSeconds": 30 },
+  "config": {
+    "fields": [
+      {
+        "key": "greeting",
+        "label": "Greeting",
+        "type": "text",
+        "required": false,
+        "defaultValue": "Hello from Glixo"
+      }
+    ]
+  },
   "components": [
     {
       "id": "hello-panel",
       "cell": "client",
       "scope": "user",
       "runtime": "node",
-      "entry": { "command": "node", "args": ["index.js"] },
-      "requires": ["ui"],
+      "entry": { "command": "node", "args": ["index.js"], "workingDirectory": "hello-panel" },
+      "requires": ["ui", "logging", "health", "config"],
       "capabilities": ["glixo.samples.hello"],
       "placement": { "kind": "user", "required": true }
     }
@@ -30,11 +43,12 @@
         "component": "HelloExtensionSettings"
       }
     ],
-    "commands": [
+    "actions": [
       {
         "id": "glixo.samples.hello.sayHello",
+        "slot": "command.palette",
         "title": "Say hello",
-        "placement": "commandPalette"
+        "command": "glixo.samples.hello.sayHello"
       }
     ]
   },
@@ -44,5 +58,6 @@
       "url": "artifacts/hello-extension-0.1.0.zip",
       "sha256": "4b5df9be80b97f38b080badc9e02748d897d664cc9a8e868fe00125910812376"
     }
-  ]
+  ],
+  "updateChannels": ["stable"]
 }
