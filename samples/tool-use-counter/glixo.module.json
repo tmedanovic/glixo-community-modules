@@ -2,6 +2,25 @@
   "id": "glixo.samples.tool-use-counter",
   "name": "Tool Use Counter",
   "description": "Client/context sample that counts tool usage by tool name for the current workspace.",
+  "icon": "assets/icon.svg",
+  "images": [
+    {
+      "url": "assets/screenshot.svg",
+      "alt": "Tool Use Counter sidebar preview",
+      "caption": "Session sidebar summary of tool call counts and recent activity.",
+      "type": "screenshot"
+    }
+  ],
+  "changelog": {
+    "entries": [
+      {
+        "version": "0.1.0",
+        "date": "2026-06-25",
+        "title": "Tool activity sidebar",
+        "description": "Adds a sidebar contribution and context provider for seeing tool usage by workspace and session."
+      }
+    ]
+  },
   "kind": "extension",
   "version": "0.1.0",
   "protocolVersion": "0",

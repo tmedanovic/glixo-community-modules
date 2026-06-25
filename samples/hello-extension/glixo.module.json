@@ -2,6 +2,25 @@
   "id": "glixo.samples.hello-extension",
   "name": "Hello Extension",
   "description": "Minimal client contribution sample with a settings panel and command.",
+  "icon": "assets/icon.svg",
+  "images": [
+    {
+      "url": "assets/screenshot.svg",
+      "alt": "Hello Extension settings and command preview",
+      "caption": "Minimal extension with a settings panel and command palette action.",
+      "type": "screenshot"
+    }
+  ],
+  "changelog": {
+    "entries": [
+      {
+        "version": "0.1.0",
+        "date": "2026-06-25",
+        "title": "Installable starter sample",
+        "description": "Adds a tiny client contribution that exercises catalog preview, install, config, health, logs, and lifecycle."
+      }
+    ]
+  },
   "kind": "extension",
   "version": "0.1.0",
   "protocolVersion": "0",

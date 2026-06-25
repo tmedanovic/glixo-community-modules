@@ -2,6 +2,25 @@
   "id": "glixo.samples.machine-status-board",
   "name": "Machine Status Board",
   "description": "Client UI plus selected-machine target helper that reports heartbeat, health, and log state for machines.",
+  "icon": "assets/icon.svg",
+  "images": [
+    {
+      "url": "assets/screenshot.svg",
+      "alt": "Machine Status Board preview",
+      "caption": "Selected-machine heartbeat, health, and log status in one workspace panel.",
+      "type": "screenshot"
+    }
+  ],
+  "changelog": {
+    "entries": [
+      {
+        "version": "0.1.0",
+        "date": "2026-06-25",
+        "title": "Selected-machine status sample",
+        "description": "Adds a client panel and target component for validating selected-machine placement, health, config, and logs."
+      }
+    ]
+  },
   "kind": "extension",
   "version": "0.1.0",
   "protocolVersion": "0",

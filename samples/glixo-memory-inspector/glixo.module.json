@@ -2,6 +2,25 @@
   "id": "glixo.samples.memory-inspector",
   "name": "Memory Inspector",
   "description": "Read-only sidebar + agent tool that shows everything the agent has saved to memory.",
+  "icon": "assets/icon.svg",
+  "images": [
+    {
+      "url": "assets/screenshot.svg",
+      "alt": "Memory Inspector sidebar preview",
+      "caption": "Searchable saved-memory sidebar plus a model-visible read-only memory tool.",
+      "type": "screenshot"
+    }
+  ],
+  "changelog": {
+    "entries": [
+      {
+        "version": "0.1.0",
+        "date": "2026-06-25",
+        "title": "Agent memory visibility",
+        "description": "Adds a sidebar, skill, and namespaced tool that let users and agents inspect saved memory without exposing secrets."
+      }
+    ]
+  },
   "kind": "extension",
   "version": "0.1.0",
   "protocolVersion": "0",

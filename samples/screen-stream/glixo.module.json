@@ -2,6 +2,25 @@
   "id": "glixo.samples.screen-stream",
   "name": "Screen Stream",
   "description": "Reference multi-component extension for streaming a target machine screen to Glixo clients.",
+  "icon": "assets/icon.svg",
+  "images": [
+    {
+      "url": "assets/screenshot.svg",
+      "alt": "Screen Stream route preview",
+      "caption": "Server relay, selected-machine capture agent, and client viewer contribution.",
+      "type": "screenshot"
+    }
+  ],
+  "changelog": {
+    "entries": [
+      {
+        "version": "0.1.0",
+        "date": "2026-06-25",
+        "title": "Multi-component screen stream",
+        "description": "Declares server, client, and selected-machine target components for exercising target placement and lifecycle previews."
+      }
+    ]
+  },
   "kind": "extension",
   "version": "0.1.0",
   "protocolVersion": "0",

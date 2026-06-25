@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-label="Memory Inspector sidebar preview">
+  <rect width="960" height="540" fill="#101114"/>
+  <rect x="58" y="46" width="844" height="448" rx="16" fill="#1d2026" stroke="#334155"/>
+  <rect x="600" y="46" width="302" height="448" rx="16" fill="#17191d" stroke="#334155"/>
+  <text x="92" y="106" fill="#eef2f7" font-family="Segoe UI, Arial" font-size="32" font-weight="700">Agent conversation</text>
+  <text x="632" y="94" fill="#eef2f7" font-family="Segoe UI, Arial" font-size="24" font-weight="700">Agent Memory</text>
+  <rect x="632" y="122" width="230" height="38" rx="8" fill="#111318" stroke="#334155"/>
+  <text x="652" y="147" fill="#9ca3af" font-family="Segoe UI, Arial" font-size="15">Search saved memory</text>
+  <g font-family="Segoe UI, Arial" font-size="16">
+    <rect x="632" y="188" width="230" height="70" rx="10" fill="#111318"/>
+    <text x="652" y="218" fill="#bfdbfe">workspace_pack</text><text x="652" y="242" fill="#e5e7eb">Install state note</text>
+    <rect x="632" y="276" width="230" height="70" rx="10" fill="#111318"/>
+    <text x="652" y="306" fill="#bfdbfe">runs_log</text><text x="652" y="330" fill="#e5e7eb">Verified e2e path</text>
+  </g>
+  <path d="M104 180h380M104 228h310M104 276h360M104 324h260" stroke="#475569" stroke-width="11" stroke-linecap="round"/>
+</svg>

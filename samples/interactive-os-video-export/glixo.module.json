@@ -2,6 +2,25 @@
   "id": "glixo.samples.interactive-os-video-export",
   "name": "Interactive OS Video Export",
   "description": "Client action sample that adds a download-as-video command to Interactive OS sessions.",
+  "icon": "assets/icon.svg",
+  "images": [
+    {
+      "url": "assets/screenshot.svg",
+      "alt": "Interactive OS video export action preview",
+      "caption": "Toolbar action contribution for exporting an Interactive OS timeline as video.",
+      "type": "screenshot"
+    }
+  ],
+  "changelog": {
+    "entries": [
+      {
+        "version": "0.1.0",
+        "date": "2026-06-25",
+        "title": "Interactive OS action sample",
+        "description": "Adds a client action manifest for validating Interactive OS toolbar contribution previews."
+      }
+    ]
+  },
   "kind": "extension",
   "version": "0.1.0",
   "protocolVersion": "0",

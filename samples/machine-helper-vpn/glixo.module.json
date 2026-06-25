@@ -2,6 +2,10 @@
   "id": "glixo.samples.machine-helper-vpn",
   "name": "Machine Helper VPN",
   "description": "Selected-machine target component sample for VPN/client-helper style extensions.",
+  "catalog": {
+    "listed": false,
+    "reason": "Hidden until remote target transport, start/health, and secret-reference handling are product-ready."
+  },
   "kind": "extension",
   "version": "0.1.0",
   "protocolVersion": "0",
