@@ -1,0 +1,72 @@
+{
+  "id": "glixo.samples.interactive-os-incident-notes",
+  "name": "Interactive OS Incident Notes",
+  "description": "Adds a simple Incident Notes app to Interactive OS sessions using the host-rendered extension app surface.",
+  "icon": "assets/icon.svg",
+  "images": [
+    {
+      "url": "assets/screenshot.svg",
+      "alt": "Incident Notes app preview",
+      "caption": "A note-style Interactive OS app contributed by an installed Extension.",
+      "type": "screenshot"
+    }
+  ],
+  "changelog": {
+    "entries": [
+      {
+        "version": "0.1.0",
+        "date": "2026-06-25",
+        "title": "Interactive OS app sample",
+        "description": "Adds a declarative Incident Notes app contribution for the Interactive OS launcher."
+      }
+    ]
+  },
+  "kind": "extension",
+  "version": "0.1.0",
+  "protocolVersion": "0",
+  "runtime": { "kind": "node", "version": "20" },
+  "entry": { "command": "echo", "args": ["client-bundled-in-app"] },
+  "capabilities": ["glixo.interactiveOs.apps.register"],
+  "requires": ["ui", "capability.glixo.interactiveOs.apps.register"],
+  "permissions": [],
+  "health": { "path": "/health", "intervalSeconds": 30 },
+  "components": [
+    {
+      "id": "incident-notes-app",
+      "cell": "client",
+      "scope": "session",
+      "runtime": "node",
+      "entry": { "command": "echo", "args": ["client-bundled-in-app"] },
+      "requires": ["ui", "capability.glixo.interactiveOs.apps.register"],
+      "capabilities": ["glixo.interactiveOs.apps.register"],
+      "placement": { "kind": "session", "required": false }
+    }
+  ],
+  "contributes": {
+    "interactiveOs": {
+      "apps": [
+        {
+          "id": "incident.notes",
+          "name": "Incident Notes",
+          "icon": "IN",
+          "accent": "#0A84FF",
+          "template": "note",
+          "width": 560,
+          "height": 420,
+          "actions": [
+            { "id": "write", "description": "Replace the visible incident note." },
+            { "id": "add", "description": "Append a line to the incident note." }
+          ]
+        }
+      ]
+    }
+  },
+  "artifacts": [
+    {
+      "rid": "any",
+      "url": "artifacts/interactive-os-incident-notes-0.1.0.zip",
+      "sha256": "302c75c3d87b56536021631d3348ed8262774715de43edd83b946025621005d2"
+    }
+  ],
+  "updateChannels": ["stable"]
+}
