@@ -30,6 +30,7 @@ without stub gating:
 - `samples/tool-use-counter`
 - `samples/interactive-os-video-export`
 - `samples/screen-stream`
+- `samples/glixo-memory-inspector` — contributes a sidebar panel, a read-only agent tool, and a skill; the reference example for the [extension authoring guide](../glixo-platform/docs/architecture/EXTENSION_AUTHORING_GUIDE.md)
 
 Target-machine samples such as Screen Stream and Machine Helper VPN install at
 the extension/account level, then enable their target component on selected
