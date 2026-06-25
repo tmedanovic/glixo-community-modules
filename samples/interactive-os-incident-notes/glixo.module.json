@@ -27,7 +27,12 @@
   "runtime": { "kind": "node", "version": "20" },
   "entry": { "command": "echo", "args": ["client-bundled-in-app"] },
   "capabilities": ["glixo.interactiveOs.apps.register"],
-  "requires": ["ui", "capability.glixo.interactiveOs.apps.register"],
+  "requires": [
+    "ui",
+    "capability.glixo.interactiveOs.apps.register",
+    "capability.glixo.interactiveOs.windows.control",
+    "capability.glixo.interactiveOs.notifications.create"
+  ],
   "permissions": [],
   "health": { "path": "/health", "intervalSeconds": 30 },
   "components": [
@@ -37,12 +42,48 @@
       "scope": "session",
       "runtime": "node",
       "entry": { "command": "echo", "args": ["client-bundled-in-app"] },
-      "requires": ["ui", "capability.glixo.interactiveOs.apps.register"],
+      "requires": [
+        "ui",
+        "capability.glixo.interactiveOs.apps.register",
+        "capability.glixo.interactiveOs.windows.control",
+        "capability.glixo.interactiveOs.notifications.create"
+      ],
       "capabilities": ["glixo.interactiveOs.apps.register"],
       "placement": { "kind": "session", "required": false }
     }
   ],
   "contributes": {
+    "actions": [
+      {
+        "id": "glixo.samples.interactive-os-incident-notes.open",
+        "slot": "interactive-os.toolbar",
+        "title": "Incident Notes",
+        "icon": "document-text-outline",
+        "command": "glixo.interactiveOs.windowAction",
+        "priority": 40,
+        "input": {
+          "appId": "incident.notes",
+          "command": "show",
+          "notify": {
+            "title": "Incident Notes ready",
+            "body": "The extension app is open in Interactive OS.",
+            "kind": "success"
+          }
+        }
+      },
+      {
+        "id": "glixo.samples.interactive-os-incident-notes.hide",
+        "slot": "interactive-os.toolbar",
+        "title": "Hide Notes",
+        "icon": "remove-circle-outline",
+        "command": "glixo.interactiveOs.windowAction",
+        "priority": 41,
+        "input": {
+          "appId": "incident.notes",
+          "command": "hide"
+        }
+      }
+    ],
     "interactiveOs": {
       "apps": [
         {
