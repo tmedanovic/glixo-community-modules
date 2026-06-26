@@ -1,0 +1,68 @@
+{
+  "id": "glixo.providers.ollama",
+  "name": "Ollama LLM Provider",
+  "kind": "extension",
+  "version": "0.1.0-alpha",
+  "protocolVersion": "0",
+  "description": "Adds Ollama as an installable local LLM provider through its OpenAI-compatible endpoint.",
+  "runtime": {
+    "kind": "node",
+    "version": "20"
+  },
+  "entry": {
+    "command": "echo",
+    "args": ["declarative-llm-provider"]
+  },
+  "capabilities": [
+    "glixo.llm.provider.ollama"
+  ],
+  "requires": [
+    "capability.glixo.llmProviders.register"
+  ],
+  "contributes": {
+    "llmProviders": [
+      {
+        "id": "ollama",
+        "label": "Ollama",
+        "description": "Run local Ollama models from the target machine.",
+        "icon": "hardware-chip-outline",
+        "adapter": "openai-compatible",
+        "credentialFields": [
+          {
+            "id": "baseUrl",
+            "label": "Base URL",
+            "type": "url",
+            "required": true,
+            "defaultValue": "http://127.0.0.1:11434/v1",
+            "helpText": "Ollama exposes an OpenAI-compatible endpoint on loopback."
+          },
+          {
+            "id": "apiKey",
+            "label": "API key",
+            "type": "secret",
+            "required": false,
+            "secret": true
+          }
+        ],
+        "modelDiscovery": {
+          "kind": "openai-compatible-models",
+          "path": "/models"
+        },
+        "modelRouting": {
+          "families": ["ollama"],
+          "patterns": ["llama*", "qwen*", "mistral*", "gemma*", "phi*", "codellama*"],
+          "servesAllFamilies": false
+        },
+        "capabilities": ["chat", "streaming", "tools"]
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "rid": "any",
+      "url": "artifacts/llm-ollama-provider-0.1.0-alpha.zip",
+      "sha256": "dev-placeholder"
+    }
+  ],
+  "updateChannels": ["stable"]
+}
