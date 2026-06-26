@@ -1,4 +1,4 @@
-# Interactive OS Video Export
+# Agxos Video Export
 
 Minimal client action sample for a "download as video" command.
 

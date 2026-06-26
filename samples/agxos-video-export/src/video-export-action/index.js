@@ -1,6 +1,6 @@
 export function createVideoExportAction() {
   return {
-    id: 'glixo.interactiveOs.downloadVideo',
+    id: 'glixo.agxos.downloadVideo',
     title: 'Download video',
     async run(context) {
       return {

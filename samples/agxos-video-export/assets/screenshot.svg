@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-label="Interactive OS video export preview">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-label="Agxos video export preview">
   <rect width="960" height="540" fill="#101114"/>
   <rect x="56" y="48" width="848" height="444" rx="16" fill="#1d2026" stroke="#334155"/>
-  <text x="92" y="106" fill="#eef2f7" font-family="Segoe UI, Arial" font-size="32" font-weight="700">Interactive OS Video Export</text>
+  <text x="92" y="106" fill="#eef2f7" font-family="Segoe UI, Arial" font-size="32" font-weight="700">Agxos Video Export</text>
   <rect x="92" y="150" width="776" height="270" rx="14" fill="#111318" stroke="#334155"/>
   <rect x="124" y="182" width="164" height="46" rx="9" fill="#242832"/>
   <text x="150" y="212" fill="#e5e7eb" font-family="Segoe UI, Arial" font-size="18">Timeline</text>
