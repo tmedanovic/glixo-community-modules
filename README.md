@@ -30,6 +30,7 @@ without stub gating:
 - `samples/tool-use-counter`
 - `samples/agxos-video-export`
 - `samples/agxos-incident-notes`
+- `samples/agxos-os-control-demo` — sandbox notify + runtime tray + window control + manifest tray `menu[]`
 - `samples/screen-stream`
 - `samples/machine-status-board`
 - `samples/glixo-memory-inspector` — contributes a sidebar panel, a read-only agent tool, and a skill; the reference example for the [extension authoring guide](../glixo-platform/docs/architecture/EXTENSION_AUTHORING_GUIDE.md)
