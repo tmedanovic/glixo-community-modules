@@ -1,0 +1,65 @@
+{
+  "id": "glixo.providers.anthropic",
+  "name": "Anthropic (Claude)",
+  "kind": "extension",
+  "version": "0.1.0-alpha",
+  "protocolVersion": "0",
+  "bundled": true,
+  "description": "First-party Anthropic LLM provider — use Claude models directly with your API key (native adapter, supports extended thinking).",
+  "runtime": {
+    "kind": "node",
+    "version": "20"
+  },
+  "entry": {
+    "command": "echo",
+    "args": ["declarative-llm-provider"]
+  },
+  "capabilities": [
+    "glixo.llm.provider.anthropic"
+  ],
+  "requires": [
+    "capability.glixo.llmProviders.register"
+  ],
+  "contributes": {
+    "llmProviders": [
+      {
+        "id": "anthropic",
+        "label": "Anthropic",
+        "description": "Use Claude models directly with your Anthropic API key.",
+        "icon": "flame-outline",
+        "adapter": "anthropic",
+        "credentialFields": [
+          {
+            "id": "apiKey",
+            "label": "API key",
+            "type": "secret",
+            "required": true,
+            "secret": true
+          },
+          {
+            "id": "baseUrl",
+            "label": "Base URL",
+            "type": "url",
+            "required": false,
+            "defaultValue": "https://api.anthropic.com"
+          }
+        ],
+        "modelDiscovery": {
+          "kind": "static"
+        },
+        "models": [
+          "claude-opus-4-8",
+          "claude-sonnet-4-6",
+          "claude-haiku-4-5-20251001"
+        ],
+        "modelRouting": {
+          "families": ["anthropic"],
+          "patterns": ["claude*", "anthropic*"],
+          "servesAllFamilies": false
+        },
+        "capabilities": ["chat", "streaming", "tools", "images", "reasoning"]
+      }
+    ]
+  },
+  "updateChannels": ["stable"]
+}
