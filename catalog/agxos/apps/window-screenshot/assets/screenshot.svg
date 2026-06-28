@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-label="Window Screenshot preview placeholder">
+  <rect width="960" height="540" fill="#0f172a"/>
+  <rect x="80" y="60" width="800" height="420" rx="16" fill="#1e293b" stroke="#6366f1" stroke-width="2"/>
+  <text x="120" y="120" fill="#6366f1" font-family="system-ui,sans-serif" font-size="28" font-weight="700">Window Screenshot</text>
+  <text x="120" y="160" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="16">Replace with assets/screenshot.png via scripts/capture-catalog-screenshots.mjs</text>
+  <rect x="120" y="200" width="180" height="44" rx="8" fill="#6366f1"/>
+  <text x="150" y="228" fill="#fff" font-family="system-ui,sans-serif" font-size="14">Capture app window</text>
+  <rect x="320" y="200" width="160" height="44" rx="8" fill="#334155"/>
+  <text x="340" y="228" fill="#e2e8f0" font-family="system-ui,sans-serif" font-size="14">Capture screen&</text>
+</svg>

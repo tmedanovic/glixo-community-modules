@@ -1,0 +1,61 @@
+{
+  "id": "glixo.providers.cliproxy",
+  "name": "CLIProxy LLM Provider",
+  "kind": "extension",
+  "version": "0.1.0-alpha",
+  "protocolVersion": "0",
+  "bundled": true,
+  "description": "Adds CLIProxy as an installable first-party LLM provider.",
+  "runtime": {
+    "kind": "node",
+    "version": "20"
+  },
+  "entry": {
+    "command": "echo",
+    "args": ["declarative-llm-provider"]
+  },
+  "capabilities": [
+    "glixo.llm.provider.cliproxy"
+  ],
+  "requires": [
+    "capability.glixo.llmProviders.register"
+  ],
+  "contributes": {
+    "llmProviders": [
+      {
+        "id": "cliproxy",
+        "label": "CLIProxy",
+        "description": "Use a self-hosted or tunneled CLIProxy gateway.",
+        "icon": "git-network-outline",
+        "adapter": "openai-compatible",
+        "credentialFields": [
+          {
+            "id": "baseUrl",
+            "label": "Base URL",
+            "type": "url",
+            "required": true,
+            "defaultValue": "http://127.0.0.1:8317/v1"
+          },
+          {
+            "id": "apiKey",
+            "label": "Bearer token",
+            "type": "secret",
+            "required": false,
+            "secret": true
+          }
+        ],
+        "modelDiscovery": {
+          "kind": "openai-compatible-models",
+          "path": "/models"
+        },
+        "modelRouting": {
+          "families": ["openai", "anthropic", "cliproxy"],
+          "patterns": ["*"],
+          "servesAllFamilies": true
+        },
+        "capabilities": ["chat", "streaming", "tools", "images", "reasoning"]
+      }
+    ]
+  },
+  "updateChannels": ["stable"]
+}

@@ -1,0 +1,96 @@
+{
+  "id": "glixo.samples.agxos-video-export",
+  "name": "Agxos Video Export",
+  "description": "Client action sample that adds a download-as-video command to Agxos sessions.",
+  "icon": "assets/icon.svg",
+  "images": [
+    {
+      "url": "assets/screenshot.png",
+      "alt": "Agxos video export action preview",
+      "caption": "Toolbar action contribution for exporting an Agxos timeline as video.",
+      "type": "screenshot"
+    }
+  ],
+  "changelog": {
+    "entries": [
+      {
+        "version": "0.1.0",
+        "date": "2026-06-25",
+        "title": "Agxos action sample",
+        "description": "Adds a client action manifest for validating Agxos toolbar contribution previews."
+      }
+    ]
+  },
+  "kind": "extension",
+  "version": "0.1.0",
+  "protocolVersion": "0",
+  "runtime": {
+    "kind": "node",
+    "version": "20"
+  },
+  "entry": {
+    "command": "echo",
+    "args": [
+      "client-bundled-in-app"
+    ]
+  },
+  "capabilities": [
+    "glixo.agxos.video.export"
+  ],
+  "requires": [
+    "ui",
+    "capability.glixo.agxos.timeline"
+  ],
+  "permissions": [
+    "browser.capture"
+  ],
+  "health": {
+    "path": "/health",
+    "intervalSeconds": 30
+  },
+  "components": [
+    {
+      "id": "video-export-action",
+      "cell": "client",
+      "scope": "session",
+      "runtime": "node",
+      "entry": {
+        "command": "echo",
+        "args": [
+          "client-bundled-in-app"
+        ]
+      },
+      "requires": [
+        "ui",
+        "capability.glixo.agxos.timeline"
+      ],
+      "capabilities": [
+        "glixo.agxos.video.export"
+      ],
+      "placement": {
+        "kind": "session",
+        "required": false
+      }
+    }
+  ],
+  "contributes": {
+    "actions": [
+      {
+        "id": "glixo.agxos.downloadVideo.button",
+        "slot": "agxos.toolbar",
+        "title": "Download video",
+        "command": "glixo.agxos.downloadVideo"
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "rid": "any",
+      "url": "artifacts/agxos-video-export-0.1.0.zip",
+      "sha256": "dedf3679c2cdc0cd7ac2662d9b96da0a1ba2633d967be307820b8d11139bbbd1"
+    }
+  ],
+  "updateChannels": [
+    "stable"
+  ]
+}
