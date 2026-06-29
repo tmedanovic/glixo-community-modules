@@ -1,0 +1,52 @@
+{
+  "id": "glixo.providers.openai-oauth",
+  "name": "OpenAI ChatGPT Login",
+  "kind": "extension",
+  "version": "0.1.0-alpha",
+  "protocolVersion": "0",
+  "bundled": true,
+  "description": "First-party OpenAI OAuth LLM provider - sign in with ChatGPT/Codex OAuth instead of pasting an API key.",
+  "runtime": {
+    "kind": "node",
+    "version": "20"
+  },
+  "entry": {
+    "command": "echo",
+    "args": ["declarative-llm-provider"]
+  },
+  "capabilities": [
+    "glixo.llm.provider.openai.oauth"
+  ],
+  "requires": [
+    "capability.glixo.llmProviders.register"
+  ],
+  "contributes": {
+    "llmProviders": [
+      {
+        "id": "openai-oauth",
+        "label": "OpenAI ChatGPT login",
+        "description": "Use OpenAI models through the ChatGPT/Codex OAuth sign-in flow.",
+        "icon": "log-in-outline",
+        "adapter": "openai-oauth",
+        "credentialFields": [
+          {
+            "id": "oauth",
+            "label": "ChatGPT sign-in",
+            "type": "oauth",
+            "required": true,
+            "secret": true,
+            "helpText": "Sign in with OpenAI in your browser; Glixo stores the returned OAuth token bundle."
+          }
+        ],
+        "models": ["gpt-5.1", "gpt-5", "gpt-4.1", "gpt-4.1-mini", "o4-mini", "o3"],
+        "modelRouting": {
+          "families": ["openai"],
+          "patterns": ["gpt*", "o1*", "o3*", "o4*", "chatgpt*"],
+          "servesAllFamilies": false
+        },
+        "capabilities": ["chat", "streaming", "tools", "images", "reasoning"]
+      }
+    ]
+  },
+  "updateChannels": ["stable"]
+}
