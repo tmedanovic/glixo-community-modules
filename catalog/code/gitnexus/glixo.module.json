@@ -1,0 +1,127 @@
+{
+  "id": "glixo.integrations.gitnexus",
+  "name": "GitNexus",
+  "description": "Adds the GitNexus repository knowledge graph as an extension-owned MCP server plus an agent skill for indexed code-graph work.",
+  "icon": "assets/icon.svg",
+  "images": [
+    {
+      "url": "assets/screenshot.svg",
+      "alt": "GitNexus code graph MCP preview",
+      "caption": "GitNexus exposes indexed repository search, symbols, call graph, impact, and blast-radius analysis through MCP.",
+      "type": "screenshot"
+    }
+  ],
+  "changelog": {
+    "entries": [
+      {
+        "version": "0.1.0",
+        "date": "2026-06-29",
+        "title": "Extension-owned GitNexus MCP",
+        "description": "Moves GitNexus out of built-in MCP defaults and into an installable extension with a pinned local MCP server and skill guidance."
+      }
+    ]
+  },
+  "kind": "extension",
+  "version": "0.1.0",
+  "protocolVersion": "0",
+  "runtime": {
+    "kind": "node",
+    "version": "20"
+  },
+  "entry": {
+    "command": "echo",
+    "args": [
+      "gitnexus-mcp-contributed-by-manifest"
+    ]
+  },
+  "capabilities": [
+    "glixo.gitnexus.mcp",
+    "glixo.gitnexus.skill"
+  ],
+  "requires": [
+    "capability.glixo.agent.mcp.register",
+    "capability.glixo.agent.skills.register"
+  ],
+  "permissions": [
+    "capability.glixo.agent.mcp.register",
+    "capability.glixo.agent.skills.register"
+  ],
+  "health": {
+    "path": "/health",
+    "intervalSeconds": 30
+  },
+  "components": [
+    {
+      "id": "gitnexus-mcp",
+      "cell": "server",
+      "scope": "workspace",
+      "runtime": "node",
+      "entry": {
+        "command": "echo",
+        "args": [
+          "gitnexus-mcp-contributed-by-manifest"
+        ]
+      },
+      "requires": [
+        "capability.glixo.agent.mcp.register"
+      ],
+      "capabilities": [
+        "glixo.gitnexus.mcp"
+      ],
+      "placement": {
+        "kind": "workspace",
+        "required": false,
+        "prompt": "Enable GitNexus MCP for workspaces where indexed repository graph tools should be available."
+      }
+    }
+  ],
+  "contributes": {
+    "mcpServers": [
+      {
+        "id": "gitnexus",
+        "title": "GitNexus",
+        "description": "Local GitNexus MCP server. Index each repository first with `npx gitnexus@1.6.5 analyze .` from the repository root.",
+        "transport": "stdio",
+        "command": "npx",
+        "args": [
+          "-y",
+          "gitnexus@1.6.5",
+          "mcp"
+        ],
+        "env": {
+          "GITNEXUS_SKIP_OPTIONAL_GRAMMARS": "1"
+        },
+        "scopes": [
+          "workspace",
+          "project",
+          "session"
+        ],
+        "capability": "glixo.gitnexus.mcp"
+      }
+    ],
+    "skills": [
+      {
+        "id": "glixo.gitnexus.skill",
+        "title": "GitNexus",
+        "description": "When and how to use the GitNexus MCP tools for repository graph questions.",
+        "path": "skills/gitnexus",
+        "scopes": [
+          "workspace",
+          "project",
+          "session"
+        ],
+        "capability": "glixo.gitnexus.skill"
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "rid": "any",
+      "url": "artifacts/glixo-gitnexus-0.1.0.zip",
+      "sha256": "2c863297b92a8de0501167fd293baea2d65e7be036e17350c6deaec88620a7be"
+    }
+  ],
+  "updateChannels": [
+    "stable"
+  ]
+}

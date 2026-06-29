@@ -35,6 +35,7 @@ These modules are synced into the hosted bundle by [glixo-dev-portal](https://gi
 | `hello-extension` | `glixo.samples.hello-extension` | Minimal settings panel + command starter |
 | `tool-use-counter` | `glixo.samples.tool-use-counter` | Session sidebar tool-use stats |
 | `memory-inspector` | `glixo.samples.memory-inspector` | Sidebar + skill + read-only memory tool |
+| `gitnexus` | `glixo.integrations.gitnexus` | GitNexus MCP server + skill |
 | `machine-status-board` | `glixo.samples.machine-status-board` | Selected-machine status panel |
 | `screen-stream` | `glixo.samples.screen-stream` | Multi-component screen streaming sample |
 
