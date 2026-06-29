@@ -89,7 +89,7 @@
 
 ```powershell
 
-cd D:/Projects/glixo-community-modules/modules/teams
+cd integrations/teams
 
 yarn install && yarn build && yarn start
 

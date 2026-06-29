@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /**
- * Install catalog extensions against a running moron-cursor stack and capture PNG screenshots.
+ * Install catalog extensions against a running Glixo Code dev stack and capture PNG screenshots.
  *
- * Requires: dev.cmd (8103 / 33103 / 5180), Playwright in glixo-code/standalone.
+ * Requires: Glixo Code on loopback (default UI :8103, server :33103, Agxos iframe :5180),
+ * Playwright in glixo-code/standalone.
  */
 import { createRequire } from 'node:module';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';

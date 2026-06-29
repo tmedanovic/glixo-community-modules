@@ -1,41 +1,30 @@
 # Glixo Teams service (`glixo.messaging.teams`)
 
-Installable Microsoft Teams messaging service for Glixo Manager + playground.
+**Alpha** — Microsoft Teams messaging integration for Glixo. Not listed on the public marketplace catalog yet (`dev-placeholder` artifact in manifest).
 
-## Dev run (no Manager)
+## Dev run (standalone)
 
 ```powershell
-cd modules/teams
+cd integrations/teams
 $env:TEAMS_AUTH_MOCK = '1'   # optional: mock auth + demo chats
 yarn install
 yarn build
 yarn start
 ```
 
-Playground: open `/teams-live` (service at `http://127.0.0.1:6120`).
+Service listens on `http://127.0.0.1:6120` by default.
 
 ## Real Microsoft auth
 
 ```powershell
-cd modules/teams
+cd integrations/teams
 # Do NOT set TEAMS_AUTH_MOCK
 yarn start
 ```
 
-1. POST `/v1/auth/device-code/start` -> open verification URI, enter user code
-2. POST `/v1/auth/device-code/poll` until `connected`
+1. `POST /v1/auth/device-code/start` → open verification URI, enter user code
+2. `POST /v1/auth/device-code/poll` until `connected`
 3. Service backfills chats and starts Trouter realtime (unless `TEAMS_REALTIME=0`)
-
-## Manager install
-
-```powershell
-cd modules/teams/scripts
-./package-dev-artifact.ps1
-```
-
-1. Add catalog source: `D:\Projects\glixo-community-modules\modules\teams` (or repo root with manifest path)
-2. Manager -> Install `glixo.messaging.teams` -> accept runtime policy -> Start
-3. Playground `/teams-live` talks to `:6120`
 
 ## Environment
 
@@ -50,6 +39,8 @@ cd modules/teams/scripts
 
 ## Architecture
 
-- **`@glixo/microsoft-native-auth`** - shared device-code + token refresh (Outlook can reuse)
-- **Trouter** - stays inside this service (Outlook uses OWA polling, not Trouter)
-- **Extension** - `extensions/teams-split-inbox` is UI-only; consumes this HTTP API + event replay
+- **`@glixo/microsoft-native-auth`** (`packages/microsoft-native-auth`) — shared device-code + token refresh
+- **Trouter** — realtime inside this service
+- **Extension UI** — archived sketch at `archive/extensions/teams-split-inbox` (not in catalog)
+
+See `EXTRACTION.md` for monorepo source map.
