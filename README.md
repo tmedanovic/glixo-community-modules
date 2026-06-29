@@ -64,11 +64,12 @@ Use `E2E_HEADED=1` to watch Playwright. Optional mockups for theme work: `design
 
 ## Bundled providers
 
-Ship preinstalled via `BundledProviderSeeder` in Glixo Code Server:
+Ship preinstalled via `BundledProviderSeeder` in Glixo Code Server. They appear on **extend.glixo.io** as browse-only entries (configure API keys in Settings → Models; not installed from the marketplace zip):
 
 - `bundled/anthropic` → `glixo.providers.anthropic`
 - `bundled/openai` → `glixo.providers.openai`
 - `bundled/cliproxy` → `glixo.providers.cliproxy`
+- `bundled/ollama` → `glixo.providers.ollama`
 
 ## Teams integration (dev)
 
