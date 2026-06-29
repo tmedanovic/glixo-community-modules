@@ -32,4 +32,5 @@ Reference extension for Agxos **OS-control** capabilities in a **sandboxed coded
 
 - App source: `dist/app.js` (plain ES module loaded by `SandboxedAppHost`).
 - SDK equivalents are documented inline; see `@glixo/agxos-app-sdk` README.
+- Notification requests may include `native.mode`, `channel`/`native.channel`, `target.os`, `urgency`, `deepLink`, and action buttons. Android channel ids should be stable.
 - Entry URL is resolved by glixo-code to `GET /v1/extensions/{id}/assets/dist/app.js`.
