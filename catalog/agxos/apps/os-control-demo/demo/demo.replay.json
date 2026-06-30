@@ -1,0 +1,44 @@
+{
+  "v": 1,
+  "title": "OS Control Demo demo",
+  "skin": "windows",
+  "extensionId": "glixo.samples.agxos-os-control-demo",
+  "createdAt": 1782854528594,
+  "turns": [
+    [
+      {
+        "id": "oscontrol.demo-open",
+        "name": "code_os_use_app",
+        "phase": "end",
+        "state": "completed",
+        "theater": true,
+        "input": {
+          "app": "oscontrol.demo",
+          "action": "open",
+          "args": {}
+        },
+        "at": 0
+      }
+    ],
+    [
+      {
+        "id": "oscontrol.demo-ping",
+        "name": "code_os_use_app",
+        "phase": "end",
+        "state": "completed",
+        "theater": true,
+        "input": {
+          "app": "oscontrol.demo",
+          "action": "ping",
+          "args": {}
+        },
+        "at": 0
+      }
+    ]
+  ],
+  "captions": [
+    "Open OS Control Demo",
+    "Run ping"
+  ],
+  "encoded": "1.eyJ2IjoxLCJ0aXRsZSI6Ik9TIENvbnRyb2wgRGVtbyBkZW1vIiwic2tpbiI6IndpbmRvd3MiLCJleHRlbnNpb25JZCI6ImdsaXhvLnNhbXBsZXMuYWd4b3Mtb3MtY29udHJvbC1kZW1vIiwiY3JlYXRlZEF0IjoxNzgyODU0NTI4NTk0LCJ0dXJucyI6W1t7ImlkIjoib3Njb250cm9sLmRlbW8tb3BlbiIsIm5hbWUiOiJjb2RlX29zX3VzZV9hcHAiLCJwaGFzZSI6ImVuZCIsInN0YXRlIjoiY29tcGxldGVkIiwidGhlYXRlciI6dHJ1ZSwiaW5wdXQiOnsiYXBwIjoib3Njb250cm9sLmRlbW8iLCJhY3Rpb24iOiJvcGVuIiwiYXJncyI6e319LCJhdCI6MH1dLFt7ImlkIjoib3Njb250cm9sLmRlbW8tcGluZyIsIm5hbWUiOiJjb2RlX29zX3VzZV9hcHAiLCJwaGFzZSI6ImVuZCIsInN0YXRlIjoiY29tcGxldGVkIiwidGhlYXRlciI6dHJ1ZSwiaW5wdXQiOnsiYXBwIjoib3Njb250cm9sLmRlbW8iLCJhY3Rpb24iOiJwaW5nIiwiYXJncyI6e319LCJhdCI6MH1dXSwiY2FwdGlvbnMiOlsiT3BlbiBPUyBDb250cm9sIERlbW8iLCJSdW4gcGluZyJdfQ"
+}

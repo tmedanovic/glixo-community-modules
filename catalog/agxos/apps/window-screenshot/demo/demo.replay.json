@@ -1,0 +1,44 @@
+{
+  "v": 1,
+  "title": "Window Screenshot demo",
+  "skin": "windows",
+  "extensionId": "glixo.samples.agxos-window-screenshot",
+  "createdAt": 1782854528596,
+  "turns": [
+    [
+      {
+        "id": "window.screenshot-open",
+        "name": "code_os_use_app",
+        "phase": "end",
+        "state": "completed",
+        "theater": true,
+        "input": {
+          "app": "window.screenshot",
+          "action": "open",
+          "args": {}
+        },
+        "at": 0
+      }
+    ],
+    [
+      {
+        "id": "window.screenshot-focus",
+        "name": "code_os_use_app",
+        "phase": "end",
+        "state": "completed",
+        "theater": true,
+        "input": {
+          "app": "window.screenshot",
+          "action": "bringToFront",
+          "args": {}
+        },
+        "at": 0
+      }
+    ]
+  ],
+  "captions": [
+    "Open Window Screenshot",
+    "Focus Window Screenshot"
+  ],
+  "encoded": "1.eyJ2IjoxLCJ0aXRsZSI6IldpbmRvdyBTY3JlZW5zaG90IGRlbW8iLCJza2luIjoid2luZG93cyIsImV4dGVuc2lvbklkIjoiZ2xpeG8uc2FtcGxlcy5hZ3hvcy13aW5kb3ctc2NyZWVuc2hvdCIsImNyZWF0ZWRBdCI6MTc4Mjg1NDUyODU5NiwidHVybnMiOltbeyJpZCI6IndpbmRvdy5zY3JlZW5zaG90LW9wZW4iLCJuYW1lIjoiY29kZV9vc191c2VfYXBwIiwicGhhc2UiOiJlbmQiLCJzdGF0ZSI6ImNvbXBsZXRlZCIsInRoZWF0ZXIiOnRydWUsImlucHV0Ijp7ImFwcCI6IndpbmRvdy5zY3JlZW5zaG90IiwiYWN0aW9uIjoib3BlbiIsImFyZ3MiOnt9fSwiYXQiOjB9XSxbeyJpZCI6IndpbmRvdy5zY3JlZW5zaG90LWZvY3VzIiwibmFtZSI6ImNvZGVfb3NfdXNlX2FwcCIsInBoYXNlIjoiZW5kIiwic3RhdGUiOiJjb21wbGV0ZWQiLCJ0aGVhdGVyIjp0cnVlLCJpbnB1dCI6eyJhcHAiOiJ3aW5kb3cuc2NyZWVuc2hvdCIsImFjdGlvbiI6ImJyaW5nVG9Gcm9udCIsImFyZ3MiOnt9fSwiYXQiOjB9XV0sImNhcHRpb25zIjpbIk9wZW4gV2luZG93IFNjcmVlbnNob3QiLCJGb2N1cyBXaW5kb3cgU2NyZWVuc2hvdCJdfQ"
+}

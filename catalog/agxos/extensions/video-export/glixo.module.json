@@ -92,5 +92,13 @@
   ],
   "updateChannels": [
     "stable"
+  ],
+  "demos": [
+    {
+      "id": "intro",
+      "kind": "replay",
+      "title": "Agxos Video Export demo",
+      "replayPath": "demo/demo.replay.json"
+    }
   ]
 }

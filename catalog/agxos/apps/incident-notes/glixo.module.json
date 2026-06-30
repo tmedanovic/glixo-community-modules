@@ -140,5 +140,13 @@
   ],
   "updateChannels": [
     "stable"
+  ],
+  "demos": [
+    {
+      "id": "intro",
+      "kind": "replay",
+      "title": "Agxos Incident Notes demo",
+      "replayPath": "demo/demo.replay.json"
+    }
   ]
 }

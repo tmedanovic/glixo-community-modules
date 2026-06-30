@@ -143,5 +143,13 @@
   ],
   "updateChannels": [
     "stable"
+  ],
+  "demos": [
+    {
+      "id": "intro",
+      "kind": "replay",
+      "title": "Screen Stream demo",
+      "replayPath": "demo/demo.replay.json"
+    }
   ]
 }

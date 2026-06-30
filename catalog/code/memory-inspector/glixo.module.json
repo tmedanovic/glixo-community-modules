@@ -156,5 +156,13 @@
   ],
   "updateChannels": [
     "stable"
+  ],
+  "demos": [
+    {
+      "id": "intro",
+      "kind": "replay",
+      "title": "Memory Inspector demo",
+      "replayPath": "demo/demo.replay.json"
+    }
   ]
 }

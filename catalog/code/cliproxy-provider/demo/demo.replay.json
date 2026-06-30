@@ -1,0 +1,46 @@
+{
+  "v": 1,
+  "title": "CLIProxy LLM Provider demo",
+  "skin": "windows",
+  "extensionId": "glixo.providers.cliproxy",
+  "createdAt": 1782854528600,
+  "turns": [
+    [
+      {
+        "id": "mp-open",
+        "name": "code_os_use_app",
+        "phase": "end",
+        "state": "completed",
+        "theater": true,
+        "input": {
+          "app": "marketplace",
+          "action": "openExtension",
+          "args": {
+            "extensionId": "glixo.providers.cliproxy"
+          }
+        },
+        "at": 0
+      }
+    ],
+    [
+      {
+        "id": "mp-focus",
+        "name": "code_os_use_app",
+        "phase": "end",
+        "state": "completed",
+        "theater": true,
+        "input": {
+          "app": "marketplace",
+          "action": "bringToFront",
+          "args": {}
+        },
+        "at": 0
+      }
+    ]
+  ],
+  "captions": [
+    "Open CLIProxy LLM Provider in the Marketplace",
+    "Browse install details and screenshots"
+  ],
+  "encoded": "1.eyJ2IjoxLCJ0aXRsZSI6IkNMSVByb3h5IExMTSBQcm92aWRlciBkZW1vIiwic2tpbiI6IndpbmRvd3MiLCJleHRlbnNpb25JZCI6ImdsaXhvLnByb3ZpZGVycy5jbGlwcm94eSIsImNyZWF0ZWRBdCI6MTc4Mjg1NDUyODYwMCwidHVybnMiOltbeyJpZCI6Im1wLW9wZW4iLCJuYW1lIjoiY29kZV9vc191c2VfYXBwIiwicGhhc2UiOiJlbmQiLCJzdGF0ZSI6ImNvbXBsZXRlZCIsInRoZWF0ZXIiOnRydWUsImlucHV0Ijp7ImFwcCI6Im1hcmtldHBsYWNlIiwiYWN0aW9uIjoib3BlbkV4dGVuc2lvbiIsImFyZ3MiOnsiZXh0ZW5zaW9uSWQiOiJnbGl4by5wcm92aWRlcnMuY2xpcHJveHkifX0sImF0IjowfV0sW3siaWQiOiJtcC1mb2N1cyIsIm5hbWUiOiJjb2RlX29zX3VzZV9hcHAiLCJwaGFzZSI6ImVuZCIsInN0YXRlIjoiY29tcGxldGVkIiwidGhlYXRlciI6dHJ1ZSwiaW5wdXQiOnsiYXBwIjoibWFya2V0cGxhY2UiLCJhY3Rpb24iOiJicmluZ1RvRnJvbnQiLCJhcmdzIjp7fX0sImF0IjowfV1dLCJjYXB0aW9ucyI6WyJPcGVuIENMSVByb3h5IExMTSBQcm92aWRlciBpbiB0aGUgTWFya2V0cGxhY2UiLCJCcm93c2UgaW5zdGFsbCBkZXRhaWxzIGFuZCBzY3JlZW5zaG90cyJdfQ"
+}

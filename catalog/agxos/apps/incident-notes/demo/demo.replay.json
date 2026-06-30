@@ -1,0 +1,46 @@
+{
+  "v": 1,
+  "title": "Incident Notes demo",
+  "skin": "windows",
+  "extensionId": "glixo.samples.agxos-incident-notes",
+  "createdAt": 1782854528588,
+  "turns": [
+    [
+      {
+        "id": "incident.notes-open",
+        "name": "code_os_use_app",
+        "phase": "end",
+        "state": "completed",
+        "theater": true,
+        "input": {
+          "app": "incident.notes",
+          "action": "open",
+          "args": {}
+        },
+        "at": 0
+      }
+    ],
+    [
+      {
+        "id": "incident.notes-write",
+        "name": "code_os_use_app",
+        "phase": "end",
+        "state": "completed",
+        "theater": true,
+        "input": {
+          "app": "incident.notes",
+          "action": "write",
+          "args": {
+            "text": "Sample note from the agent demo."
+          }
+        },
+        "at": 0
+      }
+    ]
+  ],
+  "captions": [
+    "Open Incident Notes",
+    "Run write"
+  ],
+  "encoded": "1.eyJ2IjoxLCJ0aXRsZSI6IkluY2lkZW50IE5vdGVzIGRlbW8iLCJza2luIjoid2luZG93cyIsImV4dGVuc2lvbklkIjoiZ2xpeG8uc2FtcGxlcy5hZ3hvcy1pbmNpZGVudC1ub3RlcyIsImNyZWF0ZWRBdCI6MTc4Mjg1NDUyODU4OCwidHVybnMiOltbeyJpZCI6ImluY2lkZW50Lm5vdGVzLW9wZW4iLCJuYW1lIjoiY29kZV9vc191c2VfYXBwIiwicGhhc2UiOiJlbmQiLCJzdGF0ZSI6ImNvbXBsZXRlZCIsInRoZWF0ZXIiOnRydWUsImlucHV0Ijp7ImFwcCI6ImluY2lkZW50Lm5vdGVzIiwiYWN0aW9uIjoib3BlbiIsImFyZ3MiOnt9fSwiYXQiOjB9XSxbeyJpZCI6ImluY2lkZW50Lm5vdGVzLXdyaXRlIiwibmFtZSI6ImNvZGVfb3NfdXNlX2FwcCIsInBoYXNlIjoiZW5kIiwic3RhdGUiOiJjb21wbGV0ZWQiLCJ0aGVhdGVyIjp0cnVlLCJpbnB1dCI6eyJhcHAiOiJpbmNpZGVudC5ub3RlcyIsImFjdGlvbiI6IndyaXRlIiwiYXJncyI6eyJ0ZXh0IjoiU2FtcGxlIG5vdGUgZnJvbSB0aGUgYWdlbnQgZGVtby4ifX0sImF0IjowfV1dLCJjYXB0aW9ucyI6WyJPcGVuIEluY2lkZW50IE5vdGVzIiwiUnVuIHdyaXRlIl19"
+}

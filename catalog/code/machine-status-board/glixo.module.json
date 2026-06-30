@@ -167,5 +167,13 @@
   ],
   "updateChannels": [
     "stable"
+  ],
+  "demos": [
+    {
+      "id": "intro",
+      "kind": "replay",
+      "title": "Machine Status Board demo",
+      "replayPath": "demo/demo.replay.json"
+    }
   ]
 }

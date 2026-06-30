@@ -106,5 +106,13 @@
   ],
   "updateChannels": [
     "stable"
+  ],
+  "demos": [
+    {
+      "id": "intro",
+      "kind": "replay",
+      "title": "Tool Use Counter demo",
+      "replayPath": "demo/demo.replay.json"
+    }
   ]
 }

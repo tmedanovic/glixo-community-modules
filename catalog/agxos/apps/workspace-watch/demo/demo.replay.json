@@ -1,43 +1,44 @@
 {
   "v": 1,
-  "title": "Workspace Watch intro",
+  "title": "Workspace Watch demo",
   "skin": "windows",
-  "createdAt": 1782427310000,
+  "extensionId": "glixo.samples.agxos-workspace-watch",
+  "createdAt": 1782854528598,
   "turns": [
     [
       {
-        "id": "ww-open",
+        "id": "workspace.watch-open",
         "name": "code_os_use_app",
         "phase": "end",
         "state": "completed",
+        "theater": true,
         "input": {
           "app": "workspace.watch",
           "action": "open",
           "args": {}
         },
-        "at": 1,
-        "theater": true
+        "at": 0
       }
     ],
     [
       {
-        "id": "ww-refresh",
+        "id": "workspace.watch-open",
         "name": "code_os_use_app",
         "phase": "end",
         "state": "completed",
+        "theater": true,
         "input": {
           "app": "workspace.watch",
-          "action": "refresh",
+          "action": "open",
           "args": {}
         },
-        "at": 2,
-        "theater": true
+        "at": 0
       }
     ]
   ],
   "captions": [
-    "Open Workspace Watch from the agent",
-    "Refresh the file tree and git overlay"
+    "Open Workspace Watch",
+    "Run open"
   ],
-  "encoded": "1.eyJ2IjoxLCJ0aXRsZSI6IldvcmtzcGFjZSBXYXRjaCBpbnRybyIsInNraW4iOiJ3aW5kb3dzIiwiY3JlYXRlZEF0IjoxNzgyNDI3MzEwMDAwLCJ0dXJucyI6W1t7ImlkIjoid3ctb3BlbiIsIm5hbWUiOiJjb2RlX29zX3VzZV9hcHAiLCJwaGFzZSI6ImVuZCIsInN0YXRlIjoiY29tcGxldGVkIiwiaW5wdXQiOnsiYXBwIjoid29ya3NwYWNlLndhdGNoIiwiYWN0aW9uIjoib3BlbiIsImFyZ3MiOnt9fSwiYXQiOjEsInRoZWF0ZXIiOnRydWV9XSxbeyJpZCI6Ind3LXJlZnJlc2giLCJuYW1lIjoiY29kZV9vc191c2VfYXBwIiwicGhhc2UiOiJlbmQiLCJzdGF0ZSI6ImNvbXBsZXRlZCIsImlucHV0Ijp7ImFwcCI6IndvcmtzcGFjZS53YXRjaCIsImFjdGlvbiI6InJlZnJlc2giLCJhcmdzIjp7fX0sImF0IjoyLCJ0aGVhdGVyIjp0cnVlfV1dLCJjYXB0aW9ucyI6WyJPcGVuIFdvcmtzcGFjZSBXYXRjaCBmcm9tIHRoZSBhZ2VudCIsIlJlZnJlc2ggdGhlIGZpbGUgdHJlZSBhbmQgZ2l0IG92ZXJsYXkiXX0"
+  "encoded": "1.eyJ2IjoxLCJ0aXRsZSI6IldvcmtzcGFjZSBXYXRjaCBkZW1vIiwic2tpbiI6IndpbmRvd3MiLCJleHRlbnNpb25JZCI6ImdsaXhvLnNhbXBsZXMuYWd4b3Mtd29ya3NwYWNlLXdhdGNoIiwiY3JlYXRlZEF0IjoxNzgyODU0NTI4NTk4LCJ0dXJucyI6W1t7ImlkIjoid29ya3NwYWNlLndhdGNoLW9wZW4iLCJuYW1lIjoiY29kZV9vc191c2VfYXBwIiwicGhhc2UiOiJlbmQiLCJzdGF0ZSI6ImNvbXBsZXRlZCIsInRoZWF0ZXIiOnRydWUsImlucHV0Ijp7ImFwcCI6IndvcmtzcGFjZS53YXRjaCIsImFjdGlvbiI6Im9wZW4iLCJhcmdzIjp7fX0sImF0IjowfV0sW3siaWQiOiJ3b3Jrc3BhY2Uud2F0Y2gtb3BlbiIsIm5hbWUiOiJjb2RlX29zX3VzZV9hcHAiLCJwaGFzZSI6ImVuZCIsInN0YXRlIjoiY29tcGxldGVkIiwidGhlYXRlciI6dHJ1ZSwiaW5wdXQiOnsiYXBwIjoid29ya3NwYWNlLndhdGNoIiwiYWN0aW9uIjoib3BlbiIsImFyZ3MiOnt9fSwiYXQiOjB9XV0sImNhcHRpb25zIjpbIk9wZW4gV29ya3NwYWNlIFdhdGNoIiwiUnVuIG9wZW4iXX0"
 }
