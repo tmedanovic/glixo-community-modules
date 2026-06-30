@@ -1,10 +1,10 @@
 {
   "id": "glixo.providers.cliproxy",
   "name": "CLIProxy LLM Provider",
+  "publisher": "Glixo",
   "kind": "extension",
   "version": "0.1.0-alpha",
   "protocolVersion": "0",
-  "bundled": true,
   "description": "Adds CLIProxy as an installable first-party LLM provider.",
   "runtime": {
     "kind": "node",
@@ -12,7 +12,9 @@
   },
   "entry": {
     "command": "echo",
-    "args": ["declarative-llm-provider"]
+    "args": [
+      "declarative-llm-provider"
+    ]
   },
   "capabilities": [
     "glixo.llm.provider.cliproxy"
@@ -49,13 +51,34 @@
           "path": "/models"
         },
         "modelRouting": {
-          "families": ["openai", "anthropic", "cliproxy"],
-          "patterns": ["*"],
+          "families": [
+            "openai",
+            "anthropic",
+            "cliproxy"
+          ],
+          "patterns": [
+            "*"
+          ],
           "servesAllFamilies": true
         },
-        "capabilities": ["chat", "streaming", "tools", "images", "reasoning"]
+        "capabilities": [
+          "chat",
+          "streaming",
+          "tools",
+          "images",
+          "reasoning"
+        ]
       }
     ]
   },
-  "updateChannels": ["stable"]
+  "artifacts": [
+    {
+      "rid": "any",
+      "url": "artifacts/cliproxy-provider-0.1.0-alpha.zip",
+      "sha256": "0e319c681d7cd8991aaed5f1cf079d86352ce2b0f13411a3bd4dfbf34436d41a"
+    }
+  ],
+  "updateChannels": [
+    "stable"
+  ]
 }

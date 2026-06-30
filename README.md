@@ -13,7 +13,7 @@ Product language is **extensions** — `service`, `extension`, and `component` a
 ```
 bundled/                 First-party LLM providers (preinstalled; marketplace is browse-only)
 catalog/
-  code/                  Glixo Code IDE extension samples
+  code/                  Installable Glixo Code IDE extensions and providers
   agxos/
     apps/                Agxos desktop app contributions
     extensions/          Agxos session extension contributions
@@ -35,6 +35,7 @@ These modules are synced into the hosted bundle by [glixo-dev-portal](https://gi
 | `hello-extension` | `glixo.samples.hello-extension` | Minimal settings panel + command starter |
 | `tool-use-counter` | `glixo.samples.tool-use-counter` | Session sidebar tool-use stats |
 | `memory-inspector` | `glixo.samples.memory-inspector` | Sidebar + skill + read-only memory tool |
+| `cliproxy-provider` | `glixo.providers.cliproxy` | Installable CLIProxy LLM provider |
 | `gitnexus` | `glixo.integrations.gitnexus` | GitNexus MCP server + skill |
 | `machine-status-board` | `glixo.samples.machine-status-board` | Selected-machine status panel |
 | `screen-stream` | `glixo.samples.screen-stream` | Multi-component screen streaming sample |
@@ -59,8 +60,9 @@ Preinstalled via Glixo Code Server. Marketplace entries are **browse-only** — 
 | `anthropic` | `glixo.providers.anthropic` |
 | `openai` | `glixo.providers.openai` |
 | `openai-oauth` | `glixo.providers.openai-oauth` |
-| `cliproxy` | `glixo.providers.cliproxy` |
 | `ollama` | `glixo.providers.ollama` |
+
+CLIProxy is first-party but installable, so it lives under `catalog/code/cliproxy-provider` and ships through the regular catalog artifact flow.
 
 Declarative provider authoring: [docs.glixo.dev/provider-extensions.html](https://docs.glixo.dev/provider-extensions.html).
 

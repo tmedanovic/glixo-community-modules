@@ -24,7 +24,7 @@
     "llmProviders": [
       {
         "id": "openai",
-        "label": "OpenAI",
+        "label": "OpenAI using API key",
         "description": "Use OpenAI models directly with your API key.",
         "icon": "sparkles-outline",
         "adapter": "openai-compatible",

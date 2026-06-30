@@ -24,7 +24,7 @@
     "llmProviders": [
       {
         "id": "openai-oauth",
-        "label": "OpenAI ChatGPT login",
+        "label": "OpenAI browser login",
         "description": "Use OpenAI models through the ChatGPT/Codex OAuth sign-in flow.",
         "icon": "log-in-outline",
         "adapter": "openai-oauth",

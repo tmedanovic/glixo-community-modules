@@ -24,7 +24,7 @@
     "llmProviders": [
       {
         "id": "anthropic",
-        "label": "Anthropic",
+        "label": "Anthropic using API key",
         "description": "Use Claude models directly with your Anthropic API key.",
         "icon": "flame-outline",
         "adapter": "anthropic",
