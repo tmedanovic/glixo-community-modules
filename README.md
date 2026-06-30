@@ -36,6 +36,8 @@ These modules are synced into the hosted bundle by [glixo-dev-portal](https://gi
 | `tool-use-counter` | `glixo.samples.tool-use-counter` | Session sidebar tool-use stats |
 | `memory-inspector` | `glixo.samples.memory-inspector` | Sidebar + skill + read-only memory tool |
 | `cliproxy-provider` | `glixo.providers.cliproxy` | Installable CLIProxy LLM provider |
+| `onedrive-storage` | `glixo.storage.onedrive` | Installable OneDrive storage provider |
+| `dropbox-storage` | `glixo.storage.dropbox` | Installable Dropbox storage provider |
 | `gitnexus` | `glixo.integrations.gitnexus` | GitNexus MCP server + skill |
 | `machine-status-board` | `glixo.samples.machine-status-board` | Selected-machine status panel |
 | `screen-stream` | `glixo.samples.screen-stream` | Multi-component screen streaming sample |
@@ -63,7 +65,7 @@ Preinstalled via Glixo Code Server. Marketplace entries are **browse-only** — 
 | `openai-oauth` | `glixo.providers.openai-oauth` |
 | `ollama` | `glixo.providers.ollama` |
 
-CLIProxy is first-party but installable, so it lives under `catalog/code/cliproxy-provider` and ships through the regular catalog artifact flow.
+CLIProxy is first-party but installable, so it lives under `catalog/code/cliproxy-provider` and ships through the regular catalog artifact flow. OneDrive and Dropbox are storage providers, not bundled LLM providers; they live under `catalog/code/*-storage` and must be installed before they appear in Settings.
 
 Declarative provider authoring: [docs.glixo.dev/provider-extensions.html](https://docs.glixo.dev/provider-extensions.html).
 

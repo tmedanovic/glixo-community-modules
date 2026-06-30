@@ -1,0 +1,83 @@
+{
+  "id": "glixo.storage.onedrive",
+  "name": "OneDrive Storage Provider",
+  "publisher": "Glixo Community",
+  "kind": "extension",
+  "version": "0.1.0-alpha",
+  "protocolVersion": "0",
+  "description": "Adds OneDrive as an installable storage provider for Glixo file replication and short-lived attachment links.",
+  "runtime": {
+    "kind": "node",
+    "version": "20"
+  },
+  "entry": {
+    "command": "echo",
+    "args": [
+      "declarative-storage-provider"
+    ]
+  },
+  "capabilities": [
+    "glixo.storage.provider.onedrive"
+  ],
+  "requires": [
+    "capability.glixo.storage.providers.register"
+  ],
+  "permissions": [
+    "network.microsoft-graph"
+  ],
+  "contributes": {
+    "storageProviders": [
+      {
+        "id": "onedrive",
+        "label": "OneDrive",
+        "description": "Use Microsoft OneDrive for Glixo replication and short-lived raw download links.",
+        "icon": "cloud-outline",
+        "adapter": "onedrive",
+        "credentialFields": [
+          {
+            "id": "oauth",
+            "label": "Microsoft account",
+            "type": "oauth",
+            "required": true,
+            "secret": true,
+            "helpText": "Core opens the Microsoft sign-in callback and stores the token bundle."
+          },
+          {
+            "id": "clientId",
+            "label": "Client ID override",
+            "type": "text",
+            "required": false,
+            "helpText": "Optional advanced override for a user-owned Microsoft app registration."
+          }
+        ],
+        "oauth": {
+          "authorizationUrl": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+          "tokenUrl": "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+          "scopes": [
+            "offline_access",
+            "User.Read",
+            "Files.ReadWrite"
+          ],
+          "redirectPath": "/v1/code/storage/oauth/callback",
+          "pkce": true
+        },
+        "capabilities": [
+          "replication",
+          "publicUrl",
+          "cloud",
+          "highAvailability"
+        ]
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "rid": "any",
+      "url": "artifacts/onedrive-storage-0.1.0-alpha.zip",
+      "sha256": "015b88af0a79e8f1273978799a562549c2666c52a72f8aa468ea04e350112ddc"
+    }
+  ],
+  "updateChannels": [
+    "stable"
+  ]
+}
