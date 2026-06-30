@@ -111,7 +111,7 @@
     {
       "rid": "any",
       "url": "artifacts/hello-extension-0.1.0.zip",
-      "sha256": "11500057de4673a0f2d5a2594b2d1f6504320370210c0f8d9be20bf11732b701"
+      "sha256": "5df96ae8dba623e28979566ff65fb57b593a7777db814b7ed6e341256d68b8e4"
     }
   ],
   "updateChannels": [

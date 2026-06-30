@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-label="Workspace Watch preview">
+  <rect width="960" height="540" fill="#0b0d12"/>
+  <rect x="84" y="68" width="792" height="404" rx="18" fill="#151820" stroke="#334155"/>
+  <rect x="84" y="68" width="792" height="44" rx="18" fill="#0f172a"/>
+  <text x="116" y="98" fill="#e2e8f0" font-family="Segoe UI, Arial" font-size="22" font-weight="700">Workspace Watch</text>
+  <rect x="128" y="150" width="340" height="278" rx="12" fill="#111827" stroke="#1e293b"/>
+  <text x="156" y="194" fill="#0a84ff" font-family="Segoe UI, Arial" font-size="20" font-weight="700">file tree</text>
+  <text x="156" y="236" fill="#e5e7eb" font-family="Segoe UI, Arial" font-size="16">=Á src/</text>
+  <text x="176" y="268" fill="#cbd5e1" font-family="Segoe UI, Arial" font-size="15">  index.ts</text>
+  <text x="176" y="296" fill="#cbd5e1" font-family="Segoe UI, Arial" font-size="15">  app.js</text>
+  <text x="156" y="328" fill="#e5e7eb" font-family="Segoe UI, Arial" font-size="16">=Á demo/</text>
+  <rect x="492" y="150" width="340" height="278" rx="12" fill="#111827" stroke="#1e293b"/>
+  <text x="520" y="194" fill="#34c759" font-family="Segoe UI, Arial" font-size="20" font-weight="700">git status</text>
+  <text x="520" y="236" fill="#e5e7eb" font-family="Segoe UI, Arial" font-size="16">branch: main</text>
+  <text x="520" y="268" fill="#fbbf24" font-family="Segoe UI, Arial" font-size="15">M  src/index.ts</text>
+  <text x="520" y="296" fill="#94a3b8" font-family="Segoe UI, Arial" font-size="15">?? demo/replay.json</text>
+  <rect x="720" y="420" width="88" height="28" rx="14" fill="#0a84ff"/>
+  <text x="738" y="439" fill="#eff6ff" font-family="Segoe UI, Arial" font-size="14" font-weight="700">Refresh</text>
+</svg>

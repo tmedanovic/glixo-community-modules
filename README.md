@@ -46,6 +46,7 @@ These modules are synced into the hosted bundle by [glixo-dev-portal](https://gi
 |-----------|--------------|---------|
 | `apps/incident-notes` | `glixo.samples.agxos-incident-notes` | Template note app |
 | `apps/os-control-demo` | `glixo.samples.agxos-os-control-demo` | Coded app — notify, tray, window control |
+| `apps/workspace-watch` | `glixo.samples.agxos-workspace-watch` | Coded app — workspace fs.list + git status watch |
 | `apps/window-screenshot` | `glixo.samples.agxos-window-screenshot` | Capture app/screen → PNG |
 | `extensions/video-export` | `glixo.samples.agxos-video-export` | Timeline video export action |
 
