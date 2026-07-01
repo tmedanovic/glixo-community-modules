@@ -5,10 +5,10 @@
   <text x="116" y="98" fill="#e2e8f0" font-family="Segoe UI, Arial" font-size="22" font-weight="700">Workspace Watch</text>
   <rect x="128" y="150" width="340" height="278" rx="12" fill="#111827" stroke="#1e293b"/>
   <text x="156" y="194" fill="#0a84ff" font-family="Segoe UI, Arial" font-size="20" font-weight="700">file tree</text>
-  <text x="156" y="236" fill="#e5e7eb" font-family="Segoe UI, Arial" font-size="16">=Á src/</text>
+  <text x="156" y="236" fill="#e5e7eb" font-family="Segoe UI, Arial" font-size="16">dir src/</text>
   <text x="176" y="268" fill="#cbd5e1" font-family="Segoe UI, Arial" font-size="15">  index.ts</text>
   <text x="176" y="296" fill="#cbd5e1" font-family="Segoe UI, Arial" font-size="15">  app.js</text>
-  <text x="156" y="328" fill="#e5e7eb" font-family="Segoe UI, Arial" font-size="16">=Á demo/</text>
+  <text x="156" y="328" fill="#e5e7eb" font-family="Segoe UI, Arial" font-size="16">dir demo/</text>
   <rect x="492" y="150" width="340" height="278" rx="12" fill="#111827" stroke="#1e293b"/>
   <text x="520" y="194" fill="#34c759" font-family="Segoe UI, Arial" font-size="20" font-weight="700">git status</text>
   <text x="520" y="236" fill="#e5e7eb" font-family="Segoe UI, Arial" font-size="16">branch: main</text>
