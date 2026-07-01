@@ -5,7 +5,7 @@
   "icon": "assets/icon.svg",
   "images": [
     {
-      "url": "assets/screenshot.png",
+      "url": "assets/screenshot.svg",
       "alt": "Screen Stream route preview",
       "caption": "Server relay, selected-machine capture agent, and client viewer contribution.",
       "type": "screenshot"

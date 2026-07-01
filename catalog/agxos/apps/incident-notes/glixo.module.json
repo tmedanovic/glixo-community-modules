@@ -5,7 +5,7 @@
   "icon": "assets/icon.svg",
   "images": [
     {
-      "url": "assets/screenshot.png",
+      "url": "assets/screenshot.svg",
       "alt": "Incident Notes app preview",
       "caption": "A note-style Agxos app contributed by an installed Extension.",
       "type": "screenshot"

@@ -5,7 +5,7 @@
   "icon": "assets/icon.svg",
   "images": [
     {
-      "url": "assets/screenshot.png",
+      "url": "assets/screenshot.svg",
       "alt": "Machine Status Board preview",
       "caption": "Selected-machine heartbeat, health, and log status in one workspace panel.",
       "type": "screenshot"

@@ -5,7 +5,7 @@
   "icon": "assets/icon.svg",
   "images": [
     {
-      "url": "assets/screenshot.png",
+      "url": "assets/screenshot.svg",
       "alt": "Tool Use Counter sidebar preview",
       "caption": "Session sidebar summary of tool call counts and recent activity.",
       "type": "screenshot"

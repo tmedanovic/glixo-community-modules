@@ -5,7 +5,7 @@
   "icon": "assets/icon.svg",
   "images": [
     {
-      "url": "assets/screenshot.png",
+      "url": "assets/screenshot.svg",
       "alt": "OS Control Demo app preview",
       "caption": "Coded Agxos app exercising notify, tray, and window broker paths.",
       "type": "screenshot"

@@ -5,7 +5,7 @@
   "icon": "assets/icon.svg",
   "images": [
     {
-      "url": "assets/screenshot.png",
+      "url": "assets/screenshot.svg",
       "alt": "Window Screenshot app preview",
       "caption": "Capture app window or screen and export PNG from Agxos.",
       "type": "screenshot"

@@ -5,7 +5,7 @@
   "icon": "assets/icon.svg",
   "images": [
     {
-      "url": "assets/screenshot.png",
+      "url": "assets/screenshot.svg",
       "alt": "Memory Inspector sidebar preview",
       "caption": "Searchable saved-memory sidebar plus a model-visible read-only memory tool.",
       "type": "screenshot"

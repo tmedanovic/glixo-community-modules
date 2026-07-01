@@ -5,7 +5,7 @@
   "icon": "assets/icon.svg",
   "images": [
     {
-      "url": "assets/screenshot.png",
+      "url": "assets/screenshot.svg",
       "alt": "Hello Extension settings and command preview",
       "caption": "Minimal extension with a settings panel and command palette action.",
       "type": "screenshot"

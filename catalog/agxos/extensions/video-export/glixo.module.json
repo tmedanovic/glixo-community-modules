@@ -5,7 +5,7 @@
   "icon": "assets/icon.svg",
   "images": [
     {
-      "url": "assets/screenshot.png",
+      "url": "assets/screenshot.svg",
       "alt": "Agxos video export action preview",
       "caption": "Toolbar action contribution for exporting an Agxos timeline as video.",
       "type": "screenshot"
