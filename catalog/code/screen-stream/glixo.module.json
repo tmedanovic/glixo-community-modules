@@ -81,7 +81,7 @@
       "scope": "machine",
       "runtime": "dotnet",
       "entry": {
-        "command": "glixo-cli",
+        "command": "glixo",
         "args": [
           "screen",
           "stream"
