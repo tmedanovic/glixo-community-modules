@@ -4,7 +4,6 @@
   "kind": "extension",
   "version": "0.1.0-alpha",
   "protocolVersion": "0",
-  "bundled": true,
   "description": "First-party OpenAI OAuth LLM provider - sign in with ChatGPT/Codex OAuth instead of pasting an API key.",
   "runtime": {
     "kind": "node",

@@ -4,7 +4,6 @@
   "kind": "extension",
   "version": "0.1.0-alpha",
   "protocolVersion": "0",
-  "bundled": true,
   "description": "Adds Ollama as an installable local LLM provider through its OpenAI-compatible endpoint.",
   "runtime": {
     "kind": "node",
