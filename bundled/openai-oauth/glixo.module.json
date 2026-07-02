@@ -27,7 +27,8 @@
         "label": "OpenAI browser login",
         "description": "Use OpenAI models through the ChatGPT/Codex OAuth sign-in flow.",
         "icon": "log-in-outline",
-        "adapter": "openai-oauth",
+        "contractId": "glixo.adapter.llm.v1",
+        "implementationId": "openai-oauth",
         "credentialFields": [
           {
             "id": "oauth",

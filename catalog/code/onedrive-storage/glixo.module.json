@@ -32,7 +32,8 @@
         "label": "OneDrive",
         "description": "Use Microsoft OneDrive for Glixo replication and short-lived raw download links.",
         "icon": "cloud-outline",
-        "adapter": "onedrive",
+        "contractId": "glixo.adapter.storage.v1",
+        "implementationId": "onedrive",
         "credentialFields": [
           {
             "id": "oauth",

@@ -32,7 +32,8 @@
         "label": "Dropbox",
         "description": "Use Dropbox for Glixo replication and short-lived raw download links.",
         "icon": "cube-outline",
-        "adapter": "dropbox",
+        "contractId": "glixo.adapter.storage.v1",
+        "implementationId": "dropbox",
         "credentialFields": [
           {
             "id": "oauth",

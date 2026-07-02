@@ -27,7 +27,8 @@
         "label": "Anthropic using API key",
         "description": "Use Claude models directly with your Anthropic API key.",
         "icon": "flame-outline",
-        "adapter": "anthropic",
+        "contractId": "glixo.adapter.llm.v1",
+        "implementationId": "anthropic",
         "credentialFields": [
           {
             "id": "apiKey",

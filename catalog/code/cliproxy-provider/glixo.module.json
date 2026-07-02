@@ -30,7 +30,8 @@
         "label": "CLIProxy",
         "description": "Use a self-hosted or tunneled CLIProxy gateway.",
         "icon": "git-network-outline",
-        "adapter": "openai-compatible",
+        "contractId": "glixo.adapter.llm.v1",
+        "implementationId": "openai-compatible",
         "credentialFields": [
           {
             "id": "baseUrl",
