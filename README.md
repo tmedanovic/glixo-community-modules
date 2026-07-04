@@ -36,6 +36,7 @@ These modules are synced into the hosted bundle by [glixo-dev-portal](https://gi
 | `tool-use-counter` | `glixo.samples.tool-use-counter` | Session sidebar tool-use stats |
 | `memory-inspector` | `glixo.samples.memory-inspector` | Sidebar + skill + read-only memory tool |
 | `cliproxy-provider` | `glixo.providers.cliproxy` | Installable CLIProxy LLM provider |
+| `reference-llm-adapter` | `glixo.providers.reference-echo` | Self-contained out-of-process LLM adapter example |
 | `onedrive-storage` | `glixo.storage.onedrive` | Installable OneDrive storage provider |
 | `dropbox-storage` | `glixo.storage.dropbox` | Installable Dropbox storage provider |
 | `gitnexus` | `glixo.integrations.gitnexus` | GitNexus MCP server + skill |
@@ -51,8 +52,6 @@ These modules are synced into the hosted bundle by [glixo-dev-portal](https://gi
 | `apps/workspace-watch` | `glixo.samples.agxos-workspace-watch` | Coded app — workspace fs.list + git status watch |
 | `apps/window-screenshot` | `glixo.samples.agxos-window-screenshot` | Capture app/screen → PNG |
 | `extensions/video-export` | `glixo.samples.agxos-video-export` | Timeline video export action |
-
-**Not listed:** `catalog/code/machine-helper-vpn` (`catalog.listed = false`) — work-in-progress target-machine sample.
 
 ### Bundled providers (`bundled/`)
 
@@ -128,7 +127,6 @@ Set `E2E_HEADED=1` to watch Playwright. Optional theme mockups: `design/theme-re
 |------|-----|
 | `archive/` | Retired stubs with placeholder artifacts — reference only |
 | `integrations/teams/` | Alpha service; not production-ready for marketplace |
-| `catalog/code/machine-helper-vpn` | Explicitly unlisted until target transport is ready |
 
 ## Teams integration (alpha)
 
