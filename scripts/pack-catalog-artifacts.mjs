@@ -8,8 +8,26 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const require = createRequire(path.join(path.dirname(fileURLToPath(import.meta.url)), '../../glixo-dev-portal/package.json'));
-const AdmZip = require('adm-zip');
+const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+// Resolve adm-zip from this repo first (run `npm install` here), then fall back
+// to a sibling glixo-dev-portal checkout that declares the same dependency.
+function loadAdmZip() {
+  const candidates = [
+    path.join(scriptDir, '..', 'package.json'),
+    path.join(scriptDir, '../../glixo-dev-portal/package.json'),
+  ];
+  for (const base of candidates) {
+    try {
+      return createRequire(base)('adm-zip');
+    } catch {
+      // try next candidate
+    }
+  }
+  throw new Error(
+    "Cannot resolve 'adm-zip'. Run `npm install` in glixo-community-modules (or install deps in a sibling glixo-dev-portal).",
+  );
+}
+const AdmZip = loadAdmZip();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
@@ -48,7 +66,9 @@ function addDirectory(zip, directory, zipRoot) {
       continue;
     }
     if (entry.isFile()) {
-      zip.addLocalFile(fullPath, path.posix.dirname(zipPath), path.posix.basename(zipPath));
+      const zipDir = path.posix.dirname(zipPath);
+      // adm-zip treats '.' as a literal folder ('./file'); use '' for zip-root files.
+      zip.addLocalFile(fullPath, zipDir === '.' ? '' : zipDir, path.posix.basename(zipPath));
     }
   }
 }
@@ -74,7 +94,6 @@ for (const manifestPath of findManifests()) {
   }
 
   const moduleRoot = path.dirname(manifestPath);
-  const moduleFolderName = path.basename(moduleRoot);
   const artifactsDir = path.join(moduleRoot, 'artifacts');
   mkdirSync(artifactsDir, { recursive: true });
 
@@ -85,7 +104,9 @@ for (const manifestPath of findManifests()) {
     if (existsSync(zipPath)) rmSync(zipPath);
 
     const zip = new AdmZip();
-    addDirectory(zip, moduleRoot, moduleFolderName);
+    // Pack at the module root: entries have no folder prefix, so glixo.module.json
+    // and assets/ sit at the zip root where the install runner expects them.
+    addDirectory(zip, moduleRoot, '');
     zip.writeZip(zipPath);
 
     artifact.sha256 = sha256File(zipPath);

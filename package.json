@@ -1,0 +1,13 @@
+{
+  "name": "glixo-community-modules",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Tooling deps for packing Glixo community catalog artifacts.",
+  "type": "module",
+  "scripts": {
+    "pack:artifacts": "node scripts/pack-catalog-artifacts.mjs"
+  },
+  "devDependencies": {
+    "adm-zip": "^0.5.17"
+  }
+}
