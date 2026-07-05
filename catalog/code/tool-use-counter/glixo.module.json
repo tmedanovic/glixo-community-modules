@@ -84,17 +84,6 @@
         "title": "Tool usage",
         "component": "ToolUseCounterPanel"
       }
-    ],
-    "aiContextProviders": [
-      {
-        "id": "glixo.toolUsage.context",
-        "title": "Tool usage stats",
-        "scopes": [
-          "workspace",
-          "session"
-        ],
-        "capability": "glixo.toolUsage.stats"
-      }
     ]
   },
   "artifacts": [
