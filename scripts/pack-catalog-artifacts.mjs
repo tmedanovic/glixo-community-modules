@@ -37,13 +37,22 @@ const CATALOG_ROOTS = [
   'catalog/agxos/apps',
   'catalog/agxos/extensions',
 ];
+// ZIP stores timestamps as local DOS fields and adm-zip records the host OS in
+// "version made by". Set encoded values directly and store canonical text so
+// Windows and Linux produce byte-identical artifacts.
+const FIXED_DOS_TIME = 0x00210000; // 1980-01-01 00:00:00
+const FIXED_MADE_BY = 0x0314; // UNIX, ZIP specification 2.0
+const STORED_METHOD = 0; // Avoid zlib-version-dependent deflate output.
+const CANONICAL_TEXT_EXTENSIONS = new Set([
+  '.cjs', '.css', '.html', '.js', '.json', '.md', '.mjs', '.svg', '.ts', '.tsx', '.txt', '.yaml', '.yml',
+]);
 
 function findManifests() {
   const manifests = [];
   for (const scanRoot of CATALOG_ROOTS) {
     const root = path.join(repoRoot, scanRoot);
     if (!existsSync(root)) continue;
-    for (const entry of readdirSync(root, { withFileTypes: true })) {
+    for (const entry of sortedEntries(root)) {
       if (!entry.isDirectory()) continue;
       const manifestPath = path.join(root, entry.name, 'glixo.module.json');
       if (existsSync(manifestPath)) manifests.push(manifestPath);
@@ -57,7 +66,7 @@ function shouldSkip(name) {
 }
 
 function addDirectory(zip, directory, zipRoot) {
-  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+  for (const entry of sortedEntries(directory)) {
     if (shouldSkip(entry.name)) continue;
     const fullPath = path.join(directory, entry.name);
     const zipPath = path.posix.join(zipRoot, entry.name);
@@ -66,11 +75,27 @@ function addDirectory(zip, directory, zipRoot) {
       continue;
     }
     if (entry.isFile()) {
-      const zipDir = path.posix.dirname(zipPath);
-      // adm-zip treats '.' as a literal folder ('./file'); use '' for zip-root files.
-      zip.addLocalFile(fullPath, zipDir === '.' ? '' : zipDir, path.posix.basename(zipPath));
+      // The catalog manifest is delivered separately and copied into the final
+      // install directory by ModuleInstallRunner. Including it here would make
+      // the archive hash self-referential through artifacts[].sha256.
+      if (zipPath === 'glixo.module.json') continue;
+      const zipEntry = zip.addFile(zipPath, readPackageFile(fullPath));
+      zipEntry.header.timeval = FIXED_DOS_TIME;
+      zipEntry.header.made = FIXED_MADE_BY;
+      zipEntry.header.method = STORED_METHOD;
     }
   }
+}
+
+function sortedEntries(directory) {
+  return readdirSync(directory, { withFileTypes: true })
+    .sort((left, right) => left.name < right.name ? -1 : left.name > right.name ? 1 : 0);
+}
+
+function readPackageFile(filePath) {
+  const bytes = readFileSync(filePath);
+  if (!CANONICAL_TEXT_EXTENSIONS.has(path.extname(filePath).toLowerCase())) return bytes;
+  return Buffer.from(bytes.toString('utf8').replace(/\r\n/g, '\n'));
 }
 
 function sha256File(filePath) {

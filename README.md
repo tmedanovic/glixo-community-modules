@@ -84,6 +84,10 @@ Declarative provider authoring: [docs.glixo.dev/provider-extensions.html](https:
    node scripts/pack-catalog-artifacts.mjs
    ```
 
+   Re-running the command must leave the tree unchanged. Catalog artifacts use
+   canonical line endings and fixed ZIP metadata; `glixo.module.json` is
+   delivered separately so its `sha256` does not become self-referential.
+
 4. **Test locally** with the developer portal:
 
    ```powershell

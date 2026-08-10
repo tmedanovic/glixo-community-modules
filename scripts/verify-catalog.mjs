@@ -7,6 +7,9 @@ import { fileURLToPath } from 'node:url';
 import AdmZip from 'adm-zip';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const DETERMINISTIC_DOS_TIME = 0x00210000;
+const DETERMINISTIC_MADE_BY = 0x0314;
+const DETERMINISTIC_COMPRESSION_METHOD = 0;
 const failures = [];
 const ids = new Map();
 
@@ -69,7 +72,11 @@ function verifyManifest(manifestPath, relativeRoot, policy) {
   const root = path.dirname(manifestPath);
   const artifacts = Array.isArray(manifest.artifacts) ? manifest.artifacts : [];
   if (policy.packagesRequired && artifacts.length === 0) failures.push(`${manifestName}: catalog product has no artifact`);
-  for (const artifact of artifacts) verifyArtifact(root, manifestName, artifact, runtimeEntries(manifest));
+  for (const artifact of artifacts) {
+    verifyArtifact(root, manifestName, artifact, runtimeEntries(manifest), {
+      deterministic: policy.packagesRequired,
+    });
+  }
 
   if (!policy.packagesRequired && artifacts.length === 0) {
     for (const entry of runtimeEntries(manifest)) {
@@ -84,7 +91,7 @@ function verifyManifest(manifestPath, relativeRoot, policy) {
   }
 }
 
-function verifyArtifact(root, manifestName, artifact, expectedEntries) {
+function verifyArtifact(root, manifestName, artifact, expectedEntries, policy) {
   if (typeof artifact?.url !== 'string' || !artifact.url.toLowerCase().endsWith('.zip')) {
     failures.push(`${manifestName}: artifact must reference a local ZIP`);
     return;
@@ -100,12 +107,25 @@ function verifyArtifact(root, manifestName, artifact, expectedEntries) {
   }
   const actual = createHash('sha256').update(readFileSync(artifactPath)).digest('hex');
   if (actual !== artifact.sha256.toLowerCase()) failures.push(`${manifestName}: artifact hash mismatch for ${artifact.url}`);
-  let entries;
+  let packedEntries;
   try {
-    entries = new Set(new AdmZip(artifactPath).getEntries().map((entry) => normalize(entry.entryName)));
+    packedEntries = new AdmZip(artifactPath).getEntries();
   } catch (error) {
     failures.push(`${manifestName}: artifact ${artifact.url} is not a readable ZIP (${error.message})`);
     return;
+  }
+  const entries = new Set(packedEntries.map((entry) => normalize(entry.entryName)));
+  if (policy.deterministic && entries.has('glixo.module.json')) {
+    failures.push(`${manifestName}: artifact ${artifact.url} embeds the self-referential catalog manifest`);
+  }
+  for (const entry of policy.deterministic ? packedEntries : []) {
+    if (
+      entry.header.timeval !== DETERMINISTIC_DOS_TIME
+      || entry.header.made !== DETERMINISTIC_MADE_BY
+      || entry.header.method !== DETERMINISTIC_COMPRESSION_METHOD
+    ) {
+      failures.push(`${manifestName}: artifact ${artifact.url} has non-deterministic metadata for ${entry.entryName}`);
+    }
   }
   for (const entry of expectedEntries) {
     if (!entries.has(normalize(entry))) failures.push(`${manifestName}: artifact ${artifact.url} omits declared entry ${entry}`);
