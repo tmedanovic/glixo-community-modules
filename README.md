@@ -84,7 +84,7 @@ Declarative provider authoring: [docs.glixo.dev/provider-extensions.html](https:
    node scripts/pack-catalog-artifacts.mjs
    ```
 
-4. **Test locally** with glixo-dev-portal:
+4. **Test locally** with the developer portal:
 
    ```powershell
    cd ../glixo-portals/dev

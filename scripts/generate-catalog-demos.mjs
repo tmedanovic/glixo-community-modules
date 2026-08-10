@@ -177,4 +177,4 @@ for (const manifestPath of collectManifestPaths()) {
 }
 
 console.log(`\nDone. Generated ${generated} demo(s), skipped ${skipped}.`);
-console.log('Next: cd ../glixo-dev-portal && npm run catalog:sync');
+console.log('Next: cd ../glixo-portals/dev && npm run catalog:sync');

@@ -10,11 +10,11 @@ import { fileURLToPath } from 'node:url';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 // Resolve adm-zip from this repo first (run `npm install` here), then fall back
-// to a sibling glixo-dev-portal checkout that declares the same dependency.
+// to a sibling glixo-portals/dev checkout that declares the same dependency.
 function loadAdmZip() {
   const candidates = [
     path.join(scriptDir, '..', 'package.json'),
-    path.join(scriptDir, '../../glixo-dev-portal/package.json'),
+    path.join(scriptDir, '../../glixo-portals/dev/package.json'),
   ];
   for (const base of candidates) {
     try {
@@ -24,7 +24,7 @@ function loadAdmZip() {
     }
   }
   throw new Error(
-    "Cannot resolve 'adm-zip'. Run `npm install` in glixo-community-modules (or install deps in a sibling glixo-dev-portal).",
+    "Cannot resolve 'adm-zip'. Run `npm install` in glixo-community-modules (or install deps in a sibling glixo-portals/dev checkout).",
   );
 }
 const AdmZip = loadAdmZip();

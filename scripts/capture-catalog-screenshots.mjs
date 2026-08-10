@@ -22,7 +22,7 @@ const { resolveAppCreatorE2eConfig } = await import(
   new URL('../../glixo-code/scripts/e2e/appCreatorE2eConfig.mjs', import.meta.url).href
 );
 const { findCatalogManifests } = await import(
-  new URL('../../glixo-dev-portal/scripts/catalog-manifest-paths.mjs', import.meta.url).href
+  new URL('../../glixo-portals/dev/scripts/catalog-manifest-paths.mjs', import.meta.url).href
 );
 
 const config = resolveAppCreatorE2eConfig();
@@ -97,7 +97,7 @@ async function main() {
     await browser.close();
   }
 
-  console.log('\nDone. Run: node scripts/pack-catalog-artifacts.mjs && cd ../glixo-dev-portal && npm run catalog:sync');
+  console.log('\nDone. Run: node scripts/pack-catalog-artifacts.mjs && cd ../glixo-portals/dev && npm run catalog:sync');
 }
 
 async function resolveCodeSessionUrl() {

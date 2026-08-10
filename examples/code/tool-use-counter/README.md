@@ -40,7 +40,7 @@ effect runs when Glixo Code starts.
    ```powershell
    cd glixo-community-modules
    node scripts/pack-catalog-artifacts.mjs
-   cd ../glixo-dev-portal
+   cd ../glixo-portals/dev
    npm run catalog:sync
    ```
 
