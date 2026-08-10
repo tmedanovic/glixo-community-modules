@@ -4,6 +4,7 @@
   "kind": "extension",
   "version": "0.1.0-alpha",
   "protocolVersion": "0",
+  "bundled": true,
   "description": "First-party OpenAI OAuth LLM provider - sign in with ChatGPT/Codex OAuth instead of pasting an API key.",
   "runtime": {
     "kind": "node",
@@ -35,10 +36,13 @@
             "type": "oauth",
             "required": true,
             "secret": true,
-            "helpText": "Sign in with OpenAI in your browser; Glixo stores the returned OAuth token bundle."
+            "helpText": "Sign in with OpenAI in your browser. Glixo saves and verifies the OAuth credential on your account without exposing it to the app."
           }
         ],
-        "models": ["gpt-5.1", "gpt-5", "gpt-4.1", "gpt-4.1-mini", "o4-mini", "o3"],
+        "modelDiscovery": {
+          "kind": "openai-codex-models",
+          "path": "/models"
+        },
         "modelRouting": {
           "families": ["openai"],
           "patterns": ["gpt*", "o1*", "o3*", "o4*", "chatgpt*"],

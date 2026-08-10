@@ -60,7 +60,7 @@
             "files.metadata.read",
             "files.metadata.write"
           ],
-          "redirectPath": "/v1/code/storage/oauth/callback",
+          "redirectPath": "/v1/storage/oauth/callback",
           "pkce": true
         },
         "capabilities": [

@@ -1,6 +1,7 @@
 # glixo-community-modules
 
-Official **community catalog source** for Glixo extensions and Agxos apps.
+Official source for production-ready Glixo community integrations and separately
+maintained extension-author examples.
 
 - **Marketplace:** [extend.glixo.io](https://extend.glixo.io)
 - **Builder docs:** [docs.glixo.dev](https://docs.glixo.dev)
@@ -13,10 +14,10 @@ Product language is **extensions** — `service`, `extension`, and `component` a
 ```
 bundled/                 First-party LLM providers (preinstalled; marketplace is browse-only)
 catalog/
-  code/                  Installable Glixo Code IDE extensions and providers
-  agxos/
-    apps/                Agxos desktop app contributions
-    extensions/          Agxos session extension contributions
+  code/                  Installable, user-facing integrations only
+examples/
+  code/                  Developer examples; never synced to the marketplace
+  agxos/apps/            Agxos authoring examples; never synced to the marketplace
 integrations/teams/      Alpha Teams messaging service (not in marketplace catalog)
 packages/                Shared auth helpers for integrations
 archive/                 Retired stubs — not synced to the catalog (see archive/README.md)
@@ -26,32 +27,32 @@ scripts/                 Pack artifacts, capture marketplace screenshots
 
 ## Marketplace catalog
 
-These modules are synced into the hosted bundle by [glixo-dev-portal](https://gitlab.com/tmedanovic/glixo-dev-portal) (`npm run catalog:sync`). Each listed sample ships a real artifact zip and SHA-256 in `glixo.module.json`.
+Only modules under `catalog/` are synced into the hosted bundle by
+[glixo-dev-portal](https://gitlab.com/tmedanovic/glixo-dev-portal)
+(`npm run catalog:sync`). A marketplace listing must be useful to an end user,
+ship every declared runtime entry point, and pass install/activation smoke tests.
+Manifest validation and a matching SHA-256 are necessary, but are not sufficient.
 
 ### Glixo Code extensions (`catalog/code/`)
 
 | Directory | Extension id | Summary |
 |-----------|--------------|---------|
-| `hello-extension` | `glixo.samples.hello-extension` | Minimal settings panel + command starter |
-| `tool-use-counter` | `glixo.samples.tool-use-counter` | Session sidebar tool-use stats |
-| `memory-inspector` | `glixo.samples.memory-inspector` | Sidebar + skill + read-only memory tool |
-| `cliproxy-provider` | `glixo.providers.cliproxy` | Installable CLIProxy LLM provider |
-| `reference-llm-adapter` | `glixo.providers.reference-echo` | Self-contained out-of-process LLM adapter example |
+| `cliproxy-provider` | `glixo.providers.cliproxy` | Connect Glixo to an existing CLIProxy instance |
 | `onedrive-storage` | `glixo.storage.onedrive` | Installable OneDrive storage provider |
 | `dropbox-storage` | `glixo.storage.dropbox` | Installable Dropbox storage provider |
 | `gitnexus` | `glixo.integrations.gitnexus` | GitNexus MCP server + skill |
-| `machine-status-board` | `glixo.samples.machine-status-board` | Selected-machine status panel |
-| `screen-stream` | `glixo.samples.screen-stream` | Multi-component screen streaming sample |
 
-### Agxos apps & extensions (`catalog/agxos/`)
+### Developer examples (`examples/`)
 
-| Directory | Extension id | Summary |
-|-----------|--------------|---------|
-| `apps/incident-notes` | `glixo.samples.agxos-incident-notes` | Template note app |
-| `apps/os-control-demo` | `glixo.samples.agxos-os-control-demo` | Coded app — notify, tray, window control |
-| `apps/workspace-watch` | `glixo.samples.agxos-workspace-watch` | Coded app — workspace fs.list + git status watch |
-| `apps/window-screenshot` | `glixo.samples.agxos-window-screenshot` | Capture app/screen → PNG |
-| `extensions/video-export` | `glixo.samples.agxos-video-export` | Timeline video export action |
+Examples are source material for extension authors. They are intentionally not
+installable marketplace products and all carry `catalog.listed: false`.
+
+| Directory | Example id | Purpose |
+|-----------|------------|---------|
+| `code/reference-llm-adapter` | `glixo.providers.reference-echo` | Out-of-process adapter wire-protocol example |
+| `code/memory-inspector` | `glixo.samples.memory-inspector` | First-party host-component and agent-tool example |
+| `code/tool-use-counter` | `glixo.samples.tool-use-counter` | First-party host-component state example |
+| `agxos/apps/incident-notes` | `glixo.samples.agxos-incident-notes` | Declarative Agxos note template example |
 
 ### Bundled providers (`bundled/`)
 
@@ -60,9 +61,12 @@ Preinstalled via Glixo Code Server. Marketplace entries are **browse-only** — 
 | Directory | Id |
 |-----------|-----|
 | `anthropic` | `glixo.providers.anthropic` |
+| `gemini` | `glixo.providers.gemini` |
+| `gemini-oauth` | `glixo.providers.gemini-oauth` |
 | `openai` | `glixo.providers.openai` |
 | `openai-oauth` | `glixo.providers.openai-oauth` |
 | `ollama` | `glixo.providers.ollama` |
+| `omniroute` | `glixo.providers.omniroute` |
 
 CLIProxy is first-party but installable, so it lives under `catalog/code/cliproxy-provider` and ships through the regular catalog artifact flow. OneDrive and Dropbox are storage providers, not bundled LLM providers; they live under `catalog/code/*-storage` and must be installed before they appear in Settings.
 
@@ -70,7 +74,8 @@ Declarative provider authoring: [docs.glixo.dev/provider-extensions.html](https:
 
 ## Contribute
 
-1. **Fork** this repo and add a module under `catalog/code/` or `catalog/agxos/`.
+1. **Fork** this repo. Start from `examples/`, but add a submission under
+   `catalog/code/` only after it is a complete, end-user-usable integration.
 2. Author `glixo.module.json` — see [manifest reference](https://extend.glixo.io/artifacts/docs/v0/manifest-reference.md).
 3. **Pack artifacts** (updates zip + SHA-256):
 
@@ -98,7 +103,7 @@ Public marketplace listings for Agxos apps should declare where source lives (po
 ```json
 "sourceRepository": {
   "url": "https://gitlab.com/tmedanovic/glixo-community-modules",
-  "directory": "catalog/agxos/apps/incident-notes"
+  "directory": "examples/agxos/apps/incident-notes"
 }
 ```
 
@@ -106,7 +111,9 @@ For third-party apps, use your own public GitHub/GitLab URL. See [docs.glixo.dev
 
 ### Fork and extend
 
-To add features to an existing sample, fork in App Creator or copy a catalog folder, change ids, bump version, and repack. Guide: [docs.glixo.dev/extend-existing-app.html](https://docs.glixo.dev/extend-existing-app.html).
+To study or extend a teaching sample, copy a folder from `examples/`, change ids,
+and implement the complete runtime before submitting it to `catalog/`. Guide:
+[docs.glixo.dev/extend-existing-app.html](https://docs.glixo.dev/extend-existing-app.html).
 
 ## Capture marketplace screenshots
 
@@ -121,7 +128,14 @@ cd ../glixo-dev-portal && npm run catalog:sync
 
 Set `E2E_HEADED=1` to watch Playwright. Optional theme mockups: `design/theme-references/`.
 
-## What is not in the catalog
+## Catalog admission rule
+
+An entry is removed rather than listed when its artifact omits a declared entry
+point, its UI component is not registered by the host, it only returns placeholder
+data, or the feature has moved into Glixo core. Examples are not a fallback product
+category: they live under `examples/` and are excluded from catalog generation.
+
+## Other code not in the catalog
 
 | Path | Why |
 |------|-----|

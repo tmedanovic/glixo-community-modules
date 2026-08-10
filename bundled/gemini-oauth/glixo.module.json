@@ -1,0 +1,56 @@
+{
+  "id": "glixo.providers.gemini-oauth",
+  "name": "Gemini Browser Login",
+  "kind": "extension",
+  "version": "0.1.0-alpha",
+  "protocolVersion": "0",
+  "bundled": true,
+  "description": "First-party Gemini OAuth LLM provider - sign in with Google OAuth instead of pasting an API key.",
+  "runtime": {
+    "kind": "node",
+    "version": "20"
+  },
+  "entry": {
+    "command": "echo",
+    "args": ["declarative-llm-provider"]
+  },
+  "capabilities": [
+    "glixo.llm.provider.gemini.oauth"
+  ],
+  "requires": [
+    "capability.glixo.llmProviders.register"
+  ],
+  "contributes": {
+    "llmProviders": [
+      {
+        "id": "gemini-oauth",
+        "label": "Gemini browser login",
+        "description": "Advanced. Requires a Google Cloud project with the Gemini API enabled.",
+        "icon": "log-in-outline",
+        "contractId": "glixo.adapter.llm.v1",
+        "implementationId": "gemini-oauth",
+        "credentialFields": [
+          {
+            "id": "oauth",
+            "label": "Google sign-in",
+            "type": "oauth",
+            "required": true,
+            "secret": true,
+            "helpText": "Sign in with Google. Glixo finds projects where you can use the Gemini API and asks you to choose only when more than one is available."
+          }
+        ],
+        "modelDiscovery": {
+          "kind": "gemini-models",
+          "path": "/v1/models"
+        },
+        "modelRouting": {
+          "families": ["gemini"],
+          "patterns": ["gemini*"],
+          "servesAllFamilies": false
+        },
+        "capabilities": ["chat", "streaming", "tools"]
+      }
+    ]
+  },
+  "updateChannels": ["stable"]
+}

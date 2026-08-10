@@ -2,8 +2,9 @@
   "id": "glixo.providers.ollama",
   "name": "Ollama LLM Provider",
   "kind": "extension",
-  "version": "0.1.0-alpha",
+  "version": "0.1.1-alpha",
   "protocolVersion": "0",
+  "bundled": true,
   "description": "Adds Ollama as an installable local LLM provider through its OpenAI-compatible endpoint.",
   "runtime": {
     "kind": "node",
@@ -43,6 +44,27 @@
             "type": "secret",
             "required": false,
             "secret": true
+          },
+          {
+            "id": "numCtx",
+            "label": "Context size (num_ctx)",
+            "type": "text",
+            "required": false,
+            "helpText": "Optional. Sent per request as options.num_ctx (e.g. 32768). Leave blank to use the model default."
+          },
+          {
+            "id": "numPredict",
+            "label": "Max tokens (num_predict)",
+            "type": "text",
+            "required": false,
+            "helpText": "Optional. Sent per request as options.num_predict. Leave blank for model default."
+          },
+          {
+            "id": "keepAlive",
+            "label": "Keep alive",
+            "type": "text",
+            "required": false,
+            "helpText": "Optional. Ollama keep_alive (e.g. 5m, -1 to keep loaded). Leave blank for server default."
           }
         ],
         "modelDiscovery": {
