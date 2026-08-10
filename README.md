@@ -28,7 +28,7 @@ scripts/                 Pack artifacts, capture marketplace screenshots
 ## Marketplace catalog
 
 Only modules under `catalog/` are synced into the hosted bundle by
-[glixo-dev-portal](https://gitlab.com/tmedanovic/glixo-dev-portal)
+[Glixo developer portal](https://gitlab.com/tmedanovic/glixo-portals/-/tree/main/dev)
 (`npm run catalog:sync`). A marketplace listing must be useful to an end user,
 ship every declared runtime entry point, and pass install/activation smoke tests.
 Manifest validation and a matching SHA-256 are necessary, but are not sufficient.
@@ -87,14 +87,14 @@ Declarative provider authoring: [docs.glixo.dev/provider-extensions.html](https:
 4. **Test locally** with glixo-dev-portal:
 
    ```powershell
-   cd ../glixo-dev-portal
+   cd ../glixo-portals/dev
    npm run catalog:sync
    npm run catalog:pack
    ```
 
-   Point `GLIXO_EXTENSION_CATALOG_ROOT` at your clone (see glixo-dev-portal `portals.local.ps1`).
+   Point `GLIXO_COMMUNITY_MODULES_REPO` at your clone (see `glixo-portals/dev/scripts/community-root.mjs`).
 
-5. Open a merge request. Maintainers run catalog deploy to update [extend.glixo.io](https://extend.glixo.io).
+5. Open a pull request. Maintainers run catalog deploy to update [extend.glixo.io](https://extend.glixo.io).
 
 ### Agxos apps — source repository
 
@@ -102,7 +102,7 @@ Public marketplace listings for Agxos apps should declare where source lives (po
 
 ```json
 "sourceRepository": {
-  "url": "https://gitlab.com/tmedanovic/glixo-community-modules",
+  "url": "https://github.com/tmedanovic/glixo-community-modules",
   "directory": "examples/agxos/apps/incident-notes"
 }
 ```
@@ -123,7 +123,7 @@ With Glixo Code running locally (UI on `:8103`, server on `:33103`, Agxos iframe
 cd glixo-community-modules
 node scripts/capture-catalog-screenshots.mjs
 node scripts/pack-catalog-artifacts.mjs
-cd ../glixo-dev-portal && npm run catalog:sync
+cd ../glixo-portals/dev && npm run catalog:sync
 ```
 
 Set `E2E_HEADED=1` to watch Playwright. Optional theme mockups: `design/theme-references/`.
