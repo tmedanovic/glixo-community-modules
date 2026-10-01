@@ -2,7 +2,7 @@
   "description": "A truncated host file listing is a bounded sample, never a complete project total.",
   "request": {
     "kind": "tool",
-    "contributionId": "workspace-health.inspect",
+    "contributionId": "inspect",
     "configuration": {},
     "input": { "maxFiles": 2 },
     "context": { "resourceHandles": { "workspace": "host-issued" } }
@@ -19,6 +19,10 @@
     "sampledBytes": 320,
     "truncated": true,
     "completeProjectTotals": null,
-    "largestFiles": ["src/main.cs", "README.md"]
+    "sampledExtensions": { ".cs": 1, ".md": 1 },
+    "largestFiles": [
+      { "path": "src/main.cs", "bytes": 240 },
+      { "path": "README.md", "bytes": 80 }
+    ]
   }
 }

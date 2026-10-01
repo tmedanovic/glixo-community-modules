@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 2,
+  "id": "{{PACKAGE_ID}}",
+  "version": "0.1.0",
+  "metadata": { "name": "{{NAME}}", "description": "Searches selected-workspace paths and returns small UTF-8 excerpts from matching files." },
+  "compatibility": { "schema": 2, "witWorld": "glixo:contribution/contribution@1.0.0" },
+  "components": [
+    { "id": "search", "cell": "server", "runtime": "wasm-component", "artifact": "dist/glixo-extension.component.wasm", "world": "glixo:contribution/contribution@1.0.0" }
+  ],
+  "permissions": { "requested": [
+    { "id": "tool.invoke", "scope": { "tools": ["search"] }, "reason": "Expose bounded path search and small matching-file excerpts when explicitly invoked." },
+    { "id": "fs.workspace.search", "scope": { "projects": ["selected"] }, "reason": "Search relative path names in the host-selected project only." },
+    { "id": "fs.workspace.read", "scope": { "projects": ["selected"] }, "reason": "Read at most 4 KiB from each matching file in the host-selected project." }
+  ] },
+  "contributes": { "tools": [
+    {
+      "id": "search", "component": "search", "world": "glixo:contribution/contribution@1.0.0",
+      "description": "Match relative path names (not file contents) and return bounded UTF-8 excerpts from small matching files.",
+      "inputSchema": { "type": "object", "additionalProperties": false, "required": ["query"], "properties": {
+        "query": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "limit": { "type": "integer", "minimum": 1, "maximum": 20, "default": 10 },
+        "excerptBytes": { "type": "integer", "minimum": 1, "maximum": 96, "default": 96 }
+      } },
+      "outputSchema": { "type": "object", "additionalProperties": false, "required": ["query", "items", "truncated"], "properties": {
+        "query": { "type": "string" }, "truncated": { "type": "boolean" },
+        "items": { "type": "array", "maxItems": 20, "items": { "type": "object", "additionalProperties": false, "required": ["path", "bytes", "excerpt", "excerptTruncated"], "properties": {
+          "path": { "type": "string" }, "bytes": { "type": "integer", "minimum": 0 }, "excerpt": { "type": ["string", "null"] }, "excerptTruncated": { "type": "boolean" }
+        } } }
+      } },
+      "safety": "readonly", "timeoutMs": 5000, "cancellable": true, "idempotent": true
+    }
+  ] }
+}
