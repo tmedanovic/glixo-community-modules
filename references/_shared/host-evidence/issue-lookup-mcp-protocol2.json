@@ -58,8 +58,8 @@
     },
     "typescript": {
       "component": "references/issue-lookup-mcp/typescript/dist/glixo-extension.component.wasm",
-      "sha256": "b11bb1fd9c8c149dd34926852fc2d0bd6c1c0a5abe38f1b27618e9d0af505b57",
-      "bytes": 12087337,
+      "sha256": "003f14030411a3188cae9d2f2479285416aede5f79c2bd0da3e38a3a4464414e",
+      "bytes": 12086836,
       "positive": "passed",
       "negative": "passed"
     }
