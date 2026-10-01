@@ -9,9 +9,14 @@ const index = JSON.parse(readFileSync(join(root, 'references', 'reference-index.
 const support = JSON.parse(readFileSync(join(root, 'packages', 'extension-sdk', 'support-matrix.json'), 'utf8'));
 const languageArg = process.argv.find((argument) => argument.startsWith('--language='));
 const selectedLanguage = languageArg?.slice('--language='.length);
+const referenceArg = process.argv.find((argument) => argument.startsWith('--reference='));
+const selectedReference = referenceArg?.slice('--reference='.length);
 const allowedLanguages = new Set(['csharp', 'go', 'rust', 'typescript']);
 const allowedTools = new Set(['cargo', 'componentize-go', 'dotnet', 'go', 'node', 'npm', 'wasm-tools']);
 if (selectedLanguage && !allowedLanguages.has(selectedLanguage)) throw new Error(`unsupported language: ${selectedLanguage}`);
+if (selectedReference && !index.references.some((item) => item.id === selectedReference && item.kind === 'executable' && item.status !== 'planned')) {
+  throw new Error(`unknown or non-buildable reference: ${selectedReference}`);
+}
 const failures = [];
 let executed = 0;
 
@@ -92,7 +97,8 @@ function vendorSdk(project, reference, language) {
   rewrite(project);
 }
 
-for (const reference of index.references.filter((item) => item.kind === 'executable' && item.status !== 'planned')) {
+for (const reference of index.references.filter((item) => item.kind === 'executable' && item.status !== 'planned'
+  && (!selectedReference || item.id === selectedReference))) {
   for (const language of reference.languages) {
     if (selectedLanguage && language !== selectedLanguage) continue;
     const sourceProject = resolve(root, 'references', reference.id, language);

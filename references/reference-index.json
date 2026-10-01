@@ -258,12 +258,41 @@
     },
     {
       "id": "accessible-theme",
-      "kind": "assets",
-      "languages": [],
+      "kind": "executable",
+      "languages": [
+        "csharp",
+        "go",
+        "rust",
+        "typescript"
+      ],
       "status": "preview",
       "owner": "ui",
-      "contract": "semantic theme and browser UI kit",
-      "hostAcceptance": "pending"
+      "contract": "glixo:contribution/contribution@1.0.0 + sandboxed-web.v1",
+      "hostAcceptance": "pending",
+      "uiPackage": {
+        "runtime": "sandboxed-web",
+        "sourcePath": "references/_shared/ui/accessible-theme/index.html",
+        "assetPath": "ui/index.html",
+        "actionId": "save-preferences",
+        "placement": "settings.extensions",
+        "build": "static"
+      },
+      "scaffold": {
+        "sourcePath": "references/accessible-theme/{language}",
+        "manifestPath": "references/accessible-theme/{language}/glixo.extension.json",
+        "projectManifestPath": "references/accessible-theme/{language}/glixo.project.json",
+        "sharedPaths": [
+          {
+            "destination": "ui/index.html",
+            "sourcePath": "references/_shared/ui/accessible-theme/index.html"
+          }
+        ],
+        "substitutions": {
+          "{{PACKAGE_ID}}": "package.id",
+          "{{NAME}}": "package.name",
+          "{{PUBLISHER}}": "package.publisher"
+        }
+      }
     },
     {
       "id": "review-checklist",

@@ -5,7 +5,7 @@ This repository is the public source for maintained Glixo extension-author refer
 - Extension authoring tool: `glxdev` (see the public SDK and developer docs)
 - Supported contribution package contract: manifest v2 with versioned guest contracts and SDK assets shipped beside these references
 - Reference languages: C#, Go, Rust, and TypeScript
-- Marketplace: none of the teaching projects is listed or installable
+- Marketplace: none of the teaching projects is listed; host installation and acceptance are reported separately
 
 `glixo.extension.json` describes the guest extension manifest (schema v2). The host-install distribution envelope is generated separately by the current `glxdev` tooling; it is not a guest module descriptor. Historical module-v0 descriptors in Git history are not accepted by these projects.
 
@@ -21,7 +21,7 @@ This repository is the public source for maintained Glixo extension-author refer
 | `mail-watch` | Poll Microsoft Graph Inbox delta metadata and publish idempotent events | C#, Go, Rust, TypeScript |
 | `conversation-insights` | Report message and tool-use statistics without logging prompts | C#, Go, Rust, TypeScript |
 | `prompt-redactor` | Preview and apply explicitly configured outbound redactions | C#, Go, Rust, TypeScript |
-| `accessible-theme` | Share accessible semantic theme tokens and contrast fixtures | Shared assets; no guest runtime |
+| `accessible-theme` | Install a theme-aware appearance panel with an extension-authored Web Component, host action bridge, and scoped preference storage | Browser UI assets are static; C#, Go, Rust, and TypeScript provide the separate contribution action guest |
 | `review-checklist` | Review extensions without executing package code | Shared checklist; no guest runtime |
 
 Reference status and source/toolchain evidence are in [`references/reference-index.json`](references/reference-index.json). A listed project is not a claim of host acceptance: each row identifies the source implementation and its current contract status. Public repository CI builds each implemented guest target and runs its contract checks; real host installation, provider, Microsoft Graph, and platform acceptance remain separately reported.
@@ -48,7 +48,7 @@ npm run verify
 npm run build:references
 ```
 
-A successful build means the source projects compile and pass their declared host-independent contract checks. It does not claim that a Glixo host is available, an extension is signed, a package is published, or an external account/provider accepted the integration.
+A successful build means the source projects compile and their declared component artifacts verify. CI also runs the reference and manifest checks. For `accessible-theme`, CI checks the packaged HTML digest and bridge/placement declarations separately from building each language's WASM contribution guest. These checks do not prove that a Glixo host is available, an extension is signed, a package is published, or an external account/provider accepted the integration.
 
 ## Use with glxdev
 

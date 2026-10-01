@@ -1,7 +1,7 @@
 const COMMON_CSS = `
 :host{display:inline-block;color:var(--glixo-color-text,#edf1f7);font:inherit}
 button,input,select{font:inherit;color:inherit}
-:focus-visible{outline:2px solid var(--glixo-color-accent,#3b82f6);outline-offset:2px}
+:focus-visible{outline:2px solid var(--glixo-color-accent,#10b981);outline-offset:2px}
 `;
 
 abstract class GlixoElement extends HTMLElement {
@@ -14,7 +14,6 @@ abstract class GlixoElement extends HTMLElement {
 
     protected mount(css: string, content: string): void {
         const style = document.createElement('style');
-        style.nonce = window.glixoExtension?.styleNonce ?? '';
         style.textContent = COMMON_CSS + css;
         this.root.replaceChildren(style, document.createRange().createContextualFragment(content));
     }
@@ -28,7 +27,7 @@ export class GlixoButton extends GlixoElement {
         const variant = ['primary', 'quiet', 'danger'].includes(this.getAttribute('variant') ?? '') ? this.getAttribute('variant') : 'quiet';
         this.mount(`
           button{min-height:34px;padding:6px 12px;border:1px solid var(--glixo-color-border,#ffffff20);border-radius:var(--glixo-radius-control,8px);background:var(--glixo-color-surface,#1e2229);cursor:pointer}
-          button[data-variant=primary]{background:var(--glixo-color-accent,#3b82f6);border-color:transparent;color:white}
+          button[data-variant=primary]{background:var(--glixo-color-accent,#10b981);border-color:transparent;color:#07130f}
           button[data-variant=danger]{color:var(--glixo-color-danger,#ef5a5a)}
           button:disabled{opacity:.55;cursor:not-allowed}
         `, `<button part="button" type="${escapeAttr(this.getAttribute('type') ?? 'button')}" data-variant="${variant}" ${this.hasAttribute('disabled') ? 'disabled' : ''}><slot></slot></button>`);
@@ -63,7 +62,7 @@ export class GlixoSwitch extends GlixoElement {
           button{display:inline-flex;align-items:center;gap:9px;padding:0;border:0;background:transparent;cursor:pointer;color:var(--glixo-color-text,#edf1f7)}
           i{width:34px;height:20px;padding:2px;border-radius:99px;background:var(--glixo-color-border,#ffffff20);transition:background .12s}
           i:after{content:"";display:block;width:16px;height:16px;border-radius:50%;background:white;transition:transform .12s}
-          button[aria-checked=true] i{background:var(--glixo-color-accent,#3b82f6)} button[aria-checked=true] i:after{transform:translateX(14px)}
+          button[aria-checked=true] i{background:var(--glixo-color-accent,#10b981)} button[aria-checked=true] i:after{transform:translateX(14px)}
           button:disabled{opacity:.55;cursor:not-allowed}
         `, `<button part="switch" type="button" role="switch" aria-checked="${checked}" aria-label="${escapeAttr(this.getAttribute('label') ?? '')}" ${this.hasAttribute('disabled') ? 'disabled' : ''}><i aria-hidden="true"></i><slot>${escapeText(this.getAttribute('label') ?? '')}</slot></button>`);
         this.root.querySelector('button')?.addEventListener('click', () => {
@@ -99,7 +98,7 @@ export class GlixoProgress extends GlixoElement {
     private render(): void {
         const max = finitePositive(this.getAttribute('max'), 100);
         const value = Math.min(max, Math.max(0, finitePositive(this.getAttribute('value'), 0)));
-        this.mount(`progress{display:block;width:100%;height:6px;border:0;border-radius:99px;overflow:hidden;background:var(--glixo-color-border,#ffffff20);appearance:none}progress::-webkit-progress-bar{background:var(--glixo-color-border,#ffffff20)}progress::-webkit-progress-value{background:var(--glixo-color-accent,#3b82f6)}progress::-moz-progress-bar{background:var(--glixo-color-accent,#3b82f6)}`, `<progress part="progress" aria-label="${escapeAttr(this.getAttribute('label') ?? 'Progress')}" max="${max}" value="${value}"></progress>`);
+        this.mount(`progress{display:block;width:100%;height:6px;border:0;border-radius:99px;overflow:hidden;background:var(--glixo-color-border,#ffffff20);appearance:none}progress::-webkit-progress-bar{background:var(--glixo-color-border,#ffffff20)}progress::-webkit-progress-value{background:var(--glixo-color-accent,#10b981)}progress::-moz-progress-bar{background:var(--glixo-color-accent,#10b981)}`, `<progress part="progress" aria-label="${escapeAttr(this.getAttribute('label') ?? 'Progress')}" max="${max}" value="${value}"></progress>`);
     }
 }
 

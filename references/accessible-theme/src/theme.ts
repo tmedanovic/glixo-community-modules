@@ -14,70 +14,154 @@ export interface GlixoThemeTokens {
     spacing: string;
 }
 
-export interface GlixoSandboxHost {
-    readonly theme: Readonly<Partial<GlixoThemeTokens>>;
-    readonly locale: string;
-    /** Per-frame CSP style nonce, used only for inline component styles. */
-    readonly styleNonce: string;
-    ready(): Promise<{ ready: boolean }>;
-    invoke(actionId: string, payload?: Record<string, unknown>): Promise<{ completed: boolean }>;
+export type GlixoTheme = Readonly<Partial<GlixoThemeTokens>>;
+
+interface Bootstrap {
+    readonly protocol: 'glixo.sandboxed-web.bridge';
+    readonly schema: 1;
+    readonly instanceNonce: string;
+}
+
+interface BridgeEnvelope {
+    readonly contractKind: 'sandboxed-web-bridge';
+    readonly protocol: 'glixo.sandboxed-web.bridge';
+    readonly schema: 1;
+    readonly kind: 'request' | 'response' | 'event' | 'error';
+    readonly instanceNonce: string;
+    readonly sequence: number;
+    readonly requestId?: string;
+    readonly operation?: string;
+    readonly payload?: Record<string, unknown>;
+    readonly error?: { readonly code: string; readonly message?: string };
 }
 
 declare global {
     interface Window {
-        readonly glixoExtension?: GlixoSandboxHost;
+        readonly __GLIXO_SANDBOXED_WEB__?: Bootstrap;
     }
 }
 
-export function currentTheme(): Readonly<Partial<GlixoThemeTokens>> {
-    return window.glixoExtension?.theme ?? {};
+const TOKEN_NAMES: Readonly<Record<keyof GlixoThemeTokens, string>> = {
+    background: '--glixo-color-background', panel: '--glixo-color-panel', surface: '--glixo-color-surface',
+    text: '--glixo-color-text', muted: '--glixo-color-muted', accent: '--glixo-color-accent',
+    border: '--glixo-color-border', danger: '--glixo-color-danger', warning: '--glixo-color-warning',
+    success: '--glixo-color-success', fontFamily: '--glixo-font-family', radius: '--glixo-radius-control',
+    spacing: '--glixo-space-scale',
+};
+
+const bootstrap = window.__GLIXO_SANDBOXED_WEB__;
+let sequence = 0;
+let requestSequence = 0;
+const pending = new Map<string, { resolve: (value: Record<string, unknown>) => void; reject: (error: Error) => void }>();
+const themeListeners = new Set<(tokens: GlixoTheme) => void>();
+let theme: GlixoTheme = {};
+
+function validEnvelope(value: unknown): value is BridgeEnvelope {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+    const message = value as Partial<BridgeEnvelope>;
+    return message.contractKind === 'sandboxed-web-bridge'
+        && message.protocol === 'glixo.sandboxed-web.bridge'
+        && message.schema === 1
+        && message.instanceNonce === bootstrap?.instanceNonce
+        && Number.isInteger(message.sequence)
+        && (message.kind === 'response' || message.kind === 'error' || message.kind === 'event');
 }
 
-export function subscribeTheme(listener: (tokens: Readonly<Partial<GlixoThemeTokens>>) => void): () => void {
-    const handler = (event: Event) => listener((event as CustomEvent<Readonly<Partial<GlixoThemeTokens>>>).detail ?? {});
-    window.addEventListener('glixo-theme', handler);
-    listener(currentTheme());
-    return () => window.removeEventListener('glixo-theme', handler);
+function receive(event: MessageEvent<unknown>): void {
+    if (!bootstrap || event.source !== window.parent || event.origin !== 'null' || !validEnvelope(event.data)) return;
+    const message = event.data;
+    if (message.kind === 'event' && message.operation === 'host.theme') {
+        theme = normalizeTheme(message.payload?.tokens ?? message.payload);
+        themeListeners.forEach(listener => listener(theme));
+        return;
+    }
+    if ((message.kind === 'response' || message.kind === 'error') && message.requestId) {
+        const request = pending.get(message.requestId);
+        if (!request) return;
+        pending.delete(message.requestId);
+        if (message.kind === 'error') request.reject(new Error(message.error?.code ?? 'bridge_request_failed'));
+        else request.resolve(message.payload ?? {});
+    }
 }
 
-export function applyTheme(tokens: Readonly<Partial<GlixoThemeTokens>> = currentTheme(), root: HTMLElement = document.documentElement): void {
-    const cssNames: Readonly<Record<keyof GlixoThemeTokens, string>> = {
-        background: '--glixo-color-background', panel: '--glixo-color-panel', surface: '--glixo-color-surface',
-        text: '--glixo-color-text', muted: '--glixo-color-muted', accent: '--glixo-color-accent',
-        border: '--glixo-color-border', danger: '--glixo-color-danger', warning: '--glixo-color-warning',
-        success: '--glixo-color-success', fontFamily: '--glixo-font-family', radius: '--glixo-radius-control',
-        spacing: '--glixo-space-scale',
+window.addEventListener('message', receive);
+
+function request(operation: string, payload: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+    if (!bootstrap || window.parent === window) return Promise.reject(new Error('sandbox_bridge_unavailable'));
+    if (pending.size >= 8) return Promise.reject(new Error('bridge_request_limit'));
+    const requestId = `req.${Date.now().toString(36)}_${(++requestSequence).toString(36)}`;
+    sequence += 1;
+    return new Promise((resolve, reject) => {
+        pending.set(requestId, { resolve, reject });
+        const message: BridgeEnvelope = {
+            contractKind: 'sandboxed-web-bridge', protocol: bootstrap.protocol, schema: bootstrap.schema,
+            kind: 'request', instanceNonce: bootstrap.instanceNonce, sequence, requestId, operation, payload,
+        };
+        window.parent.postMessage(message, '*');
+        window.setTimeout(() => {
+            const outstanding = pending.get(requestId);
+            if (!outstanding) return;
+            pending.delete(requestId);
+            outstanding.reject(new Error('bridge_request_timeout'));
+        }, 5000);
+    });
+}
+
+function announceReady(): void {
+    if (!bootstrap || window.parent === window) return;
+    sequence += 1;
+    const message: BridgeEnvelope = {
+        contractKind: 'sandboxed-web-bridge', protocol: bootstrap.protocol, schema: bootstrap.schema,
+        kind: 'event', instanceNonce: bootstrap.instanceNonce, sequence, operation: 'guest.ready',
     };
-    const declarations = (Object.entries(tokens) as Array<[keyof GlixoThemeTokens, string]>)
-        .filter(([, value]) => typeof value === 'string'
-            && value.length <= 256
-            && !/[<>;]/.test(value)
-            && !/(?:url|expression)\s*\(/i.test(value))
-        .map(([key, value]) => `${cssNames[key]}:${value}`);
-    const selector = root === document.documentElement ? ':root' : '[data-glixo-theme-root]';
-    let style = root.querySelector<HTMLStyleElement>('style[data-glixo-extension-theme]');
-    if (!style) {
-        style = document.createElement('style');
-        style.dataset.glixoExtensionTheme = '';
-        style.nonce = window.glixoExtension?.styleNonce ?? '';
-        root.appendChild(style);
+    window.parent.postMessage(message, '*');
+}
+
+export function currentTheme(): GlixoTheme { return theme; }
+
+function normalizeTheme(value: unknown): GlixoTheme {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+    const source = value as Record<string, unknown>;
+    const aliases: Readonly<Record<string, keyof GlixoThemeTokens>> = {
+        'color.bg': 'background', 'color.background': 'background', 'color.panel': 'panel',
+        'color.surface': 'surface', 'color.text': 'text', 'color.muted': 'muted',
+        'color.accent': 'accent', 'color.border': 'border', 'color.danger': 'danger',
+        'color.warning': 'warning', 'color.success': 'success', 'font.family': 'fontFamily',
+        'control.radius': 'radius', 'space.scale': 'spacing',
+    };
+    const normalized: Partial<GlixoThemeTokens> = {};
+    for (const [key, item] of Object.entries(source)) {
+        const target = aliases[key] ?? (key in TOKEN_NAMES ? key as keyof GlixoThemeTokens : undefined);
+        if (target && typeof item === 'string') Object.assign(normalized, { [target]: item });
     }
-    style.textContent = `${selector}{${declarations.join(';')}}`;
+    return normalized;
+}
+
+export function subscribeTheme(listener: (tokens: GlixoTheme) => void): () => void {
+    themeListeners.add(listener);
+    listener(theme);
+    return () => themeListeners.delete(listener);
+}
+
+export function applyTheme(tokens: GlixoTheme = theme, root: HTMLElement = document.documentElement): void {
+    for (const [key, value] of Object.entries(tokens) as Array<[keyof GlixoThemeTokens, string]>) {
+        if (typeof value !== 'string' || value.length > 256 || /[<>;]/.test(value) || /(?:url|expression)\s*\(/i.test(value)) continue;
+        root.style.setProperty(TOKEN_NAMES[key], value);
+    }
 }
 
 export function connectTheme(root: HTMLElement = document.documentElement): () => void {
     const unsubscribe = subscribeTheme(tokens => applyTheme(tokens, root));
-    const initial = window.glixoExtension?.ready;
-    if (initial) void initial().catch(() => undefined);
+    announceReady();
+    void request('lifecycle.ready').then(() => request('theme.tokens')).then(result => {
+        const tokens = normalizeTheme(result.tokens);
+        theme = tokens;
+        themeListeners.forEach(listener => listener(theme));
+    }).catch(() => undefined);
     return unsubscribe;
 }
 
-// SOURCE_TABS: shared-theme-controls
-// docs:snippet-start shared-theme-controls:typescript
-export const sharedThemeControls = Object.freeze({
-    colors: Object.freeze({ background: 'var(--glixo-color-background)', panel: 'var(--glixo-color-panel)', surface: 'var(--glixo-color-surface)', text: 'var(--glixo-color-text)', muted: 'var(--glixo-color-muted)', accent: 'var(--glixo-color-accent)', border: 'var(--glixo-color-border)', danger: 'var(--glixo-color-danger)', warning: 'var(--glixo-color-warning)', success: 'var(--glixo-color-success)' }),
-    fontFamily: 'var(--glixo-font-family)',
-    radius: 'var(--glixo-radius-control)',
-    spacing: 'var(--glixo-space-scale)',
-});
-// docs:snippet-end shared-theme-controls:typescript
+export async function invoke(actionId: string, payload: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+    if (!/^[a-z0-9][a-z0-9.-]{1,127}$/.test(actionId)) throw new Error('action_id_invalid');
+    return request('action.invoke', { id: actionId, params: payload });
+}

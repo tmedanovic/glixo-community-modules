@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "verify": "node scripts/verify-references.mjs",
+    "verify": "node scripts/verify-references.mjs && node scripts/verify-manifests.mjs && node scripts/verify-ui-reference.mjs",
+    "verify:ui": "node scripts/verify-ui-reference.mjs",
     "verify:manifests": "node scripts/verify-manifests.mjs",
     "verify:evidence": "node scripts/verify-host-evidence.mjs",
     "verify:sdk-packages": "node scripts/verify-sdk-packages.mjs",

@@ -1,0 +1,11 @@
+{
+  "components": [
+    {
+      "recipe": "contribution-csharp-v1",
+      "language": "csharp",
+      "artifact": "dist/glixo-extension.component.wasm",
+      "id": "panel-actions"
+    }
+  ],
+  "schemaVersion": 1
+}
