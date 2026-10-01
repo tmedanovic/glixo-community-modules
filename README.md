@@ -7,6 +7,8 @@ This repository is the public source for maintained Glixo extension-author refer
 - Reference languages: C#, Go, Rust, and TypeScript
 - Marketplace: none of the teaching projects is listed or installable
 
+`glixo.extension.json` describes the guest extension manifest (schema v2). The host-install distribution envelope is generated separately by the current `glxdev` tooling; it is not a guest module descriptor. Historical module-v0 descriptors in Git history are not accepted by these projects.
+
 ## References
 
 | Reference | What it teaches | Executable projects |
