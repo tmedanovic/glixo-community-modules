@@ -76,15 +76,20 @@ function main() {
     const npmArchive = ensureContained(join(output, 'npm', npmOutput.filename));
     artifacts.push({ ecosystem: 'npm', package: versions.typescript.name, version: versions.typescript.version, file: relative(root, npmArchive).replaceAll('\\', '/'), sha256: sha256(npmArchive), bytes: statSync(npmArchive).size });
 
+    const csharpSource = join(root, 'packages', 'extension-sdk', 'csharp');
+    const csharpStaged = join(scratch, 'csharp-sdk');
+    cpSync(csharpSource, csharpStaged, { recursive: true, filter: (path) => !/(^|[\\/])(obj|bin)([\\/]|$)/.test(path) });
     const dotnetOut = join(output, 'nuget');
-    run('dotnet', ['pack', 'packages/extension-sdk/csharp/Glixo.ExtensionSdk/Glixo.ExtensionSdk.csproj', '--configuration', 'Release', '--output', dotnetOut, '--verbosity', 'minimal'], root);
+    run('dotnet', ['pack', join(csharpStaged, 'Glixo.ExtensionSdk', 'Glixo.ExtensionSdk.csproj'), '--configuration', 'Release', '--output', dotnetOut, '--verbosity', 'minimal'], root);
     const nupkg = listFiles(dotnetOut).find((file) => basename(file).toLowerCase() === 'glixo.extensionsdk.0.1.0.nupkg');
     if (!nupkg) throw new Error('NuGet pack did not emit Glixo.ExtensionSdk.0.1.0.nupkg.');
     ensureContained(nupkg);
     artifacts.push({ ecosystem: 'nuget', package: versions.csharp.name, version: versions.csharp.version, file: relative(root, nupkg).replaceAll('\\', '/'), sha256: sha256(nupkg), bytes: statSync(nupkg).size });
 
-    const cargoTarget = join(output, '.cargo-target');
-    run('cargo', ['package', '--no-verify', '--manifest-path', 'packages/extension-sdk/rust/Cargo.toml'], root, { ...process.env, CARGO_TARGET_DIR: cargoTarget });
+    const rustStaged = join(scratch, 'rust-sdk');
+    cpSync(join(root, 'packages', 'extension-sdk', 'rust'), rustStaged, { recursive: true, filter: (path) => !/(^|[\\/])(target)([\\/]|$)/.test(path) });
+    const cargoTarget = join(scratch, 'cargo-target');
+    run('cargo', ['package', '--no-verify', '--allow-dirty', '--manifest-path', join(rustStaged, 'Cargo.toml')], root, { ...process.env, CARGO_TARGET_DIR: cargoTarget });
     const crate = join(cargoTarget, 'package', 'glixo-extension-sdk-0.1.0.crate');
     ensureContained(crate);
     const crateTarget = join(output, 'cargo', basename(crate));
