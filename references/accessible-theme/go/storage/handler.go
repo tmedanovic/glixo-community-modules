@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/glixo/extension-sdk-go/state"
+	"github.com/tmedanovic/glixo-community-modules/packages/extension-sdk/go/state"
 )
 
 const actionID = "save-preferences"
