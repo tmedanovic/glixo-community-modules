@@ -44,7 +44,7 @@ function run(project, step, label) {
 }
 
 function copyTree(source, destination) {
-  const ignored = new Set(['.git', 'node_modules', 'bin', 'obj', 'target', 'dist', 'vendor']);
+  const ignored = new Set(['.git', 'node_modules', 'bin', 'obj', 'target', 'dist', 'vendor', '.glixo-sdk']);
   cpSync(source, destination, {
     recursive: true,
     filter(path) {
@@ -59,13 +59,15 @@ function vendorSdk(project, reference, language) {
   if (!sdkPath || typeof sdkPath !== 'string' || isAbsolute(sdkPath) || sdkPath.split(/[\\/]/).includes('..')) return;
   const sourceSdk = resolve(root, sdkPath);
   if (!existsSync(sourceSdk)) throw new Error(`${reference.id}/${language}: public SDK source is missing: ${sdkPath}`);
-  const vendorPath = join(project, 'vendor', 'glixo-extension-sdk');
-  mkdirSync(join(project, 'vendor'), { recursive: true });
+  // Go treats any vendor/ directory as module vendoring and rejects our SDK source copy.
+  const sdkDirectory = language === 'go' ? '.glixo-sdk' : 'vendor';
+  const vendorPath = join(project, sdkDirectory, 'glixo-extension-sdk');
+  mkdirSync(join(project, sdkDirectory), { recursive: true });
   copyTree(sourceSdk, vendorPath);
 
   function rewrite(directory) {
     for (const name of readdirSync(directory)) {
-      if (['.git', 'node_modules', 'bin', 'obj', 'target', 'dist', 'vendor'].includes(name)) continue;
+      if (['.git', 'node_modules', 'bin', 'obj', 'target', 'dist', 'vendor', '.glixo-sdk'].includes(name)) continue;
       const path = join(directory, name);
       const info = statSync(path);
       if (info.isDirectory()) { rewrite(path); continue; }
@@ -75,7 +77,7 @@ function vendorSdk(project, reference, language) {
         source = source.replace(/file:(?:\.\.\/)+packages\/extension-sdk\/typescript/g, 'file:vendor/glixo-extension-sdk');
         source = source.replace(/(?:\.\.\/)+packages\/extension-sdk\/typescript/g, 'vendor/glixo-extension-sdk');
       } else if (language === 'go') {
-        source = source.replace(/=>\s*(?:\.\.\/)+packages\/extension-sdk\/go/g, '=> ./vendor/glixo-extension-sdk');
+        source = source.replace(/=>\s*(?:\.\.\/)+packages\/extension-sdk\/go/g, '=> ./.glixo-sdk/glixo-extension-sdk');
       } else if (language === 'rust') {
         source = source.replace(/path\s*=\s*"(?:\.\.\/)+packages\/extension-sdk\/rust"/g, 'path = "vendor/glixo-extension-sdk"');
       } else if (language === 'csharp' && name.endsWith('.csproj')) {

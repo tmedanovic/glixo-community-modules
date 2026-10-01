@@ -108,6 +108,16 @@ for (const item of index.references ?? []) {
     if (source.startsWith('..')) errors.push(`${item.id}/${language}: project escaped references root`);
     const entries = readdirSync(project);
     if (!entries.length) errors.push(`${item.id}/${language}: empty project`);
+    if (language === 'csharp') {
+      const sdkPinPath = join(project, 'global.json');
+      if (!existsSync(sdkPinPath)) errors.push(`${item.id}/csharp: global.json SDK pin is required for locked restore`);
+      else {
+        const sdkPin = JSON.parse(readFileSync(sdkPinPath, 'utf8')).sdk;
+        if (sdkPin?.version !== support?.toolchains?.csharp?.dotnetSdk?.version || sdkPin?.rollForward !== 'disable') {
+          errors.push(`${item.id}/csharp: global.json must pin the support matrix SDK without roll-forward`);
+        }
+      }
+    }
     const readme = join(project, 'README.md');
     if (!existsSync(readme)) errors.push(`${item.id}/${language}: README with runnable instructions is required`);
     const projectFile = join(project, 'reference.json');

@@ -48,3 +48,30 @@ test('build runner rejects recipe working directories outside the project before
   assert.match(result.stderr, /cwd escapes project root/);
   assert.equal(result.stdout, '');
 });
+
+test('Go SDK source copy does not trigger automatic Go module vendoring', (t) => {
+  const root = mkdtempSync(join(tmpdir(), 'glixo-reference-go-recipe-'));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const project = join(root, 'references', 'sample-reference', 'go');
+  const sdk = join(root, 'packages', 'extension-sdk', 'go');
+  mkdirSync(project, { recursive: true });
+  mkdirSync(sdk, { recursive: true });
+  writeFileSync(join(sdk, 'go.mod'), 'module github.com/glixo/extension-sdk-go\n');
+  writeFileSync(join(project, 'go.mod'), 'module example.test/reference\n\nreplace github.com/glixo/extension-sdk-go => ../../../packages/extension-sdk/go\n');
+  writeFileSync(join(project, 'reference.json'), JSON.stringify({
+    referenceId: 'sample-reference', language: 'go', build: { recipeId: 'contribution-go-v1' },
+  }));
+  writeFileSync(join(root, 'references', 'reference-index.json'), JSON.stringify({ references: [
+    { id: 'sample-reference', kind: 'executable', status: 'preview', languages: ['go'] },
+  ] }));
+  const check = "const fs=require('node:fs');const mod=fs.readFileSync('go.mod','utf8');if(fs.existsSync('vendor')||!fs.existsSync('.glixo-sdk/glixo-extension-sdk/go.mod')||!mod.includes('=> ./.glixo-sdk/glixo-extension-sdk'))process.exit(2);fs.mkdirSync('dist',{recursive:true});fs.writeFileSync('dist/guest.wasm','component')";
+  writeFileSync(join(root, 'packages', 'extension-sdk', 'support-matrix.json'), JSON.stringify({
+    languages: { go: { sdkPath: 'packages/extension-sdk/go' } },
+    recipes: { 'contribution-go-v1': { language: 'go', build: {
+      steps: [{ tool: 'node', args: ['-e', check], cwd: '.', output: 'dist/guest.wasm' }],
+      verification: { tool: 'node', args: ['-e', "if(require('node:fs').readFileSync('dist/guest.wasm','utf8')!=='component')process.exit(2)"], cwd: '.', output: 'dist/guest.wasm' },
+    } } },
+  }));
+  const result = spawnSync(process.execPath, [script, '--language=go'], { cwd: root, encoding: 'utf8' });
+  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+});
