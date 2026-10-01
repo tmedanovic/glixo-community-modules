@@ -38,7 +38,7 @@ function validateDeclaredSchema(reference, language, projectRoot, relativePath, 
 
   if (!selectedPath || !existsSync(selectedPath)) {
     errors.push(`${label}: declared schema file is missing (${relativePath})`);
-    return;
+    return null;
   }
 
   const bytes = readFileSync(selectedPath);
@@ -57,7 +57,7 @@ function validateDeclaredSchema(reference, language, projectRoot, relativePath, 
     data = JSON.parse(bytes.toString('utf8'));
   } catch (error) {
     errors.push(`${label}: schema is not valid JSON (${error instanceof Error ? error.message : String(error)})`);
-    return;
+    return digest;
   }
   if (label.includes('/configuration/')) {
     for (const unsupported of ['$schema', 'title']) {
@@ -70,10 +70,23 @@ function validateDeclaredSchema(reference, language, projectRoot, relativePath, 
     errors.push(`${label}: invalid JSON Schema (${error instanceof Error ? error.message : String(error)})`);
   }
   checkedSchemas += 1;
+  return digest;
+}
+
+function requireFamilyDigest(digests, key, digest, label) {
+  if (!digest) return;
+  const previous = digests.get(key);
+  if (previous && previous.digest !== digest) {
+    errors.push(`${label}: schema bytes differ across language templates (${previous.label}: ${previous.digest}, current: ${digest})`);
+  } else {
+    digests.set(key, { digest, label });
+  }
 }
 
 for (const reference of index.references) {
   if (reference.kind !== 'executable') continue;
+  const configurationDigests = new Map();
+  const eventDigests = new Map();
   for (const language of reference.languages) {
     const projectRoot = resolve(root, 'references', reference.id, language);
     const manifestPath = join(projectRoot, 'glixo.extension.json');
@@ -88,7 +101,7 @@ for (const reference of index.references) {
     }
 
     for (const configuration of manifest.configurations ?? []) {
-      validateDeclaredSchema(
+      const digest = validateDeclaredSchema(
         reference,
         language,
         projectRoot,
@@ -96,16 +109,18 @@ for (const reference of index.references) {
         `${reference.id}/${language}/configuration/${configuration.id}`,
         configuration.schemaDigest,
       );
+      requireFamilyDigest(configurationDigests, configuration.id, digest, `${reference.id}/${language}/configuration/${configuration.id}`);
     }
     for (const event of manifest.events?.publish ?? []) {
       if (event.schema) {
-        validateDeclaredSchema(
+        const digest = validateDeclaredSchema(
           reference,
           language,
           projectRoot,
           event.schema,
           `${reference.id}/${language}/event/${event.type}@${event.schemaVersion}`,
         );
+        requireFamilyDigest(eventDigests, `${event.type}@${event.schemaVersion}`, digest, `${reference.id}/${language}/event/${event.type}@${event.schemaVersion}`);
       }
     }
   }
