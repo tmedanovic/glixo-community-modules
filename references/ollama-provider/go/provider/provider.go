@@ -227,15 +227,60 @@ func caps(ep glixo_http_types.EndpointGrant, model string) (map[string]bool, err
 }
 func chatMessages(r request, c map[string]bool) ([]any, error) {
 	out := []any{}
+	pendingTools := map[string]string{}
 	for _, m := range r.Messages {
 		var text strings.Builder
 		images := []string{}
+		toolCalls := []any{}
+		toolName := ""
 		for _, p := range m.Parts {
 			switch p.Tag() {
 			case glixo_llm_types_types.ContentPartText:
 				text.WriteString(p.Text())
 			case glixo_llm_types_types.ContentPartToolResult:
-				text.WriteString(p.ToolResult())
+				if m.Role != "tool" || toolName != "" {
+					return nil, fmt.Errorf("tool_result_requires_tool_message")
+				}
+				var result map[string]json.RawMessage
+				if json.Unmarshal([]byte(p.ToolResult()), &result) != nil {
+					return nil, fmt.Errorf("tool_result_invalid")
+				}
+				var id string
+				if json.Unmarshal(result["id"], &id) != nil || id == "" || result["result"] == nil {
+					return nil, fmt.Errorf("tool_result_invalid")
+				}
+				name, ok := pendingTools[id]
+				if !ok {
+					return nil, fmt.Errorf("tool_result_call_id_unmatched")
+				}
+				delete(pendingTools, id)
+				var resultText string
+				if json.Unmarshal(result["result"], &resultText) != nil {
+					resultText = string(result["result"])
+				}
+				text.WriteString(resultText)
+				toolName = name
+			case glixo_llm_types_types.ContentPartToolCallDetails:
+				if m.Role != "assistant" {
+					return nil, fmt.Errorf("tool_call_requires_assistant_role")
+				}
+				call := p.ToolCallDetails()
+				if !call.Complete || call.Id == "" || call.Name == "" {
+					return nil, fmt.Errorf("tool_call_details_invalid")
+				}
+				if _, ok := pendingTools[call.Id]; ok {
+					return nil, fmt.Errorf("tool_call_id_duplicate")
+				}
+				argsText := "{}"
+				if call.ArgumentsFragment.IsSome() {
+					argsText = call.ArgumentsFragment.Some()
+				}
+				var args map[string]any
+				if json.Unmarshal([]byte(argsText), &args) != nil || args == nil {
+					return nil, fmt.Errorf("tool_call_arguments_invalid")
+				}
+				pendingTools[call.Id] = call.Name
+				toolCalls = append(toolCalls, map[string]any{"type": "function", "function": map[string]any{"index": len(toolCalls), "name": call.Name, "arguments": args}})
 			case glixo_llm_types_types.ContentPartReasoning:
 				text.WriteString(p.Reasoning())
 			case glixo_llm_types_types.ContentPartMediaRef:
@@ -258,6 +303,15 @@ func chatMessages(r request, c map[string]bool) ([]any, error) {
 			}
 		}
 		item := map[string]any{"role": m.Role, "content": text.String()}
+		if len(toolCalls) > 0 {
+			item["tool_calls"] = toolCalls
+		}
+		if toolName != "" {
+			item["tool_name"] = toolName
+		}
+		if m.Role == "tool" && toolName == "" {
+			return nil, fmt.Errorf("tool_message_result_missing")
+		}
 		if len(images) > 0 {
 			item["images"] = images
 		}

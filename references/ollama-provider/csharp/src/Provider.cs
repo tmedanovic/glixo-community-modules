@@ -48,6 +48,12 @@ public static class ProviderExportsImpl
         return output.ToArray();
     }
 
+    private static JsonDocument ParseToolResult(string payload)
+    {
+        try { return JsonDocument.Parse(payload); }
+        catch (JsonException) { throw new InvalidOperationException("tool_result_invalid"); }
+    }
+
     private static void WriteJsonValue(Utf8JsonWriter writer, object? value)
     {
         switch (value)
@@ -175,10 +181,13 @@ public static class ProviderExportsImpl
         if (string.IsNullOrWhiteSpace(request.model)) throw new InvalidOperationException("model_required");
         if (request.tools.Count > 0 && !caps.Contains("tools")) throw new InvalidOperationException("model_does_not_support_tools");
         var messages = new List<Dictionary<string, object?>>();
+        var pendingTools = new Dictionary<string, string>(StringComparer.Ordinal);
         foreach (var message in request.messages)
         {
             var content = new StringBuilder();
             var images = new List<string>();
+            var toolCalls = new List<object?>();
+            string? toolName = null;
             foreach (var part in message.parts)
             {
                 if (part.Tag == 6)
@@ -191,10 +200,50 @@ public static class ProviderExportsImpl
                     try { _ = Convert.FromBase64String(encoded); } catch { throw new InvalidOperationException("vision_image_data_invalid"); }
                     images.Add(encoded);
                 }
-                else if (part.Tag is 0 or 3 or 4) content.Append(Text(part));
+                else if (part.Tag is 0 or 4) content.Append(Text(part));
+                else if (part.Tag == 2)
+                {
+                    if (message.role != "assistant") throw new InvalidOperationException("tool_call_requires_assistant_role");
+                    var call = part.AsToolCallDetails;
+                    if (!call.complete || string.IsNullOrWhiteSpace(call.id) || string.IsNullOrWhiteSpace(call.name))
+                        throw new InvalidOperationException("tool_call_details_invalid");
+                    if (pendingTools.ContainsKey(call.id)) throw new InvalidOperationException("tool_call_id_duplicate");
+                    JsonElement arguments;
+                    try { arguments = JsonDocument.Parse(call.argumentsFragment ?? "{}").RootElement.Clone(); }
+                    catch { throw new InvalidOperationException("tool_call_arguments_invalid"); }
+                    if (arguments.ValueKind != JsonValueKind.Object) throw new InvalidOperationException("tool_call_arguments_invalid");
+                    pendingTools.Add(call.id, call.name);
+                    toolCalls.Add(new Dictionary<string, object?>
+                    {
+                        ["type"] = "function",
+                        ["function"] = new Dictionary<string, object?>
+                        {
+                            ["index"] = toolCalls.Count,
+                            ["name"] = call.name,
+                            ["arguments"] = arguments
+                        }
+                    });
+                }
+                else if (part.Tag == 3)
+                {
+                    if (message.role != "tool" || toolName is not null)
+                        throw new InvalidOperationException("tool_result_requires_tool_message");
+                    using var result = ParseToolResult(part.AsToolResult);
+                    var root = result.RootElement;
+                    if (root.ValueKind != JsonValueKind.Object || !root.TryGetProperty("id", out var idValue) ||
+                        idValue.ValueKind != JsonValueKind.String || string.IsNullOrWhiteSpace(idValue.GetString()) ||
+                        !root.TryGetProperty("result", out var resultValue))
+                        throw new InvalidOperationException("tool_result_invalid");
+                    if (!pendingTools.Remove(idValue.GetString()!, out toolName))
+                        throw new InvalidOperationException("tool_result_call_id_unmatched");
+                    content.Append(resultValue.ValueKind == JsonValueKind.String ? resultValue.GetString() : resultValue.GetRawText());
+                }
                 else if (part.Tag is not (7 or 8)) throw new InvalidOperationException("unsupported_message_part");
             }
             var item = new Dictionary<string, object?> { ["role"] = message.role, ["content"] = content.ToString() };
+            if (toolCalls.Count > 0) item["tool_calls"] = toolCalls;
+            if (toolName is not null) item["tool_name"] = toolName;
+            if (message.role == "tool" && toolName is null) throw new InvalidOperationException("tool_message_result_missing");
             if (images.Count > 0) item["images"] = images;
             messages.Add(item);
         }
@@ -377,4 +426,3 @@ public static class ProviderExportsImpl
     public static void Cancel(uint handle) { if (Sessions.TryGetValue(handle, out var s) && !s.TerminalSent) { s.Stream.Cancel(); s.Cancelled = true; } }
     public static void Drop(uint handle) { if (Sessions.TryRemove(handle, out var s)) s.Stream.Dispose(); }
 }
-

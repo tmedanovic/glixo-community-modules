@@ -73,22 +73,15 @@ fn capabilities(grant: &glixo::http::types::EndpointGrant, model: &str) -> Resul
     let value = read_json(grant, "/api/show", "POST", Some(json!({"model": model})))?;
     Ok(value.get("capabilities").and_then(Value::as_array).into_iter().flatten().filter_map(Value::as_str).map(str::to_owned).collect())
 }
-fn part(value: glixo::llm_types::types::ContentPart) -> Result<(String, String), String> {
-    use glixo::llm_types::types::ContentPart as P;
-    match value {
-        P::Text(s) | P::ToolResult(s) | P::Reasoning(s) => Ok((s, String::new())),
-        P::MediaRef(s) => Ok((String::new(), s)),
-        P::ToolCallDetails(call) if call.complete => Ok((String::new(), String::new())),
-        P::Citation(_) | P::Annotation(_) => Ok((String::new(), String::new())),
-        P::ToolCall(_) | P::ToolCallDetails(_) | P::StructuredOutput(_) | P::Unknown(_) => Err("unsupported_message_part".into()),
-    }
-}
 fn chat_body(req: &glixo::llm_types::types::LlmRequest, caps: &HashSet<String>) -> Result<Value, String> {
     use glixo::llm_types::types::ContentPart as P;
     if !req.tools.is_empty() && !caps.contains("tools") { return Err("model_does_not_support_tools".into()); }
     let mut messages = Vec::new();
+    let mut pending_tools = HashMap::<String, String>::new();
     for message in &req.messages {
         let mut content = String::new(); let mut images = Vec::new();
+        let mut tool_calls = Vec::new();
+        let mut tool_name: Option<String> = None;
         for p in &message.parts {
             match p {
                 P::MediaRef(v) => {
@@ -97,12 +90,36 @@ fn chat_body(req: &glixo::llm_types::types::LlmRequest, caps: &HashSet<String>) 
                     if encoded.is_empty() || !encoded.bytes().all(|b| b.is_ascii_alphanumeric() || b"+/=".contains(&b)) { return Err("vision_image_data_invalid".into()); }
                     images.push(encoded.to_owned());
                 }
-                P::Text(v) | P::ToolResult(v) | P::Reasoning(v) => content.push_str(v),
+                P::Text(v) | P::Reasoning(v) => content.push_str(v),
+                P::ToolCallDetails(call) => {
+                    if message.role != "assistant" { return Err("tool_call_requires_assistant_role".into()); }
+                    if !call.complete || call.id.is_empty() || call.name.is_empty() { return Err("tool_call_details_invalid".into()); }
+                    if pending_tools.contains_key(&call.id) { return Err("tool_call_id_duplicate".into()); }
+                    let args: Value = serde_json::from_str(call.arguments_fragment.as_deref().unwrap_or("{}"))
+                        .map_err(|_| "tool_call_arguments_invalid".to_owned())?;
+                    if !args.is_object() { return Err("tool_call_arguments_invalid".into()); }
+                    pending_tools.insert(call.id.clone(), call.name.clone());
+                    tool_calls.push(json!({"type":"function","function":{"index":tool_calls.len(),"name":call.name,"arguments":args}}));
+                }
+                P::ToolResult(payload) => {
+                    if message.role != "tool" || tool_name.is_some() { return Err("tool_result_requires_tool_message".into()); }
+                    let result: Value = serde_json::from_str(payload).map_err(|_| "tool_result_invalid".to_owned())?;
+                    let id = result.get("id").and_then(Value::as_str).filter(|id| !id.is_empty())
+                        .ok_or_else(|| "tool_result_invalid".to_owned())?;
+                    let value = result.get("result").ok_or_else(|| "tool_result_invalid".to_owned())?;
+                    let name = pending_tools.remove(id).ok_or_else(|| "tool_result_call_id_unmatched".to_owned())?;
+                    let rendered = value.as_str().map(str::to_owned).unwrap_or_else(|| value.to_string());
+                    content.push_str(&rendered);
+                    tool_name = Some(name);
+                }
                 P::Citation(_) | P::Annotation(_) => (),
                 _ => return Err("unsupported_message_part".into()),
             }
         }
         let mut m = json!({"role": message.role, "content": content});
+        if !tool_calls.is_empty() { m["tool_calls"] = json!(tool_calls); }
+        if let Some(name) = tool_name { m["tool_name"] = json!(name); }
+        if message.role == "tool" && m.get("tool_name").is_none() { return Err("tool_message_result_missing".into()); }
         if !images.is_empty() { m["images"] = json!(images); }
         messages.push(m);
     }
@@ -211,4 +228,3 @@ impl exports::glixo::llm_provider_compat::provider::Guest for OllamaProvider {
 }
 
 export!(OllamaProvider);
-

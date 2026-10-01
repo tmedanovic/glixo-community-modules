@@ -119,12 +119,34 @@ function showModel(context: Context, model: string): Set<string> {
 function ollamaMessages(request: Request, capabilities: Set<string>): unknown[] {
   const wantsVision = request.messages.some((message) => message.parts.some((part) => part.tag === "media-ref"));
   if (wantsVision && !capabilities.has("vision")) throw new Error("model_does_not_support_vision");
+  const pendingTools = new Map<string, string>();
   const messages = request.messages.map((message) => {
     const content: string[] = [];
     const images: string[] = [];
+    const toolCalls: unknown[] = [];
+    let toolName: string | undefined;
     for (const part of message.parts) {
-      if (part.tag === "text" || part.tag === "tool-result") content.push(String(part.val ?? ""));
+      if (part.tag === "text") content.push(String(part.val ?? ""));
       else if (part.tag === "reasoning") content.push(String(part.val ?? ""));
+      else if (part.tag === "tool-call-details") {
+        if (message.role !== "assistant") throw new Error("tool_call_requires_assistant_role");
+        const call = part.val as { id?: unknown; name?: unknown; argumentsFragment?: unknown; complete?: unknown } | undefined;
+        if (!call || typeof call.id !== "string" || !call.id || typeof call.name !== "string" || !call.name || call.complete !== true)
+          throw new Error("tool_call_details_invalid");
+        if (pendingTools.has(call.id)) throw new Error("tool_call_id_duplicate");
+        const args = parseObject(typeof call.argumentsFragment === "string" ? call.argumentsFragment : "{}", "tool_call_arguments_invalid");
+        pendingTools.set(call.id, call.name);
+        toolCalls.push({ type: "function", function: { index: toolCalls.length, name: call.name, arguments: args } });
+      }
+      else if (part.tag === "tool-result") {
+        if (message.role !== "tool" || toolName !== undefined) throw new Error("tool_result_requires_tool_message");
+        const result = parseToolResult(String(part.val ?? ""));
+        const matchedName = pendingTools.get(result.id);
+        if (!matchedName) throw new Error("tool_result_call_id_unmatched");
+        pendingTools.delete(result.id);
+        toolName = matchedName;
+        content.push(typeof result.value === "string" ? result.value : JSON.stringify(result.value));
+      }
       else if (part.tag === "media-ref") {
         const value = String(part.val ?? "");
         const match = /^data:image\/[a-zA-Z0-9.+-]+;base64,([A-Za-z0-9+/]+={0,2})$/.exec(value);
@@ -134,9 +156,25 @@ function ollamaMessages(request: Request, capabilities: Set<string>): unknown[] 
         throw new Error(`unsupported_message_part_${part.tag}`);
       }
     }
-    return { role: message.role, content: content.join(""), ...(images.length ? { images } : {}) };
+    if (message.role === "tool" && toolName === undefined) throw new Error("tool_message_result_missing");
+    return {
+      role: message.role,
+      content: content.join(""),
+      ...(toolCalls.length ? { tool_calls: toolCalls } : {}),
+      ...(toolName ? { tool_name: toolName } : {}),
+      ...(images.length ? { images } : {}),
+    };
   });
   return messages;
+}
+
+function parseToolResult(payload: string): { id: string; value: unknown } {
+  let parsed: unknown;
+  try { parsed = JSON.parse(payload); } catch { throw new Error("tool_result_invalid"); }
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("tool_result_invalid");
+  const result = parsed as Record<string, unknown>;
+  if (typeof result.id !== "string" || !result.id || !("result" in result)) throw new Error("tool_result_invalid");
+  return { id: result.id, value: result.result };
 }
 function buildChat(request: Request, caps: Set<string>): Record<string, unknown> {
   if (!request.model) throw new Error("model_required");
@@ -322,7 +360,6 @@ export const provider = {
 };
 
 function unusedLog(messageText: string): void { log("debug", messageText); }
-
 
 
 
