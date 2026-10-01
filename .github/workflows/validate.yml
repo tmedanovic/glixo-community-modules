@@ -16,6 +16,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: node scripts/ci-compiler-pin.mjs --all
       - run: npm run test:build-runner
       - run: npm run verify:sdk-packages
