@@ -7,3 +7,4 @@ target/
 *.log
 .DS_Store
 **/.glixo/
+**/vendor/glixo-extension-sdk/
