@@ -13,20 +13,20 @@
       { "id": "fs.workspace.search", "scope": { "projects": ["selected"] }, "reason": "List bounded relative paths and file sizes only from the host-selected project." }
     ]
   },
-  "contributes": {
+  "contributions": {
     "tools": [
       {
         "id": "inspect", "component": "inspect", "world": "glixo:contribution/contribution@1.0.0",
-        "description": "Summarize a bounded sample of relative workspace paths and file sizes; report full totals only when the host says the listing is complete.",
+        "description": "Summarize a bounded sample of relative workspace paths and file sizes; report eligible-file totals only when the host says the listing is complete.",
         "inputSchema": { "type": "object", "additionalProperties": false, "properties": { "maxFiles": { "type": "integer", "minimum": 1, "maximum": 100, "default": 100 } } },
         "outputSchema": {
           "type": "object", "additionalProperties": false,
-          "required": ["sampledFiles", "sampledBytes", "truncated", "completeProjectTotals", "sampledExtensions", "largestFiles"],
+          "required": ["sampledFiles", "sampledBytes", "truncated", "eligibleFileTotals", "sampledExtensions", "largestFiles"],
           "properties": {
             "sampledFiles": { "type": "integer", "minimum": 0 },
             "sampledBytes": { "type": "integer", "minimum": 0 },
             "truncated": { "type": "boolean" },
-            "completeProjectTotals": { "type": ["object", "null"], "properties": { "fileCount": { "type": "integer" }, "bytes": { "type": "integer" } } },
+            "eligibleFileTotals": { "type": ["object", "null"], "description": "Totals for files included by the broker traversal; it omits ignored folders and reparse points, so it is not a total for every filesystem entry.", "properties": { "fileCount": { "type": "integer" }, "bytes": { "type": "integer" } } },
             "sampledExtensions": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 } },
             "largestFiles": { "type": "array", "maxItems": 10, "items": { "type": "object", "additionalProperties": false, "required": ["path", "bytes"], "properties": { "path": { "type": "string" }, "bytes": { "type": "integer", "minimum": 0 } } } }
           }

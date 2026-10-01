@@ -10,7 +10,7 @@ class MemoryState {
   delete(key) { return this.values.delete(key); }
 }
 
-const request = (operation, input) => ({ kind: 'tool', contributionId: 'storage', input: { operation, ...input } });
+const request = (operation, input) => ({ kind: 'tools', contributionId: 'storage', input: { operation, ...input } });
 
 test('storage operations stay in the declared test namespace and return only logical keys', () => {
   const state = new MemoryState();

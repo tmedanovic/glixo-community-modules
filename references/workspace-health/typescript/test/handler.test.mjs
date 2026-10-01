@@ -3,7 +3,7 @@ import test from 'node:test';
 import { handleWorkspaceHealth } from '../dist/js/handler.js';
 
 const request = (input = {}, resourceHandles = { workspace: 'host-issued' }) => ({
-  kind: 'tool', contributionId: 'inspect', input, context: { resourceHandles },
+  kind: 'tools', contributionId: 'inspect', input, context: { resourceHandles },
 });
 
 test('workspace health sorts a bounded sample and does not claim complete totals when truncated', () => {
@@ -20,7 +20,7 @@ test('workspace health sorts a bounded sample and does not claim complete totals
   assert.equal(result.sampledFiles, 2);
   assert.equal(result.sampledBytes, 320);
   assert.equal(result.truncated, true);
-  assert.equal(result.completeProjectTotals, null);
+  assert.equal(result.eligibleFileTotals, null);
   assert.deepEqual(result.sampledExtensions, { '.cs': 1, '.md': 1 });
   assert.deepEqual(result.largestFiles.map((item) => item.path), ['src/main.cs', 'zeta.md']);
 });
@@ -30,7 +30,7 @@ test('complete listings may report project totals and stable largest-file order'
     { path: 'b.txt', bytes: 5 }, { path: 'a.txt', bytes: 5 },
   ], truncated: false }) };
   const result = handleWorkspaceHealth(request(), workspace);
-  assert.deepEqual(result.completeProjectTotals, { fileCount: 2, bytes: 10 });
+  assert.deepEqual(result.eligibleFileTotals, { fileCount: 2, bytes: 10 });
   assert.deepEqual(result.largestFiles.map((item) => item.path), ['a.txt', 'b.txt']);
 });
 

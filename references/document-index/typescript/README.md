@@ -1,6 +1,6 @@
 # Document Index (TypeScript)
 
-This executable contribution searches **relative path names** through the host workspace broker, then reads up to 4 KiB from each matching file and returns a UTF-8 excerpt of at most 96 bytes. It does not index, search, or transmit file contents beyond those excerpts. Large files are listed with a null excerpt. Paths and reads remain bound to the host-issued `workspace` handle for the selected project; the guest never chooses a root path.
+This executable data source searches **relative path names only** through the host workspace broker, then reads up to 4 KiB from each matching file and returns a UTF-8 excerpt of at most 96 bytes. It does not index or search file contents. Large files are listed with a null excerpt. Paths and reads remain bound to the host-issued `workspace` handle for the selected project; the guest never chooses a root path.
 
 The contribution is Preview until the real host permission, packaging, and invocation path is accepted. The project manifest pins the shared SDK recipe `contribution-typescript-v1`; this source tree alone does not claim a built component or successful installation.
 

@@ -4,7 +4,11 @@
   "type": "module",
   "scripts": {
     "verify": "node scripts/verify-references.mjs",
+    "verify:manifests": "node scripts/verify-manifests.mjs",
     "build:references": "node scripts/build-references.mjs",
     "test:build-runner": "node --test scripts/build-references.test.mjs"
+  },
+  "devDependencies": {
+    "ajv": "8.20.0"
   }
 }

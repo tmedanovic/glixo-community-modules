@@ -13,7 +13,7 @@
       { "id": "storage.extension", "scope": { "prefixes": ["workspace-storage/test/"] }, "reason": "Keep all example data in the package's approved workspace-storage test namespace." }
     ]
   },
-  "contributes": {
+  "contributions": {
     "tools": [
       {
         "id": "storage",

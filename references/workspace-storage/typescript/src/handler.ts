@@ -12,7 +12,7 @@ export interface StorageInput {
 }
 
 export interface HostEnvelope {
-  readonly kind: 'tool';
+  readonly kind: 'tools';
   readonly contributionId: string;
   readonly configuration?: unknown;
   readonly input: StorageInput;
@@ -33,7 +33,7 @@ export type StorageResponse =
 
 /** Run one bounded operation inside the installed package's explicit test prefix. */
 export function handleStorage(envelope: HostEnvelope, state: ScopedState): StorageResponse {
-  if (envelope.kind !== 'tool' || envelope.contributionId !== CONTRIBUTION_ID) {
+  if (envelope.kind !== 'tools' || envelope.contributionId !== CONTRIBUTION_ID) {
     throw new Error('contribution_mismatch');
   }
   const input = envelope.input;

@@ -9,7 +9,7 @@ export interface WorkspaceReader {
   read(handle: string, path: string, maxBytes: number): string;
 }
 export interface HostEnvelope {
-  readonly kind: 'tool' | 'data-source';
+  readonly kind: 'dataSources';
   readonly contributionId: string;
   readonly input: { readonly query: string; readonly limit?: number; readonly excerptBytes?: number };
   readonly context?: { readonly resourceHandles?: Readonly<Record<string, string>> };
@@ -18,7 +18,7 @@ export interface IndexedDocument { readonly path: string; readonly bytes: number
 export interface DocumentIndexResult { readonly query: string; readonly items: readonly IndexedDocument[]; readonly truncated: boolean; }
 
 export function handleDocumentIndex(envelope: HostEnvelope, workspace: WorkspaceReader): DocumentIndexResult {
-  if (!['tool', 'data-source'].includes(envelope.kind) || envelope.contributionId !== CONTRIBUTION_ID) throw new Error('contribution_mismatch');
+  if (envelope.kind !== 'dataSources' || envelope.contributionId !== CONTRIBUTION_ID) throw new Error('contribution_mismatch');
   const handle = envelope.context?.resourceHandles?.workspace;
   if (typeof handle !== 'string' || handle.length === 0) throw new Error('workspace_handle_missing');
   const query = envelope.input?.query;
@@ -32,7 +32,7 @@ export function handleDocumentIndex(envelope: HostEnvelope, workspace: Workspace
   try { parsed = JSON.parse(raw) as SearchResult; } catch { throw new Error('workspace_search_result_invalid'); }
   if (!parsed || !Array.isArray(parsed.items) || typeof parsed.truncated !== 'boolean') throw new Error('workspace_search_result_invalid');
   const matches = parsed.items.map(validateItem)
-    .sort((left, right) => left.path.localeCompare(right.path, 'en'))
+    .sort((left, right) => compareUtf8(left.path, right.path))
     .slice(0, limit);
   const items = matches.map((item): IndexedDocument => {
     if (item.bytes > maxReadBytes) return { ...item, excerpt: null, excerptTruncated: true };
@@ -59,4 +59,15 @@ function utf8Prefix(value: string, bytes: Uint8Array, limit: number): string {
     catch { end -= 1; }
   }
   return '';
+}
+
+function compareUtf8(left: string, right: string): number {
+  const encoder = new TextEncoder();
+  const leftBytes = encoder.encode(left);
+  const rightBytes = encoder.encode(right);
+  const length = Math.min(leftBytes.length, rightBytes.length);
+  for (let index = 0; index < length; index += 1) {
+    if (leftBytes[index] !== rightBytes[index]) return leftBytes[index]! - rightBytes[index]!;
+  }
+  return leftBytes.length - rightBytes.length;
 }

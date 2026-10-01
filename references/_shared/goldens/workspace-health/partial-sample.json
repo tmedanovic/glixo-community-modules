@@ -1,7 +1,7 @@
 {
   "description": "A truncated host file listing is a bounded sample, never a complete project total.",
   "request": {
-    "kind": "tool",
+    "kind": "tools",
     "contributionId": "inspect",
     "configuration": {},
     "input": { "maxFiles": 2 },
@@ -18,7 +18,7 @@
     "sampledFiles": 2,
     "sampledBytes": 320,
     "truncated": true,
-    "completeProjectTotals": null,
+    "eligibleFileTotals": null,
     "sampledExtensions": { ".cs": 1, ".md": 1 },
     "largestFiles": [
       { "path": "src/main.cs", "bytes": 240 },

@@ -44,7 +44,7 @@ else {
   }
   for (const [recipeId, recipe] of Object.entries(recipes ?? {})) {
     if (!['csharp', 'go', 'rust', 'typescript'].includes(recipe.language)) errors.push(`${recipeId}: unsupported recipe language`);
-    if (recipe.kind !== 'component') errors.push(`${recipeId}: only component recipes are accepted`);
+    if (!['component', 'contribution', 'llm-provider'].includes(recipe.kind)) errors.push(`${recipeId}: unsupported recipe kind ${recipe.kind}`);
     if (typeof recipe.world !== 'string' || !recipe.world.includes('@')) errors.push(`${recipeId}: exact versioned world is required`);
     if (!Array.isArray(recipe.build?.steps) || !recipe.build.steps.length) errors.push(`${recipeId}: build steps are required`);
     if (!recipe.build?.verification || typeof recipe.build.verification.tool !== 'string' || !Array.isArray(recipe.build.verification.args)) errors.push(`${recipeId}: component verification recipe is required`);
@@ -99,7 +99,7 @@ for (const item of index.references ?? []) {
       errors.push(`${item.id}/${language}: project directory is missing`);
       continue;
     }
-    const source = relative(project, root);
+    const source = relative(root, project);
     if (source.startsWith('..')) errors.push(`${item.id}/${language}: project escaped references root`);
     const entries = readdirSync(project);
     if (!entries.length) errors.push(`${item.id}/${language}: empty project`);

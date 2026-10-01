@@ -3,7 +3,7 @@ export interface SearchItem { readonly path: string; readonly bytes: number; }
 export interface SearchResult { readonly items: readonly SearchItem[]; readonly truncated: boolean; }
 export interface WorkspaceReader { search(handle: string, query: string, limit: number): string; }
 export interface HostEnvelope {
-  readonly kind: 'tool';
+  readonly kind: 'tools';
   readonly contributionId: string;
   readonly input: { readonly maxFiles?: number };
   readonly context?: { readonly resourceHandles?: Readonly<Record<string, string>> };
@@ -12,13 +12,13 @@ export interface WorkspaceHealthResult {
   readonly sampledFiles: number;
   readonly sampledBytes: number;
   readonly truncated: boolean;
-  readonly completeProjectTotals: { readonly fileCount: number; readonly bytes: number } | null;
+  readonly eligibleFileTotals: { readonly fileCount: number; readonly bytes: number } | null;
   readonly sampledExtensions: Readonly<Record<string, number>>;
   readonly largestFiles: readonly SearchItem[];
 }
 
 export function handleWorkspaceHealth(envelope: HostEnvelope, workspace: WorkspaceReader): WorkspaceHealthResult {
-  if (envelope.kind !== 'tool' || envelope.contributionId !== CONTRIBUTION_ID) throw new Error('contribution_mismatch');
+  if (envelope.kind !== 'tools' || envelope.contributionId !== CONTRIBUTION_ID) throw new Error('contribution_mismatch');
   const handle = envelope.context?.resourceHandles?.workspace;
   if (typeof handle !== 'string' || handle.length === 0) throw new Error('workspace_handle_missing');
   const limit = envelope.input?.maxFiles ?? 100;
@@ -27,7 +27,7 @@ export function handleWorkspaceHealth(envelope: HostEnvelope, workspace: Workspa
   let parsed: SearchResult;
   try { parsed = JSON.parse(raw) as SearchResult; } catch { throw new Error('workspace_search_result_invalid'); }
   if (!parsed || !Array.isArray(parsed.items) || typeof parsed.truncated !== 'boolean') throw new Error('workspace_search_result_invalid');
-  const items = parsed.items.map(validateItem).sort((left, right) => left.path.localeCompare(right.path, 'en'));
+  const items = parsed.items.map(validateItem).sort((left, right) => compareUtf8(left.path, right.path));
   const sampledBytes = items.reduce((total, item) => total + item.bytes, 0);
   const sampledExtensions: Record<string, number> = {};
   for (const item of items) {
@@ -36,13 +36,13 @@ export function handleWorkspaceHealth(envelope: HostEnvelope, workspace: Workspa
     const extension = dot <= 0 ? '[none]' : filename.slice(dot).toLowerCase();
     sampledExtensions[extension] = (sampledExtensions[extension] ?? 0) + 1;
   }
-  const largestFiles = [...items].sort((left, right) => right.bytes - left.bytes || left.path.localeCompare(right.path, 'en')).slice(0, 10);
+  const largestFiles = [...items].sort((left, right) => right.bytes - left.bytes || compareUtf8(left.path, right.path)).slice(0, 10);
   return {
     sampledFiles: items.length,
     sampledBytes,
     truncated: parsed.truncated,
-    completeProjectTotals: parsed.truncated ? null : { fileCount: items.length, bytes: sampledBytes },
-    sampledExtensions: Object.fromEntries(Object.entries(sampledExtensions).sort(([left], [right]) => left.localeCompare(right, 'en'))),
+    eligibleFileTotals: parsed.truncated ? null : { fileCount: items.length, bytes: sampledBytes },
+    sampledExtensions: Object.fromEntries(Object.entries(sampledExtensions).sort(([left], [right]) => compareUtf8(left, right))),
     largestFiles,
   };
 }
@@ -53,4 +53,15 @@ function validateItem(item: SearchItem): SearchItem {
     || item.path.split('/').some((segment) => segment === '..' || segment === '.' || segment.length === 0)
     || !Number.isSafeInteger(item.bytes) || item.bytes < 0) throw new Error('workspace_search_item_invalid');
   return { path: item.path, bytes: item.bytes };
+}
+
+function compareUtf8(left: string, right: string): number {
+  const encoder = new TextEncoder();
+  const leftBytes = encoder.encode(left);
+  const rightBytes = encoder.encode(right);
+  const length = Math.min(leftBytes.length, rightBytes.length);
+  for (let index = 0; index < length; index += 1) {
+    if (leftBytes[index] !== rightBytes[index]) return leftBytes[index]! - rightBytes[index]!;
+  }
+  return leftBytes.length - rightBytes.length;
 }
