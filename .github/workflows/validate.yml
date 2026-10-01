@@ -26,13 +26,17 @@ jobs:
       fail-fast: false
       matrix:
         language: [csharp, go, rust, typescript]
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.language == 'csharp' && 'windows-latest' || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
       - id: pins
         env:
-          LANGUAGE: ${{ matrix.language }}
-        run: node scripts/ci-compiler-pin.mjs "$LANGUAGE" >> "$GITHUB_OUTPUT"
+          EXTENSION_LANGUAGE: ${{ matrix.language }}
+        shell: bash
+        run: node scripts/ci-compiler-pin.mjs "$EXTENSION_LANGUAGE" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-dotnet@v4
         if: matrix.language == 'csharp'
         with:
@@ -46,9 +50,9 @@ jobs:
         with:
           toolchain: ${{ steps.pins.outputs.compiler }}
           targets: wasm32-wasip2
-      - uses: actions/setup-node@v4
-        if: matrix.language == 'typescript'
-        with:
-          node-version: ${{ steps.pins.outputs.compiler }}
+      - name: Install pinned guest tools
+        env:
+          EXTENSION_LANGUAGE: ${{ matrix.language }}
+        run: node scripts/ci-install-guest-tools.mjs
       - name: Build and check all ${{ matrix.language }} references
         run: node scripts/build-references.mjs --language=${{ matrix.language }}
