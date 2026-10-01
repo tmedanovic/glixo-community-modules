@@ -1,23 +1,23 @@
-import { workspaceRead, workspaceSearch, type WResult } from 'glixo:contribution/broker@1.0.0';
+import { workspaceRead, workspaceSearch } from 'glixo:contribution/broker@1.0.0';
 import { handleDocumentIndex, type HostEnvelope, type WorkspaceReader } from './handler.js';
 
 const workspace: WorkspaceReader = {
-  search(handle, query, limit) { return unwrap(workspaceSearch(handle, query, limit)); },
-  read(handle, path, maxBytes) { return unwrap(workspaceRead(handle, path, maxBytes)); },
+  search(handle, query, limit) { return workspaceSearch(handle, query, limit); },
+  read(handle, path, maxBytes) { return workspaceRead(handle, path, maxBytes); },
 };
 
 export const guest = {
-  invoke(requestJson: string): WResult<string> {
+  invoke(requestJson: string): string {
     try {
       const response = handleDocumentIndex(JSON.parse(requestJson) as HostEnvelope, workspace);
-      return { tag: 'ok', val: JSON.stringify(response) };
+      return JSON.stringify(response);
     } catch (error) {
-      return { tag: 'err', val: error instanceof Error ? error.message : 'document_index_failed' };
+      throw errorPayload(error, 'document_index_failed');
     }
   },
 };
 
-function unwrap<T>(result: WResult<T>): T {
-  if (result.tag === 'err') throw new Error(result.val);
-  return result.val;
+function errorPayload(error: unknown, fallback: string): string {
+  const message = error instanceof Error ? error.message : typeof error === 'string' ? error : fallback;
+  return message.slice(0, 240) || fallback;
 }

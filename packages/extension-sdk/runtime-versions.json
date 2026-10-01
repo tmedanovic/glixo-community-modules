@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "glixo-extension-runtime-versions/v1",
+  "runnerVersion": "0.2.0",
+  "protocolVersion": 2,
+  "defaultMaxFrame": 2097152,
+  "wasmtimeVersion": "48.0.2",
+  "wasmtimeCargoRequirement": "=48.0.2",
+  "engineCacheId": "wasmtime-48.0.2-compat-epoch",
+  "supportedAbiWorlds": {
+    "llmTypes": "glixo:llm-types@3.0.0",
+    "llmCompat": "glixo:llm-provider-compat@3.0.0",
+    "llmAsync": "glixo:llm-provider-async@3.0.0",
+    "storageTypes": "glixo:storage-types@3.0.0",
+    "storageCompat": "glixo:storage-provider-compat@3.0.0",
+    "storageAsync": "glixo:storage-provider-async@3.0.0",
+    "http": "glixo:http@3.0.0",
+    "contribution": "glixo:contribution@1.0.0"
+  },
+  "legacyAbi": {
+    "note": "wit/legacy/v1 is spike/legacy JSON-string ABI and is not the production profile"
+  }
+}

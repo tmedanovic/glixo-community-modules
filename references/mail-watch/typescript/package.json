@@ -1,0 +1,20 @@
+{
+  "name": "@glixo/reference-mail-watch-typescript",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "npm run build --prefix ../../../packages/extension-sdk/typescript && tsc --project tsconfig.json && node node_modules/esbuild/bin/esbuild dist/js/guest.js --bundle --external:glixo:* --format=esm --tsconfig=tsconfig.json --outfile=dist/bundle.js && jco componentize dist/bundle.js --wit wit --world-name contribution --disable all --out dist/glixo-extension.component.wasm",
+    "test": "node --test test/*.test.mjs",
+    "contract-check": "npm run build && npm test",
+    "component-check": "wasm-tools component wit dist/glixo-extension.component.wasm"
+  },
+  "dependencies": {
+    "@glixo/extension-sdk": "file:../../../packages/extension-sdk/typescript"
+  },
+  "devDependencies": {
+    "@bytecodealliance/componentize-js": "0.23.0",
+    "@bytecodealliance/jco": "1.35.0",
+    "esbuild": "0.28.2",
+    "typescript": "6.0.3"
+  }
+}

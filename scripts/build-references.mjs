@@ -1,6 +1,7 @@
 import { spawnSync } from 'node:child_process';
-import { existsSync, globSync, readFileSync } from 'node:fs';
-import { isAbsolute, join, resolve, sep } from 'node:path';
+import { cpSync, existsSync, globSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import process from 'node:process';
 
 const root = process.cwd();
@@ -26,7 +27,12 @@ function run(project, step, label) {
     throw new Error(`${label} has an unsupported tool or malformed argv`);
   }
   const cwd = insideProject(project, step.cwd ?? '.', `${label}.cwd`);
-  const result = spawnSync(step.tool, step.args, { cwd, encoding: 'utf8', stdio: 'inherit', shell: false });
+  const windowsNpmCli = join(dirname(process.execPath), 'node_modules', 'npm', 'bin', 'npm-cli.js');
+  const executable = process.platform === 'win32' && step.tool === 'npm' ? process.execPath : step.tool;
+  const args = executable === process.execPath && step.tool === 'npm' && process.platform === 'win32'
+    ? [windowsNpmCli, ...step.args]
+    : step.args;
+  const result = spawnSync(executable, args, { cwd, encoding: 'utf8', stdio: 'inherit', shell: false });
   executed += 1;
   if (result.error) throw new Error(`${label}: ${result.error.message}`);
   if (result.status !== 0) throw new Error(`${label}: ${step.tool} exited ${result.status}`);
@@ -37,12 +43,64 @@ function run(project, step, label) {
   }
 }
 
+function copyTree(source, destination) {
+  const ignored = new Set(['.git', 'node_modules', 'bin', 'obj', 'target', 'dist', 'vendor']);
+  cpSync(source, destination, {
+    recursive: true,
+    filter(path) {
+      const parts = path.split(/[\\/]/);
+      return !parts.some((part) => ignored.has(part));
+    },
+  });
+}
+
+function vendorSdk(project, reference, language) {
+  const sdkPath = support.languages?.[language]?.sdkPath;
+  if (!sdkPath || typeof sdkPath !== 'string' || isAbsolute(sdkPath) || sdkPath.split(/[\\/]/).includes('..')) return;
+  const sourceSdk = resolve(root, sdkPath);
+  if (!existsSync(sourceSdk)) throw new Error(`${reference.id}/${language}: public SDK source is missing: ${sdkPath}`);
+  const vendorPath = join(project, 'vendor', 'glixo-extension-sdk');
+  mkdirSync(join(project, 'vendor'), { recursive: true });
+  copyTree(sourceSdk, vendorPath);
+
+  function rewrite(directory) {
+    for (const name of readdirSync(directory)) {
+      if (['.git', 'node_modules', 'bin', 'obj', 'target', 'dist', 'vendor'].includes(name)) continue;
+      const path = join(directory, name);
+      const info = statSync(path);
+      if (info.isDirectory()) { rewrite(path); continue; }
+      if (!['.json', '.toml', '.mod', '.csproj'].includes(name.slice(name.lastIndexOf('.')))) continue;
+      let source = readFileSync(path, 'utf8');
+      if (language === 'typescript') {
+        source = source.replace(/file:(?:\.\.\/)+packages\/extension-sdk\/typescript/g, 'file:vendor/glixo-extension-sdk');
+        source = source.replace(/(?:\.\.\/)+packages\/extension-sdk\/typescript/g, 'vendor/glixo-extension-sdk');
+      } else if (language === 'go') {
+        source = source.replace(/=>\s*(?:\.\.\/)+packages\/extension-sdk\/go/g, '=> ./vendor/glixo-extension-sdk');
+      } else if (language === 'rust') {
+        source = source.replace(/path\s*=\s*"(?:\.\.\/)+packages\/extension-sdk\/rust"/g, 'path = "vendor/glixo-extension-sdk"');
+      } else if (language === 'csharp' && name.endsWith('.csproj')) {
+        const sdkProject = join(vendorPath, 'Glixo.ExtensionSdk', 'Glixo.ExtensionSdk.csproj');
+        const relativeSdkProject = relative(dirname(path), sdkProject).replaceAll('\\', '/');
+        source = source.replace(/Include="[^"]*packages\/extension-sdk\/csharp\/Glixo\.ExtensionSdk\/Glixo\.ExtensionSdk\.csproj"/g, `Include="${relativeSdkProject}"`);
+      }
+      if (source !== readFileSync(path, 'utf8')) writeFileSync(path, source);
+    }
+  }
+
+  rewrite(project);
+}
+
 for (const reference of index.references.filter((item) => item.kind === 'executable' && item.status !== 'planned')) {
   for (const language of reference.languages) {
     if (selectedLanguage && language !== selectedLanguage) continue;
-    const project = resolve(root, 'references', reference.id, language);
+    const sourceProject = resolve(root, 'references', reference.id, language);
+    const buildRoot = mkdtempSync(join(tmpdir(), 'glixo-reference-build-'));
+    const project = join(buildRoot, 'project');
     const metadataPath = join(project, 'reference.json');
     try {
+      if (!existsSync(sourceProject)) throw new Error('project directory is missing');
+      copyTree(sourceProject, project);
+      vendorSdk(project, reference, language);
       if (!existsSync(metadataPath)) throw new Error('reference.json is missing');
       const metadata = JSON.parse(readFileSync(metadataPath, 'utf8'));
       if (metadata.referenceId !== reference.id || metadata.language !== language) throw new Error('reference identity mismatch');
@@ -56,6 +114,8 @@ for (const reference of index.references.filter((item) => item.kind === 'executa
       run(project, recipe.build.verification, `${recipeId}.verification`);
     } catch (error) {
       failures.push(`${reference.id}/${language}: ${error instanceof Error ? error.message : String(error)}`);
+    } finally {
+      rmSync(buildRoot, { recursive: true, force: true });
     }
   }
 }

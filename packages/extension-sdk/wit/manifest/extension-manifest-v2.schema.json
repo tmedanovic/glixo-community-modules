@@ -69,6 +69,8 @@
           "enum": [
             "application/wasm",
             "text/html",
+            "text/css",
+            "text/javascript",
             "application/json",
             "image/png",
             "image/svg+xml",
@@ -181,7 +183,8 @@
         "tools": { "type": "array", "items": { "$ref": "#/$defs/ToolContribution" } },
         "mcp": { "type": "array", "items": { "$ref": "#/$defs/McpContribution" } },
         "dataSources": { "type": "array", "items": { "$ref": "#/$defs/DataSourceContribution" } },
-        "backgroundServices": { "type": "array", "items": { "$ref": "#/$defs/BackgroundServiceContribution" } }
+        "backgroundServices": { "type": "array", "items": { "$ref": "#/$defs/BackgroundServiceContribution" } },
+        "messageMiddleware": { "type": "array", "items": { "$ref": "#/$defs/MessageMiddlewareContribution" } }
       }
     },
     "DataSourceContribution": {
@@ -211,6 +214,23 @@
         "export": { "type": "string", "minLength": 1 }
       }
     },
+    "MessageMiddlewareContribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "component", "hooks", "order", "failurePolicy"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
+        "component": { "type": "string", "minLength": 1 },
+        "world": { "type": "string", "const": "glixo:contribution/contribution@1.0.0" },
+        "configuration": { "type": "string", "minLength": 1 },
+        "targetApplications": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^app\\.[a-z0-9][a-z0-9.-]{1,127}$" } },
+        "hooks": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "enum": ["before-provider", "completed", "committed", "transform-response"] } },
+        "order": { "type": "integer", "minimum": -1000, "maximum": 1000 },
+        "failurePolicy": { "type": "string", "enum": ["block", "continue"] },
+        "timeoutMs": { "type": "integer", "minimum": 1, "maximum": 30000 },
+        "maxBytes": { "type": "integer", "minimum": 1, "maximum": 131072 }
+      }
+    },
     "BackgroundServiceContribution": {
       "type": "object",
       "additionalProperties": false,
@@ -222,15 +242,26 @@
         "world": { "type": "string" },
         "cell": { "type": "string", "enum": ["server", "desktop", "os", "mobile", "browser"] },
         "archetype": { "type": "string", "enum": ["event-handler", "scheduled", "webhook-ingest"] },
+        "schedule": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["intervalMs"],
+          "properties": {
+            "intervalMs": { "type": "integer", "minimum": 1000, "maximum": 86400000 }
+          }
+        },
         "activation": { "type": "string", "enum": ["install", "grant", "manual"] },
         "quota": { "type": "integer", "minimum": 1, "maximum": 64 },
         "retry": { "type": "integer", "minimum": 0, "maximum": 8 },
         "idempotent": { "type": "boolean" },
         "health": { "type": "string", "enum": ["none", "export", "event"] },
         "shutdown": { "type": "string", "enum": ["graceful", "immediate"] },
-        "timeoutMs": { "type": "integer", "minimum": 1 },
+        "timeoutMs": { "type": "integer", "minimum": 1, "maximum": 30000 },
         "export": { "type": "string", "minLength": 1 }
-      }
+      },
+      "allOf": [
+        { "if": { "properties": { "archetype": { "const": "scheduled" } }, "required": ["archetype"] }, "then": { "required": ["schedule"] }, "else": { "not": { "required": ["schedule"] } } }
+      ]
     },
     "ToolContribution": {
       "type": "object",
@@ -294,6 +325,8 @@
           "type": "string",
           "enum": [
             "text/html",
+            "text/css",
+            "text/javascript",
             "application/json",
             "image/png",
             "image/svg+xml",
@@ -470,6 +503,7 @@
       "required": ["id"],
       "properties": {
         "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 80 },
         "component": { "type": "string" },
         "configuration": { "type": "string" },
         "world": { "type": "string" },

@@ -97,5 +97,3 @@ public sealed class NdjsonStream : IDisposable
     private static byte[] TrimCarriageReturn(byte[] line) =>
         line.Length > 0 && line[^1] == (byte)'\r' ? line[..^1] : line;
 }
-
-\n

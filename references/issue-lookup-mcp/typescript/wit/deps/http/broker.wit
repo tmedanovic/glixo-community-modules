@@ -1,0 +1,11 @@
+package glixo:http@3.0.0;
+
+interface broker {
+  use types.{http-request, header};
+  http-start: func(request: http-request) -> result<u32, string>;
+  http-status: func(handle: u32) -> result<u16, string>;
+  http-response-headers: func(handle: u32) -> result<list<header>, string>;
+  http-read: func(handle: u32, max-bytes: u32) -> result<option<list<u8>>, string>;
+  http-cancel: func(handle: u32);
+  http-drop: func(handle: u32);
+}

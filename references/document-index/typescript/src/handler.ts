@@ -17,6 +17,7 @@ export interface HostEnvelope {
 export interface IndexedDocument { readonly path: string; readonly bytes: number; readonly excerpt: string | null; readonly excerptTruncated: boolean; }
 export interface DocumentIndexResult { readonly query: string; readonly items: readonly IndexedDocument[]; readonly truncated: boolean; }
 
+// docs:snippet-start document-index-handler:typescript
 export function handleDocumentIndex(envelope: HostEnvelope, workspace: WorkspaceReader): DocumentIndexResult {
   if (envelope.kind !== 'dataSources' || envelope.contributionId !== CONTRIBUTION_ID) throw new Error('contribution_mismatch');
   const handle = envelope.context?.resourceHandles?.workspace;
@@ -43,6 +44,7 @@ export function handleDocumentIndex(envelope: HostEnvelope, workspace: Workspace
   });
   return { query, items, truncated: parsed.truncated };
 }
+// docs:snippet-end document-index-handler:typescript
 
 function validateItem(item: SearchItem): SearchItem {
   if (!item || typeof item.path !== 'string' || item.path.length === 0 || item.path.startsWith('/') || item.path.includes('\\')

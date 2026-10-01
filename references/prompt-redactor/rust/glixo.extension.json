@@ -1,0 +1,65 @@
+{
+  "$schema": "https://schemas.glixo.dev/extension-manifest/v2.json",
+  "schemaVersion": 2,
+  "id": "{{PACKAGE_ID}}",
+  "version": "0.1.0",
+  "metadata": {
+    "name": "{{NAME}}",
+    "description": "Apply explicit literal redaction rules to outgoing user text.",
+    "license": "MIT"
+  },
+  "artifacts": [
+    {
+      "path": "dist/glixo-extension.component.wasm",
+      "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "mediaType": "application/wasm"
+    }
+  ],
+  "components": [
+    {
+      "id": "redactor",
+      "cell": "server",
+      "runtime": "wasm-component",
+      "artifact": "dist/glixo-extension.component.wasm",
+      "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "world": "glixo:contribution/contribution@1.0.0"
+    }
+  ],
+  "permissions": {
+    "requested": [
+      {
+        "id": "message.content.read",
+        "reason": "Read eligible outgoing user text so the guest can create redaction patches."
+      },
+      {
+        "id": "message.input.transform",
+        "reason": "Apply account-configured literal redaction rules to outgoing user text before provider submission."
+      }
+    ]
+  },
+  "contributions": {
+    "messageMiddleware": [
+      {
+        "id": "prompt-redactor",
+        "component": "redactor",
+        "world": "glixo:contribution/contribution@1.0.0",
+        "hooks": [
+          "before-provider"
+        ],
+        "order": -100,
+        "failurePolicy": "block",
+        "timeoutMs": 1000,
+        "maxBytes": 65536,
+        "configuration": "redaction-rules"
+      }
+    ]
+  },
+  "configurations": [
+    {
+      "id": "redaction-rules",
+      "scope": "account",
+      "schema": "configuration.schema.json",
+      "schemaDigest": "sha256:c3b1d83eb46f15ff4e2dcb359c79ba00d68c23d4f8211742bcfc39847c7ba5b0"
+    }
+  ]
+}

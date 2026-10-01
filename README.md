@@ -17,7 +17,7 @@ This repository is the public source for maintained Glixo extension-author refer
 | `workspace-health` | Read host-scoped workspace facts and report actionable health findings | C#, Go, Rust, TypeScript |
 | `document-index` | Search host-authorized project files and return bounded results with provenance | C#, Go, Rust, TypeScript |
 | `workspace-storage` | Store and retrieve values through an approved test namespace | C#, Go, Rust, TypeScript |
-| `issue-lookup-mcp` | Use the approved HTTPS Streamable HTTP MCP transport to look up issues | C#, Go, Rust, TypeScript |
+| `issue-lookup-mcp` | Use the approved local Streamable HTTP MCP connection to look up issues | C#, Go, Rust, TypeScript |
 | `mail-watch` | Poll Microsoft Graph Inbox delta metadata and publish idempotent events | C#, Go, Rust, TypeScript |
 | `conversation-insights` | Report message and tool-use statistics without logging prompts | C#, Go, Rust, TypeScript |
 | `prompt-redactor` | Preview and apply explicitly configured outbound redactions | C#, Go, Rust, TypeScript |

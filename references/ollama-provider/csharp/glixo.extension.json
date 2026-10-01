@@ -1,0 +1,56 @@
+{
+  "$schema": "https://schemas.glixo.dev/extension-manifest/v2.json",
+  "schemaVersion": 2,
+  "id": "community.glixo.ollama-provider-csharp",
+  "version": "0.1.0",
+  "metadata": {
+    "name": "Ollama provider reference (C#)",
+    "description": "Preview Ollama LLM provider implemented as a .NET WebAssembly component.",
+    "license": "MIT"
+  },
+  "compatibility": {
+    "host": ">=0.9.0 <1.0.0",
+    "schema": 2,
+    "witWorld": "glixo:llm-provider-compat/provider-compat@3.0.0"
+  },
+  "components": [
+    {
+      "id": "provider",
+      "cell": "server",
+      "runtime": "wasm-component",
+      "artifact": "dist/glixo-extension.component.wasm",
+      "world": "glixo:llm-provider-compat/provider-compat@3.0.0"
+    }
+  ],
+  "configurations": [
+    {
+      "id": "provider-account",
+      "scope": "account",
+      "schema": "schemas/account.json",
+      "schemaDigest": "sha256:3152ec5dbcdfecae787b75bf7baa08ddbb3c380ec470580cc3e131730b645df4"
+    }
+  ],
+  "permissions": {
+    "requested": [
+      {
+        "id": "http.connection",
+        "scope": {
+          "endpointNames": ["ollama"],
+          "methods": ["GET", "POST"],
+          "paths": ["/api/tags", "/api/show", "/api/chat"]
+        },
+        "reason": "Connect to the host-approved Ollama endpoint for model discovery, capability lookup, and chat."
+      }
+    ]
+  },
+  "contributions": {
+    "llmProviders": [
+      {
+        "id": "default",
+        "component": "provider",
+        "configuration": "provider-account",
+        "world": "glixo:llm-provider-compat/provider-compat@3.0.0"
+      }
+    ]
+  }
+}

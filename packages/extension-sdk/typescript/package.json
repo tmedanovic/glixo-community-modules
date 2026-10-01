@@ -12,7 +12,8 @@
     "./logging": "./dist/logging.js",
     "./workspace": "./dist/workspace.js",
     "./guest": "./dist/guest.js",
-    "./llm": "./dist/llm.js"
+    "./llm": "./dist/llm.js",
+    "./wit": "./dist/wit.js"
   },
   "scripts": {
     "build": "tsc --project tsconfig.json",

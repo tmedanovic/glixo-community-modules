@@ -1,0 +1,52 @@
+{
+  "id": "dev.glixo.reference.mail-watch",
+  "version": "0.1.0",
+  "metadata": { "name": "Mail Watch", "description": "Bounded Microsoft Graph Inbox delta watcher" },
+  "cells": ["server"],
+  "components": [
+    {
+      "id": "mail-watch",
+      "cell": "server",
+      "runtime": "wasm-component",
+      "artifact": "artifacts/mail-watch.wasm",
+      "world": "glixo:contribution/contribution@1.0.0"
+    }
+  ],
+  "permissions": {
+    "requested": [
+      { "id": "service.activate", "scope": { "services": ["mail-watch"], "archetypes": ["scheduled"] }, "reason": "Run the bounded Inbox delta check on the selected schedule after account activation." },
+      { "id": "http.client", "scope": { "hosts": ["graph.microsoft.com"], "methods": ["GET"] }, "reason": "Read Inbox message metadata from Microsoft Graph delta pages." },
+      { "id": "secret.use", "scope": { "names": ["oauth"], "via": "http-injection" }, "reason": "Inject the account's Graph OAuth credential into an HTTPS bearer request without exposing its value to the guest." },
+      { "id": "events.publish", "scope": { "types": ["mail.received"], "scope": "account" }, "reason": "Publish metadata-only notifications for newly received Inbox messages." }
+    ]
+  },
+  "events": {
+    "publish": [
+      { "type": "mail.received", "schema": "event.schema.json", "schemaVersion": 1, "scope": "account", "reason": "Notify Glixo workflows and account notifications about new Inbox metadata." }
+    ]
+  },
+  "configurations": [
+    { "id": "mail-watch", "scope": "account", "schema": "configuration.schema.json", "schemaDigest": "sha256:1b2a040fc86d9a20bdaa48c5e303b10703a2df4c692992eba8df901030238007" }
+  ],
+  "contributions": {
+    "backgroundServices": [
+      {
+        "id": "mail-watch",
+        "component": "mail-watch",
+        "configuration": "mail-watch",
+        "world": "glixo:contribution/contribution@1.0.0",
+        "cell": "server",
+        "archetype": "scheduled",
+        "schedule": { "intervalMs": 60000 },
+        "activation": "grant",
+        "quota": 1,
+        "retry": 3,
+        "idempotent": true,
+        "health": "export",
+        "shutdown": "graceful",
+        "timeoutMs": 5000,
+        "export": "guest.invoke"
+      }
+    ]
+  }
+}

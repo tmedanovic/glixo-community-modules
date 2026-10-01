@@ -17,7 +17,7 @@
         "rust",
         "typescript"
       ],
-      "status": "planned",
+      "status": "preview",
       "owner": "provider-sdk",
       "contract": "glixo:llm-provider-compat/provider-compat@3.0.0 + glixo:http/broker@3.0.0",
       "hostAcceptance": "pending",
@@ -47,7 +47,7 @@
         "rust",
         "typescript"
       ],
-      "status": "planned",
+      "status": "preview",
       "owner": "references",
       "contract": "glixo:contribution/contribution@1.0.0",
       "hostAcceptance": "pending",
@@ -77,7 +77,7 @@
         "rust",
         "typescript"
       ],
-      "status": "planned",
+      "status": "preview",
       "owner": "references",
       "contract": "glixo:contribution/contribution@1.0.0 + host-scoped workspace query",
       "hostAcceptance": "pending",
@@ -107,7 +107,7 @@
         "rust",
         "typescript"
       ],
-      "status": "planned",
+      "status": "preview",
       "owner": "references",
       "contract": "glixo:contribution/contribution@1.0.0 + prefix-scoped storage.extension",
       "hostAcceptance": "pending",
@@ -137,9 +137,9 @@
         "rust",
         "typescript"
       ],
-      "status": "planned",
+      "status": "preview",
       "owner": "references",
-      "contract": "glixo:contribution/contribution@1.0.0 + approved HTTPS Streamable HTTP",
+      "contract": "glixo:contribution/contribution@1.0.0 + glixo:http/broker@3.0.0 + approved local http.connection Streamable HTTP",
       "hostAcceptance": "pending",
       "scaffold": {
         "sourcePath": "references/issue-lookup-mcp/{language}",
@@ -167,9 +167,9 @@
         "rust",
         "typescript"
       ],
-      "status": "planned",
+      "status": "preview",
       "owner": "services",
-      "contract": "glixo:contribution/contribution@1.0.0 + background-service/event contract revision pending",
+      "contract": "glixo:contribution/contribution@1.0.0 + account-scoped Microsoft Graph Mail.ReadBasic + durable mail.received v1 event",
       "hostAcceptance": "pending",
       "scaffold": {
         "sourcePath": "references/mail-watch/{language}",
@@ -177,8 +177,16 @@
         "projectManifestPath": "references/mail-watch/{language}/glixo.project.json",
         "sharedPaths": [
           {
-            "destination": "shared/goldens/mail-watch",
-            "sourcePath": "references/_shared/goldens/mail-watch"
+            "destination": "configuration.schema.json",
+            "sourcePath": "references/_shared/mail-watch/configuration.schema.json"
+          },
+          {
+            "destination": "event.schema.json",
+            "sourcePath": "references/_shared/mail-watch/event.schema.json"
+          },
+          {
+            "destination": "shared/host-fixture.json",
+            "sourcePath": "references/_shared/mail-watch/host-fixture.json"
           }
         ],
         "substitutions": {
@@ -197,9 +205,9 @@
         "rust",
         "typescript"
       ],
-      "status": "planned",
+      "status": "preview",
       "owner": "middleware",
-      "contract": "glixo:contribution/contribution@1.0.0 + message-middleware contract revision pending",
+      "contract": "glixo:contribution/contribution@1.0.0 + glixo:message-middleware/types@1.0.0",
       "hostAcceptance": "pending",
       "scaffold": {
         "sourcePath": "references/conversation-insights/{language}",
@@ -227,9 +235,9 @@
         "rust",
         "typescript"
       ],
-      "status": "planned",
+      "status": "preview",
       "owner": "middleware",
-      "contract": "glixo:contribution/contribution@1.0.0 + message-middleware contract revision pending",
+      "contract": "glixo:contribution/contribution@1.0.0 + glixo:message-middleware/types@1.0.0",
       "hostAcceptance": "pending",
       "scaffold": {
         "sourcePath": "references/prompt-redactor/{language}",

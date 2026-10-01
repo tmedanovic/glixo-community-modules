@@ -5,6 +5,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="src/Handler.cs" />
-    <ProjectReference Include="../../../../packages/extension-sdk/csharp/Glixo.ExtensionSdk/Glixo.ExtensionSdk.csproj" />
+    <ProjectReference Include="../../../packages/extension-sdk/csharp/Glixo.ExtensionSdk/Glixo.ExtensionSdk.csproj" />
   </ItemGroup>
 </Project>

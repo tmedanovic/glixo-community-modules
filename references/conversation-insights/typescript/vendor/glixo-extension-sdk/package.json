@@ -1,0 +1,24 @@
+{
+  "name": "@glixo/extension-sdk",
+  "version": "0.1.0",
+  "description": "Typed guest-side helpers for Glixo WebAssembly extensions",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./dist/index.js",
+    "./http": "./dist/http.js",
+    "./state": "./dist/state.js",
+    "./logging": "./dist/logging.js",
+    "./workspace": "./dist/workspace.js",
+    "./guest": "./dist/guest.js",
+    "./llm": "./dist/llm.js"
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "typecheck": "tsc --noEmit --project tsconfig.json"
+  },
+  "devDependencies": {
+    "typescript": "6.0.3"
+  }
+}

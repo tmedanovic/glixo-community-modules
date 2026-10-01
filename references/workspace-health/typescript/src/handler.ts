@@ -17,6 +17,7 @@ export interface WorkspaceHealthResult {
   readonly largestFiles: readonly SearchItem[];
 }
 
+// docs:snippet-start workspace-health-handler:typescript
 export function handleWorkspaceHealth(envelope: HostEnvelope, workspace: WorkspaceReader): WorkspaceHealthResult {
   if (envelope.kind !== 'tools' || envelope.contributionId !== CONTRIBUTION_ID) throw new Error('contribution_mismatch');
   const handle = envelope.context?.resourceHandles?.workspace;
@@ -46,6 +47,7 @@ export function handleWorkspaceHealth(envelope: HostEnvelope, workspace: Workspa
     largestFiles,
   };
 }
+// docs:snippet-end workspace-health-handler:typescript
 
 function validateItem(item: SearchItem): SearchItem {
   if (!item || typeof item.path !== 'string' || item.path.length === 0 || item.path.startsWith('/') || item.path.includes('\\')

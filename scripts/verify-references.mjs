@@ -20,6 +20,7 @@ for (const name of readdirSync(root)) {
 }
 function checkLegacyFiles(directory) {
   for (const name of readdirSync(directory)) {
+    if (['.git', 'node_modules', 'bin', 'obj', 'target', 'dist'].includes(name)) continue;
     const path = join(directory, name);
     const info = lstatSync(path);
     if (info.isSymbolicLink()) { errors.push(`symbolic link is not allowed in references: ${relative(root, path)}`); continue; }

@@ -32,6 +32,7 @@ export type StorageResponse =
   | { readonly operation: 'delete'; readonly key: string; readonly deleted: boolean };
 
 /** Run one bounded operation inside the installed package's explicit test prefix. */
+// docs:snippet-start workspace-storage-handler:typescript
 export function handleStorage(envelope: HostEnvelope, state: ScopedState): StorageResponse {
   if (envelope.kind !== 'tools' || envelope.contributionId !== CONTRIBUTION_ID) {
     throw new Error('contribution_mismatch');
@@ -71,6 +72,7 @@ export function handleStorage(envelope: HostEnvelope, state: ScopedState): Stora
       throw new Error('storage_operation_invalid');
   }
 }
+// docs:snippet-end workspace-storage-handler:typescript
 
 function storageKey(value: unknown): string {
   if (typeof value !== 'string' || !keyPattern.test(value)) throw new Error('storage_key_invalid');

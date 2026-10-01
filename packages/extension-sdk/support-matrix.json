@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "hostProtocol": {
-    "version": 1,
+    "version": 2,
     "defaultMaxFrame": 2097152,
-    "runnerVersion": "0.1.0",
+    "runnerVersion": "0.2.0",
     "wasmtimeVersion": "48.0.2",
-    "source": "docs/glixo-platform/contracts/extensions/runtime/runtime-versions.json"
+    "source": "packages/extension-sdk/runtime-versions.json"
   },
   "witRevision": {
     "http": "glixo:http@3.0.0",
@@ -14,7 +14,7 @@
     "contributionWorld": "glixo:contribution@1.0.0"
   },
   "goldenFixtures": {
-    "ollamaProtocol": "community-modules/references/shared/test-vectors/ollama",
+    "ollamaProtocol": "references/_shared/test-vectors/ollama",
     "providerFixtureSchema": "packages/extension-sdk/test-vectors/provider-fixture.schema.json"
   },
   "languages": {
@@ -202,8 +202,6 @@
               "--world",
               "provider-compat",
               "build",
-              "--go",
-              "go",
               "--output",
               "dist/glixo-extension.component.wasm"
             ],
@@ -253,13 +251,13 @@
               "--no-restore"
             ],
             "cwd": ".",
-            "output": "bin/Release/net10.0/wasi-wasm/publish/Glixo.OllamaProvider.wasm"
+            "output": "bin/Release/net10.0/wasi-wasm/native/Glixo.OllamaProvider.wasm"
           },
           {
             "tool": "node",
             "args": [
               "scripts/copy-artifact.mjs",
-              "bin/Release/net10.0/wasi-wasm/publish/Glixo.OllamaProvider.wasm",
+              "bin/Release/net10.0/wasi-wasm/native/Glixo.OllamaProvider.wasm",
               "dist/glixo-extension.component.wasm"
             ],
             "cwd": ".",
@@ -306,7 +304,8 @@
             "tool": "npm",
             "args": [
               "ci",
-              "--ignore-scripts"
+              "--ignore-scripts",
+              "--install-links"
             ],
             "cwd": ".",
             "output": "node_modules"
@@ -443,8 +442,6 @@
               "--world",
               "contribution",
               "build",
-              "--go",
-              "go",
               "--output",
               "dist/glixo-extension.component.wasm"
             ],
@@ -494,13 +491,13 @@
               "--no-restore"
             ],
             "cwd": ".",
-            "output": "bin/Release/net10.0/wasi-wasm/publish/Glixo.Contribution.wasm"
+            "output": "bin/Release/net10.0/wasi-wasm/native/Glixo.Contribution.wasm"
           },
           {
             "tool": "node",
             "args": [
               "scripts/copy-artifact.mjs",
-              "bin/Release/net10.0/wasi-wasm/publish/Glixo.Contribution.wasm",
+              "bin/Release/net10.0/wasi-wasm/native/Glixo.Contribution.wasm",
               "dist/glixo-extension.component.wasm"
             ],
             "cwd": ".",
@@ -547,7 +544,8 @@
             "tool": "npm",
             "args": [
               "ci",
-              "--ignore-scripts"
+              "--ignore-scripts",
+              "--install-links"
             ],
             "cwd": ".",
             "output": "node_modules"
@@ -614,6 +612,8 @@
     "realOllamaEndpoint": "not-yet-verified",
     "toolRoundTrip": "not-yet-verified",
     "cancellation": "not-yet-verified",
-    "sizeLimitBytes": 8388608
+    "componentMaxBytes": 16777216,
+    "archiveMaxBytes": 7340032,
+    "expandedPackageMaxBytes": 33554432
   }
 }

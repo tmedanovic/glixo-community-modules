@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -37,7 +37,7 @@ test('build runner executes only the resolved SDK recipe and checks its declared
   const result = spawnSync(process.execPath, [script], { cwd: root, encoding: 'utf8' });
   assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
   assert.match(result.stdout, /2 pinned SDK recipe steps completed/);
-  assert.equal(readFileSync(join(root, 'references', 'sample-reference', 'typescript', 'dist', 'glixo-extension.component.wasm'), 'utf8'), 'component');
+  assert.equal(existsSync(join(root, 'references', 'sample-reference', 'typescript', 'dist', 'glixo-extension.component.wasm')), false);
 });
 
 test('build runner rejects recipe working directories outside the project before spawning tools', (t) => {
