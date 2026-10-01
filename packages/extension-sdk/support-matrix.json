@@ -104,7 +104,7 @@
         "kind": "runtime"
       },
       "npm": {
-        "version": "11.6.2",
+        "version": "10.9.2",
         "kind": "package-manager"
       },
       "typescript": {
