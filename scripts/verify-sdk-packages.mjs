@@ -34,6 +34,8 @@ const checks = [
   ['rust', packages.rust?.version === tomlField(rust, 'version'), 'Cargo package version'],
   ['rust', tomlField(rust, 'repository')?.startsWith('https://') && tomlField(rust, 'readme') === 'README.md', 'Cargo repository and readme metadata'],
   ['go', packages.go?.name === go.match(/^module\s+(\S+)$/m)?.[1], 'Go module path'],
+  ['go', packages.go?.repository === 'https://github.com/tmedanovic/glixo-community-modules' && packages.go?.distribution === 'nested-module-tag', 'Go nested-module repository route'],
+  ['go', packages.go?.tag === `packages/extension-sdk/go/v${packages.go?.version}`, 'Go nested-module release tag'],
   ['matrix', manifest.schemaVersion === 1 && matrix.schemaVersion === 1, 'release manifest and support matrix schemas'],
 ];
 

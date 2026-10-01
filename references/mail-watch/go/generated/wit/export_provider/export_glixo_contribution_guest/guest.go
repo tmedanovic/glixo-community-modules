@@ -8,8 +8,8 @@ import (
 	"github.com/glixo-community/glixo-contribution-guest-go/generated/wit/glixo_http_broker"
 	withttp "github.com/glixo-community/glixo-contribution-guest-go/generated/wit/glixo_http_types"
 	"github.com/glixo-community/glixo-contribution-guest-go/mailwatch"
-	"github.com/glixo/extension-sdk-go/httpbroker"
-	"github.com/glixo/extension-sdk-go/state"
+	"github.com/tmedanovic/glixo-community-modules/packages/extension-sdk/go/httpbroker"
+	"github.com/tmedanovic/glixo-community-modules/packages/extension-sdk/go/state"
 	abitypes "go.bytecodealliance.org/pkg/wit/types"
 )
 

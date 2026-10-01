@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/glixo/extension-sdk-go/httpbroker"
+	"github.com/tmedanovic/glixo-community-modules/packages/extension-sdk/go/httpbroker"
 )
 
 type fixtureBroker struct { request httpbroker.Request; reads int; canceled, dropped bool }

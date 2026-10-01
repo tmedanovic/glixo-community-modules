@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/glixo/extension-sdk-go/httpbroker"
-	"github.com/glixo/extension-sdk-go/state"
+	"github.com/tmedanovic/glixo-community-modules/packages/extension-sdk/go/httpbroker"
+	"github.com/tmedanovic/glixo-community-modules/packages/extension-sdk/go/state"
 )
 
 type fixtureBroker struct {

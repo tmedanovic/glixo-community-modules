@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/glixo/extension-sdk-go/workspace"
+	"github.com/tmedanovic/glixo-community-modules/packages/extension-sdk/go/workspace"
 )
 
 type fakeWorkspace struct {

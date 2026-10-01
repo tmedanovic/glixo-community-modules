@@ -24,9 +24,11 @@
     },
     "go": {
       "ecosystem": "go-module",
-      "name": "github.com/glixo/extension-sdk-go",
+      "name": "github.com/tmedanovic/glixo-community-modules/packages/extension-sdk/go",
       "version": "0.1.0",
-      "distribution": "versioned-source-commit",
+      "repository": "https://github.com/tmedanovic/glixo-community-modules",
+      "tag": "packages/extension-sdk/go/v0.1.0",
+      "distribution": "nested-module-tag",
       "publication": "not-performed"
     }
   }

@@ -56,8 +56,8 @@ test('Go SDK source copy does not trigger automatic Go module vendoring', (t) =>
   const sdk = join(root, 'packages', 'extension-sdk', 'go');
   mkdirSync(project, { recursive: true });
   mkdirSync(sdk, { recursive: true });
-  writeFileSync(join(sdk, 'go.mod'), 'module github.com/glixo/extension-sdk-go\n');
-  writeFileSync(join(project, 'go.mod'), 'module example.test/reference\n\nreplace github.com/glixo/extension-sdk-go => ../../../packages/extension-sdk/go\n');
+  writeFileSync(join(sdk, 'go.mod'), 'module github.com/tmedanovic/glixo-community-modules/packages/extension-sdk/go\n');
+  writeFileSync(join(project, 'go.mod'), 'module example.test/reference\n\nreplace github.com/tmedanovic/glixo-community-modules/packages/extension-sdk/go => ../../../packages/extension-sdk/go\n');
   writeFileSync(join(project, 'reference.json'), JSON.stringify({
     referenceId: 'sample-reference', language: 'go', build: { recipeId: 'contribution-go-v1' },
   }));

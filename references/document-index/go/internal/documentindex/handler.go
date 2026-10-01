@@ -10,8 +10,8 @@ import (
 	"unicode/utf16"
 	"unicode/utf8"
 
-	"github.com/glixo/extension-sdk-go/guest"
-	"github.com/glixo/extension-sdk-go/workspace"
+	"github.com/tmedanovic/glixo-community-modules/packages/extension-sdk/go/guest"
+	"github.com/tmedanovic/glixo-community-modules/packages/extension-sdk/go/workspace"
 )
 
 const (

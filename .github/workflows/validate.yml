@@ -56,5 +56,11 @@ jobs:
         env:
           EXTENSION_LANGUAGE: ${{ matrix.language }}
         run: node scripts/ci-install-guest-tools.mjs
+      - name: Test Go SDK and clean consumer import
+        if: matrix.language == 'go'
+        shell: bash
+        run: |
+          (cd packages/extension-sdk/go && go test ./...)
+          (cd packages/extension-sdk/go-import-consumer && go test ./...)
       - name: Build and check all ${{ matrix.language }} references
         run: node scripts/build-references.mjs --language=${{ matrix.language }}

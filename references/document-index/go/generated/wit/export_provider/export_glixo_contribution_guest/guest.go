@@ -5,7 +5,7 @@ import (
 
 	"github.com/glixo-community/glixo-contribution-guest-go/generated/wit/glixo_contribution_broker"
 	"github.com/glixo-community/glixo-contribution-guest-go/internal/documentindex"
-	"github.com/glixo/extension-sdk-go/workspace"
+	"github.com/tmedanovic/glixo-community-modules/packages/extension-sdk/go/workspace"
 	types "go.bytecodealliance.org/pkg/wit/types"
 )
 

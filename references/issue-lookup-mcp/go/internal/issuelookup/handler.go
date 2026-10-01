@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/glixo/extension-sdk-go/httpbroker"
+	"github.com/tmedanovic/glixo-community-modules/packages/extension-sdk/go/httpbroker"
 )
 
 const maxResponseBytes = 128 * 1024

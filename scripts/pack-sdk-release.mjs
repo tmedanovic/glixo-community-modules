@@ -11,7 +11,8 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const versions = JSON.parse(readFileSync(join(root, 'packages', 'extension-sdk', 'release-manifest.json'), 'utf8')).packages;
 const output = resolve(process.argv[2] || join(root, '.glixo', 'dist', 'sdk-release', versions.typescript.version));
 const outputRelative = relative(root, output);
-if (!outputRelative || outputRelative === '..' || outputRelative.startsWith(`..${sep}`) || !outputRelative.startsWith('.glixo')) {
+const outputSegments = outputRelative.split(sep);
+if (!outputRelative || outputRelative === '..' || outputRelative.startsWith(`..${sep}`) || outputSegments[0] !== '.glixo' || outputSegments.length < 2) {
   throw new Error(`SDK release output must be contained under the ignored .glixo directory: ${output}`);
 }
 
@@ -89,17 +90,18 @@ function main() {
     const rustStaged = join(scratch, 'rust-sdk');
     cpSync(join(root, 'packages', 'extension-sdk', 'rust'), rustStaged, { recursive: true, filter: (path) => !/(^|[\\/])(target)([\\/]|$)/.test(path) });
     const cargoTarget = join(scratch, 'cargo-target');
-    run('cargo', ['package', '--no-verify', '--allow-dirty', '--manifest-path', join(rustStaged, 'Cargo.toml')], root, { ...process.env, CARGO_TARGET_DIR: cargoTarget });
+    run('cargo', ['package', '--manifest-path', join(rustStaged, 'Cargo.toml')], root, { ...process.env, CARGO_TARGET_DIR: cargoTarget });
     const crate = join(cargoTarget, 'package', 'glixo-extension-sdk-0.1.0.crate');
     ensureContained(crate);
     const crateTarget = join(output, 'cargo', basename(crate));
     cpSync(crate, crateTarget);
-    artifacts.push({ ecosystem: 'cargo', package: versions.rust.name, version: versions.rust.version, file: relative(root, crateTarget).replaceAll('\\', '/'), sha256: sha256(crateTarget), bytes: statSync(crateTarget).size });
+    artifacts.push({ ecosystem: 'cargo', package: versions.rust.name, version: versions.rust.version, file: relative(root, crateTarget).replaceAll('\\', '/'), sha256: sha256(crateTarget), bytes: statSync(crateTarget).size, validation: 'cargo package archive verification passed; crate tests not run by this command' });
 
     try {
       run('go', ['test', './...'], join(root, 'packages', 'extension-sdk', 'go'));
+      run('go', ['test', './...'], join(root, 'packages', 'extension-sdk', 'go-import-consumer'));
       goStatus = 'source-qualified';
-      goValidation = 'go test ./... passed';
+      goValidation = 'SDK go test ./... and clean consumer import test passed';
     } catch (error) {
       if (!/go.*(not recognized|not found|ENOENT)/i.test(String(error))) throw error;
       goValidation = 'not-run: Go toolchain unavailable on the packaging host';
@@ -116,7 +118,7 @@ function main() {
     schema: 'glixo.extension-sdk.release-receipt.v1',
     source: { repository: 'https://github.com/tmedanovic/glixo-community-modules.git', revision: sourceRevision, clean: true },
     packages: artifacts,
-    go: { package: versions.go.name, version: versions.go.version, sourcePath: 'packages/extension-sdk/go', status: goStatus, validation: goValidation },
+    go: { package: versions.go.name, version: versions.go.version, repository: versions.go.repository, tag: versions.go.tag, sourcePath: 'packages/extension-sdk/go', status: goStatus, validation: goValidation },
     publication: 'not-performed',
     signatures: null,
   };

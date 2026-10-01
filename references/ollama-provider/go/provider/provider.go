@@ -13,7 +13,7 @@ import (
 	"github.com/glixo-community/ollama-provider-go/generated/wit/glixo_http_broker"
 	"github.com/glixo-community/ollama-provider-go/generated/wit/glixo_http_types"
 	"github.com/glixo-community/ollama-provider-go/generated/wit/glixo_llm_types_types"
-	"github.com/glixo/extension-sdk-go/httpbroker"
+	"github.com/tmedanovic/glixo-community-modules/packages/extension-sdk/go/httpbroker"
 	types "go.bytecodealliance.org/pkg/wit/types"
 )
 

@@ -8,8 +8,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/glixo/extension-sdk-go/guest"
-	"github.com/glixo/extension-sdk-go/workspace"
+	"github.com/tmedanovic/glixo-community-modules/packages/extension-sdk/go/guest"
+	"github.com/tmedanovic/glixo-community-modules/packages/extension-sdk/go/workspace"
 )
 
 const maximumJSONInteger uint64 = 9_007_199_254_740_991

@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/glixo-community/glixo-contribution-guest-go/internal/issuelookup"
-	"github.com/glixo/extension-sdk-go/httpbroker"
+	"github.com/tmedanovic/glixo-community-modules/packages/extension-sdk/go/httpbroker"
 	"github.com/glixo-community/glixo-contribution-guest-go/generated/wit/glixo_http_broker"
 	withttp "github.com/glixo-community/glixo-contribution-guest-go/generated/wit/glixo_http_types"
 	abitypes "go.bytecodealliance.org/pkg/wit/types"
