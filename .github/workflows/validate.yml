@@ -16,6 +16,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - run: node scripts/ci-compiler-pin.mjs --all
       - run: npm run test:build-runner
       - run: npm run verify
 
@@ -31,8 +32,7 @@ jobs:
       - id: pins
         env:
           LANGUAGE: ${{ matrix.language }}
-        run: |
-          node -e "const fs=require('node:fs'); const m=JSON.parse(fs.readFileSync('packages/extension-sdk/support-matrix.json')); const l=m.languages[process.env.LANGUAGE]; const names={csharp:'dotnet',go:'go',rust:'rustc',typescript:'node'}; const pin=l.toolchain.find(x=>x.tool===names[process.env.LANGUAGE]); if(!pin) process.exit(1); console.log('compiler='+pin.version)" >> "$GITHUB_OUTPUT"
+        run: node scripts/ci-compiler-pin.mjs "$LANGUAGE" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-dotnet@v4
         if: matrix.language == 'csharp'
         with:
