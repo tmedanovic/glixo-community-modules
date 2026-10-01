@@ -59,8 +59,8 @@ for (const item of index.references ?? []) {
       for (const [key, value] of Object.entries(expected)) {
         if (scaffold[key] !== value) errors.push(`${item.id}: scaffold.${key} must be ${value}`);
       }
-      if (!Array.isArray(scaffold.sharedPaths) || scaffold.sharedPaths.some((path) => typeof path !== 'string' || !path.startsWith('references/_shared/'))) errors.push(`${item.id}: scaffold.sharedPaths must name explicit shared assets`);
-      if (!scaffold.substitutions || scaffold.substitutions['{{PACKAGE_ID}}'] !== 'id' || scaffold.substitutions['{{NAME}}'] !== 'metadata.name' || scaffold.substitutions['{{PUBLISHER}}'] !== 'publisher') errors.push(`${item.id}: scaffold metadata substitutions are incomplete`);
+      if (!Array.isArray(scaffold.sharedPaths) || scaffold.sharedPaths.some((path) => !path || typeof path.sourcePath !== 'string' || !path.sourcePath.startsWith('references/_shared/') || typeof path.destination !== 'string' || path.destination.startsWith('/') || path.destination.split(/[\\/]/).includes('..'))) errors.push(`${item.id}: scaffold.sharedPaths must map explicit shared assets to safe project-relative destinations`);
+      if (!scaffold.substitutions || scaffold.substitutions['{{PACKAGE_ID}}'] !== 'package.id' || scaffold.substitutions['{{NAME}}'] !== 'package.name' || scaffold.substitutions['{{PUBLISHER}}'] !== 'package.publisher') errors.push(`${item.id}: scaffold metadata substitutions are incomplete`);
     }
   }
   if (item.kind !== 'executable') {
