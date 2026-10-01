@@ -1,4 +1,4 @@
-name: Validate community modules
+name: Validate extension references
 
 on:
   push:
@@ -9,15 +9,45 @@ permissions:
   contents: read
 
 jobs:
-  catalog:
+  inventory:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npm run pack:artifacts
-      - run: git diff --exit-code
       - run: npm run verify
+
+  guest-builds:
+    needs: inventory
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [csharp, go, rust, typescript]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: pins
+        env:
+          LANGUAGE: ${{ matrix.language }}
+        run: |
+          node -e "const fs=require('node:fs'); const m=JSON.parse(fs.readFileSync('packages/extension-sdk/support-matrix.json')); const l=m.languages[process.env.LANGUAGE]; const names={csharp:'dotnet',go:'go',rust:'rustc',typescript:'node'}; const pin=l.toolchain.find(x=>x.tool===names[process.env.LANGUAGE]); if(!pin) process.exit(1); console.log('compiler='+pin.version)" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-dotnet@v4
+        if: matrix.language == 'csharp'
+        with:
+          dotnet-version: ${{ steps.pins.outputs.compiler }}
+      - uses: actions/setup-go@v5
+        if: matrix.language == 'go'
+        with:
+          go-version: ${{ steps.pins.outputs.compiler }}
+      - uses: dtolnay/rust-toolchain@stable
+        if: matrix.language == 'rust'
+        with:
+          toolchain: ${{ steps.pins.outputs.compiler }}
+          targets: wasm32-wasip2
+      - uses: actions/setup-node@v4
+        if: matrix.language == 'typescript'
+        with:
+          node-version: ${{ steps.pins.outputs.compiler }}
+      - name: Build and check all ${{ matrix.language }} references
+        run: node scripts/build-references.mjs --language=${{ matrix.language }}

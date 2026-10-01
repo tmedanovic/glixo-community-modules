@@ -1,14 +1,9 @@
 {
-  "name": "glixo-community-modules",
-  "version": "0.0.0",
+  "name": "glixo-extension-references",
   "private": true,
-  "description": "Tooling deps for packing Glixo community catalog artifacts.",
   "type": "module",
   "scripts": {
-    "pack:artifacts": "node scripts/pack-catalog-artifacts.mjs",
-    "verify": "node scripts/verify-catalog.mjs"
-  },
-  "devDependencies": {
-    "adm-zip": "^0.6.0"
+    "verify": "node scripts/verify-references.mjs",
+    "build:references": "node scripts/build-references.mjs"
   }
 }
