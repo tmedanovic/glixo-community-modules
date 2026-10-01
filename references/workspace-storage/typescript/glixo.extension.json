@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 2,
+  "id": "{{PACKAGE_ID}}",
+  "version": "0.1.0",
+  "metadata": { "name": "{{NAME}}", "description": "Demonstrates prefix-scoped Glixo extension storage in an isolated test namespace." },
+  "compatibility": { "schema": 2, "witWorld": "glixo:contribution/contribution@1.0.0" },
+  "components": [
+    { "id": "storage", "cell": "server", "runtime": "wasm-component", "artifact": "dist/glixo-extension.component.wasm", "world": "glixo:contribution/contribution@1.0.0" }
+  ],
+  "permissions": {
+    "requested": [
+      { "id": "tool.invoke", "scope": { "tools": ["storage"] }, "reason": "Expose the bounded storage example as an explicitly invoked Glixo tool." },
+      { "id": "storage.extension", "scope": { "prefixes": ["workspace-storage/test/"] }, "reason": "Keep all example data in the package's approved workspace-storage test namespace." }
+    ]
+  },
+  "contributes": {
+    "tools": [
+      {
+        "id": "storage",
+        "component": "storage",
+        "world": "glixo:contribution/contribution@1.0.0",
+        "description": "Get, set, list, or delete bounded values in the approved workspace-storage test namespace.",
+        "inputSchema": {
+          "oneOf": [
+            { "type": "object", "additionalProperties": false, "required": ["operation", "key"], "properties": { "operation": { "const": "get" }, "key": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" } } },
+            { "type": "object", "additionalProperties": false, "required": ["operation", "key", "value"], "properties": { "operation": { "const": "set" }, "key": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" }, "value": { "type": "string", "maxLength": 4096 } } },
+            { "type": "object", "additionalProperties": false, "required": ["operation"], "properties": { "operation": { "const": "list" }, "prefix": { "type": "string", "pattern": "^(?:[a-z0-9][a-z0-9._-]{0,63})?$" } } },
+            { "type": "object", "additionalProperties": false, "required": ["operation", "key"], "properties": { "operation": { "const": "delete" }, "key": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" } } }
+          ]
+        },
+        "outputSchema": {
+          "oneOf": [
+            { "type": "object", "additionalProperties": false, "required": ["operation", "key", "value"], "properties": { "operation": { "const": "get" }, "key": { "type": "string" }, "value": { "type": ["string", "null"] } } },
+            { "type": "object", "additionalProperties": false, "required": ["operation", "key", "stored"], "properties": { "operation": { "const": "set" }, "key": { "type": "string" }, "stored": { "const": true } } },
+            { "type": "object", "additionalProperties": false, "required": ["operation", "prefix", "keys"], "properties": { "operation": { "const": "list" }, "prefix": { "type": "string" }, "keys": { "type": "array", "maxItems": 100, "items": { "type": "string" } } } },
+            { "type": "object", "additionalProperties": false, "required": ["operation", "key", "deleted"], "properties": { "operation": { "const": "delete" }, "key": { "type": "string" }, "deleted": { "type": "boolean" } } }
+          ]
+        },
+        "safety": "mutating",
+        "timeoutMs": 5000,
+        "cancellable": false,
+        "idempotent": false,
+        "confirmation": "invoke"
+      }
+    ]
+  }
+}
