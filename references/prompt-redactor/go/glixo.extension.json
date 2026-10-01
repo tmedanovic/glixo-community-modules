@@ -8,20 +8,12 @@
     "description": "Apply explicit literal redaction rules to outgoing user text.",
     "license": "MIT"
   },
-  "artifacts": [
-    {
-      "path": "dist/glixo-extension.component.wasm",
-      "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
-      "mediaType": "application/wasm"
-    }
-  ],
   "components": [
     {
       "id": "redactor",
       "cell": "server",
       "runtime": "wasm-component",
       "artifact": "dist/glixo-extension.component.wasm",
-      "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
       "world": "glixo:contribution/contribution@1.0.0"
     }
   ],
