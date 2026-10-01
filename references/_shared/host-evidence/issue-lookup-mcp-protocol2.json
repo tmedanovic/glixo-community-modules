@@ -1,6 +1,13 @@
 {
   "schemaVersion": 1,
   "referenceId": "issue-lookup-mcp",
+  "evidenceId": "issue-lookup-mcp-protocol2-framed-conformance",
+  "publicSource": {
+    "repository": "glixo-community-references",
+    "binarySourceSnapshot": "1c53c3478279576e9e012e39708d034d02bbd5a1",
+    "currentManifestSnapshot": "224046912967cd38c6c1ccab6b3be58ab73e8bbd",
+    "note": "The Issue Lookup guest source is unchanged in the current manifest snapshot; later commits only changed middleware prebuild metadata and the Ollama permission-scope key."
+  },
   "sourceCommit": "1c53c3478279576e9e012e39708d034d02bbd5a1",
   "classification": "fixture-only; no production MCP service, credentials, or external network",
   "golden": "references/_shared/goldens/issue-lookup-mcp/stateless-streamable-http.json",
@@ -11,7 +18,14 @@
     "wasmtimeVersion": "48.0.2",
     "maxFrameBytes": 2097152
   },
+  "driver": {
+    "repository": "glixo-ext-tooling",
+    "path": "packages/public-api/src/extensions/glixoExtHostDriver.mjs",
+    "sourceCommit": "b4240e8b5428e0c3f847bd128bfea57b68b276ab",
+    "sha256": "99bb228a95f8268343f25e74827d1c05ad9377a6a91ebaa6d796044b772b8571"
+  },
   "fixture": {
+    "classification": "fixture-only",
     "endpoint": "https://issues.example.test/mcp",
     "method": "POST",
     "operation": "tools/call",
@@ -63,5 +77,16 @@
       "positive": "passed",
       "negative": "passed"
     }
+  },
+  "scopes": {
+    "framedFixture": {
+      "result": "passed",
+      "credentialsUsed": false,
+      "externalNetworkUsed": false,
+      "production": false,
+      "persisted": false
+    },
+    "installedHost": { "status": "not-tested" },
+    "liveMcpService": { "status": "not-tested" }
   }
 }
