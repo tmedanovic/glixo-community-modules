@@ -1,0 +1,619 @@
+{
+  "schemaVersion": 1,
+  "hostProtocol": {
+    "version": 1,
+    "defaultMaxFrame": 2097152,
+    "runnerVersion": "0.1.0",
+    "wasmtimeVersion": "48.0.2",
+    "source": "docs/glixo-platform/contracts/extensions/runtime/runtime-versions.json"
+  },
+  "witRevision": {
+    "http": "glixo:http@3.0.0",
+    "llmTypes": "glixo:llm-types@3.0.0",
+    "providerWorld": "glixo:llm-provider-compat@3.0.0",
+    "contributionWorld": "glixo:contribution@1.0.0"
+  },
+  "goldenFixtures": {
+    "ollamaProtocol": "community-modules/references/shared/test-vectors/ollama",
+    "providerFixtureSchema": "packages/extension-sdk/test-vectors/provider-fixture.schema.json"
+  },
+  "languages": {
+    "rust": {
+      "status": "preview",
+      "sdkPath": "packages/extension-sdk/rust",
+      "recipeId": "ollama-provider-rust-v3"
+    },
+    "go": {
+      "status": "preview",
+      "sdkPath": "packages/extension-sdk/go",
+      "recipeId": "ollama-provider-go-v3"
+    },
+    "csharp": {
+      "status": "preview",
+      "sdkPath": "packages/extension-sdk/csharp",
+      "recipeId": "ollama-provider-csharp-v3"
+    },
+    "typescript": {
+      "status": "preview",
+      "sdkPath": "packages/extension-sdk/typescript",
+      "recipeId": "ollama-provider-typescript-v3"
+    }
+  },
+  "toolchains": {
+    "rust": {
+      "rustc": {
+        "version": "1.96.0",
+        "kind": "compiler"
+      },
+      "cargo": {
+        "version": "1.96.0",
+        "kind": "build"
+      },
+      "witBindgen": {
+        "version": "0.62.0",
+        "kind": "bindings"
+      },
+      "wasmTools": {
+        "version": "1.239.0",
+        "kind": "verify"
+      },
+      "target": "wasm32-wasip2"
+    },
+    "go": {
+      "go": {
+        "version": "1.27.1",
+        "kind": "compiler"
+      },
+      "componentizeGo": {
+        "version": "0.4.3",
+        "kind": "componentizer",
+        "bootstrap": {
+          "path": ".glixo/tools/componentize-go.exe",
+          "platforms": {
+            "windows-x64": {
+              "url": "https://github.com/bytecodealliance/componentize-go/releases/download/v0.4.3/componentize-go-windows-amd64.zip",
+              "sha256": "b7fc1dbfdb9edb97d06d94124b845363bab14ff6a819b518dd6329d0a9428567",
+              "archiveMember": "componentize-go.exe"
+            }
+          }
+        },
+        "embeddedWitBindgen": "0.61.1"
+      },
+      "goBytecodeAlliancePkg": {
+        "version": "0.2.3",
+        "kind": "runtime"
+      }
+    },
+    "csharp": {
+      "dotnetSdk": {
+        "version": "10.0.301",
+        "kind": "compiler"
+      },
+      "componentizeDotnet": {
+        "version": "0.8.0-preview00011",
+        "kind": "componentizer"
+      },
+      "witBindgenCsharp": {
+        "version": "0.58.0",
+        "kind": "bindings"
+      }
+    },
+    "typescript": {
+      "node": {
+        "version": "22.14.0",
+        "kind": "runtime"
+      },
+      "npm": {
+        "version": "11.6.2",
+        "kind": "package-manager"
+      },
+      "typescript": {
+        "version": "6.0.3",
+        "kind": "typecheck"
+      },
+      "jco": {
+        "version": "1.35.0",
+        "kind": "componentize"
+      },
+      "componentizeJs": {
+        "version": "0.23.0",
+        "kind": "engine"
+      },
+      "esbuild": {
+        "version": "0.28.2",
+        "kind": "bundler"
+      }
+    }
+  },
+  "recipes": {
+    "ollama-provider-rust-v3": {
+      "language": "rust",
+      "world": "glixo:llm-provider-compat/provider-compat@3.0.0",
+      "artifact": "dist/glixo-extension.component.wasm",
+      "build": {
+        "steps": [
+          {
+            "tool": "cargo",
+            "args": [
+              "build",
+              "--locked",
+              "--release",
+              "--target",
+              "wasm32-wasip2",
+              "--target-dir",
+              "target"
+            ],
+            "cwd": ".",
+            "output": "target/wasm32-wasip2/release/glixo_ollama_provider.wasm"
+          },
+          {
+            "tool": "node",
+            "args": [
+              "scripts/copy-artifact.mjs",
+              "target/wasm32-wasip2/release/glixo_ollama_provider.wasm",
+              "dist/glixo-extension.component.wasm"
+            ],
+            "cwd": ".",
+            "output": "dist/glixo-extension.component.wasm"
+          }
+        ],
+        "verification": {
+          "tool": "wasm-tools",
+          "args": [
+            "component",
+            "wit",
+            "dist/glixo-extension.component.wasm"
+          ],
+          "output": "dist/glixo-extension.component.wasm"
+        }
+      },
+      "kind": "llm-provider"
+    },
+    "ollama-provider-go-v3": {
+      "language": "go",
+      "world": "glixo:llm-provider-compat/provider-compat@3.0.0",
+      "artifact": "dist/glixo-extension.component.wasm",
+      "build": {
+        "steps": [
+          {
+            "tool": "componentize-go",
+            "args": [
+              "--wit-path",
+              "wit",
+              "--world",
+              "provider-compat",
+              "bindings",
+              "--output",
+              "generated/wit",
+              "--format",
+              "--pkg-name",
+              "github.com/glixo-community/ollama-provider-go/generated/wit",
+              "--export-pkg-name",
+              "github.com/glixo-community/ollama-provider-go/generated/wit/export_provider"
+            ],
+            "cwd": ".",
+            "output": "generated/wit/wit_exports/wit_exports.go"
+          },
+          {
+            "tool": "componentize-go",
+            "args": [
+              "--wit-path",
+              "wit",
+              "--world",
+              "provider-compat",
+              "build",
+              "--go",
+              "go",
+              "--output",
+              "dist/glixo-extension.component.wasm"
+            ],
+            "cwd": ".",
+            "output": "dist/glixo-extension.component.wasm"
+          }
+        ],
+        "verification": {
+          "tool": "wasm-tools",
+          "args": [
+            "component",
+            "wit",
+            "dist/glixo-extension.component.wasm"
+          ],
+          "output": "dist/glixo-extension.component.wasm"
+        }
+      },
+      "kind": "llm-provider"
+    },
+    "ollama-provider-csharp-v3": {
+      "language": "csharp",
+      "world": "glixo:llm-provider-compat/provider-compat@3.0.0",
+      "artifact": "dist/glixo-extension.component.wasm",
+      "build": {
+        "steps": [
+          {
+            "tool": "dotnet",
+            "args": [
+              "restore",
+              "Glixo.OllamaProvider.csproj",
+              "--runtime",
+              "wasi-wasm",
+              "--locked-mode"
+            ],
+            "cwd": ".",
+            "output": "obj/project.assets.json"
+          },
+          {
+            "tool": "dotnet",
+            "args": [
+              "build",
+              "Glixo.OllamaProvider.csproj",
+              "--configuration",
+              "Release",
+              "--runtime",
+              "wasi-wasm",
+              "--no-restore"
+            ],
+            "cwd": ".",
+            "output": "bin/Release/net10.0/wasi-wasm/publish/Glixo.OllamaProvider.wasm"
+          },
+          {
+            "tool": "node",
+            "args": [
+              "scripts/copy-artifact.mjs",
+              "bin/Release/net10.0/wasi-wasm/publish/Glixo.OllamaProvider.wasm",
+              "dist/glixo-extension.component.wasm"
+            ],
+            "cwd": ".",
+            "output": "dist/glixo-extension.component.wasm"
+          }
+        ],
+        "verification": {
+          "tool": "wasm-tools",
+          "args": [
+            "component",
+            "wit",
+            "dist/glixo-extension.component.wasm"
+          ],
+          "output": "dist/glixo-extension.component.wasm"
+        }
+      },
+      "kind": "llm-provider"
+    },
+    "ollama-provider-typescript-v3": {
+      "language": "typescript",
+      "world": "glixo:llm-provider-compat/provider-compat@3.0.0",
+      "artifact": "dist/glixo-extension.component.wasm",
+      "build": {
+        "steps": [
+          {
+            "tool": "npm",
+            "args": [
+              "ci",
+              "--ignore-scripts"
+            ],
+            "cwd": "vendor/glixo-extension-sdk",
+            "output": "vendor/glixo-extension-sdk/node_modules"
+          },
+          {
+            "tool": "npm",
+            "args": [
+              "run",
+              "build"
+            ],
+            "cwd": "vendor/glixo-extension-sdk",
+            "output": "vendor/glixo-extension-sdk/dist/http.js"
+          },
+          {
+            "tool": "npm",
+            "args": [
+              "ci",
+              "--ignore-scripts"
+            ],
+            "cwd": ".",
+            "output": "node_modules"
+          },
+          {
+            "tool": "node",
+            "args": [
+              "node_modules/typescript/bin/tsc",
+              "--project",
+              "tsconfig.json"
+            ],
+            "cwd": ".",
+            "output": "dist/js/provider.js"
+          },
+          {
+            "tool": "node",
+            "args": [
+              "node_modules/esbuild/bin/esbuild",
+              "dist/js/provider.js",
+              "--bundle",
+              "--format=esm",
+              "--external:glixo:*",
+              "--outfile=dist/bundle.js"
+            ],
+            "cwd": ".",
+            "output": "dist/bundle.js"
+          },
+          {
+            "tool": "node",
+            "args": [
+              "node_modules/@bytecodealliance/jco/dist/jco.js",
+              "componentize",
+              "dist/bundle.js",
+              "--wit",
+              "wit",
+              "--world-name",
+              "provider-compat",
+              "--disable",
+              "all",
+              "--cwd",
+              ".",
+              "--out",
+              "dist/glixo-extension.component.wasm"
+            ],
+            "cwd": ".",
+            "output": "dist/glixo-extension.component.wasm"
+          }
+        ],
+        "verification": {
+          "tool": "wasm-tools",
+          "args": [
+            "component",
+            "wit",
+            "dist/glixo-extension.component.wasm"
+          ],
+          "output": "dist/glixo-extension.component.wasm"
+        }
+      },
+      "kind": "llm-provider"
+    },
+    "contribution-rust-v1": {
+      "language": "rust",
+      "world": "glixo:contribution/contribution@1.0.0",
+      "artifact": "dist/glixo-extension.component.wasm",
+      "build": {
+        "steps": [
+          {
+            "tool": "cargo",
+            "args": [
+              "build",
+              "--locked",
+              "--release",
+              "--target",
+              "wasm32-wasip2",
+              "--target-dir",
+              "target"
+            ],
+            "cwd": ".",
+            "output": "target/wasm32-wasip2/release/glixo_contribution_guest.wasm"
+          },
+          {
+            "tool": "node",
+            "args": [
+              "scripts/copy-artifact.mjs",
+              "target/wasm32-wasip2/release/glixo_contribution_guest.wasm",
+              "dist/glixo-extension.component.wasm"
+            ],
+            "cwd": ".",
+            "output": "dist/glixo-extension.component.wasm"
+          }
+        ],
+        "verification": {
+          "tool": "wasm-tools",
+          "args": [
+            "component",
+            "wit",
+            "dist/glixo-extension.component.wasm"
+          ],
+          "output": "dist/glixo-extension.component.wasm"
+        }
+      },
+      "kind": "contribution"
+    },
+    "contribution-go-v1": {
+      "language": "go",
+      "world": "glixo:contribution/contribution@1.0.0",
+      "artifact": "dist/glixo-extension.component.wasm",
+      "build": {
+        "steps": [
+          {
+            "tool": "componentize-go",
+            "args": [
+              "--wit-path",
+              "wit",
+              "--world",
+              "contribution",
+              "bindings",
+              "--output",
+              "generated/wit",
+              "--format",
+              "--pkg-name",
+              "github.com/glixo-community/glixo-contribution-guest-go/generated/wit",
+              "--export-pkg-name",
+              "github.com/glixo-community/glixo-contribution-guest-go/generated/wit/export_provider"
+            ],
+            "cwd": ".",
+            "output": "generated/wit/wit_exports/wit_exports.go"
+          },
+          {
+            "tool": "componentize-go",
+            "args": [
+              "--wit-path",
+              "wit",
+              "--world",
+              "contribution",
+              "build",
+              "--go",
+              "go",
+              "--output",
+              "dist/glixo-extension.component.wasm"
+            ],
+            "cwd": ".",
+            "output": "dist/glixo-extension.component.wasm"
+          }
+        ],
+        "verification": {
+          "tool": "wasm-tools",
+          "args": [
+            "component",
+            "wit",
+            "dist/glixo-extension.component.wasm"
+          ],
+          "output": "dist/glixo-extension.component.wasm"
+        }
+      },
+      "kind": "contribution"
+    },
+    "contribution-csharp-v1": {
+      "language": "csharp",
+      "world": "glixo:contribution/contribution@1.0.0",
+      "artifact": "dist/glixo-extension.component.wasm",
+      "build": {
+        "steps": [
+          {
+            "tool": "dotnet",
+            "args": [
+              "restore",
+              "Glixo.Contribution.csproj",
+              "--runtime",
+              "wasi-wasm",
+              "--locked-mode"
+            ],
+            "cwd": ".",
+            "output": "obj/project.assets.json"
+          },
+          {
+            "tool": "dotnet",
+            "args": [
+              "build",
+              "Glixo.Contribution.csproj",
+              "--configuration",
+              "Release",
+              "--runtime",
+              "wasi-wasm",
+              "--no-restore"
+            ],
+            "cwd": ".",
+            "output": "bin/Release/net10.0/wasi-wasm/publish/Glixo.Contribution.wasm"
+          },
+          {
+            "tool": "node",
+            "args": [
+              "scripts/copy-artifact.mjs",
+              "bin/Release/net10.0/wasi-wasm/publish/Glixo.Contribution.wasm",
+              "dist/glixo-extension.component.wasm"
+            ],
+            "cwd": ".",
+            "output": "dist/glixo-extension.component.wasm"
+          }
+        ],
+        "verification": {
+          "tool": "wasm-tools",
+          "args": [
+            "component",
+            "wit",
+            "dist/glixo-extension.component.wasm"
+          ],
+          "output": "dist/glixo-extension.component.wasm"
+        }
+      },
+      "kind": "contribution"
+    },
+    "contribution-typescript-v1": {
+      "language": "typescript",
+      "world": "glixo:contribution/contribution@1.0.0",
+      "artifact": "dist/glixo-extension.component.wasm",
+      "build": {
+        "steps": [
+          {
+            "tool": "npm",
+            "args": [
+              "ci",
+              "--ignore-scripts"
+            ],
+            "cwd": "vendor/glixo-extension-sdk",
+            "output": "vendor/glixo-extension-sdk/node_modules"
+          },
+          {
+            "tool": "npm",
+            "args": [
+              "run",
+              "build"
+            ],
+            "cwd": "vendor/glixo-extension-sdk",
+            "output": "vendor/glixo-extension-sdk/dist/http.js"
+          },
+          {
+            "tool": "npm",
+            "args": [
+              "ci",
+              "--ignore-scripts"
+            ],
+            "cwd": ".",
+            "output": "node_modules"
+          },
+          {
+            "tool": "node",
+            "args": [
+              "node_modules/typescript/bin/tsc",
+              "--project",
+              "tsconfig.json"
+            ],
+            "cwd": ".",
+            "output": "dist/js/guest.js"
+          },
+          {
+            "tool": "node",
+            "args": [
+              "node_modules/esbuild/bin/esbuild",
+              "dist/js/guest.js",
+              "--bundle",
+              "--format=esm",
+              "--external:glixo:*",
+              "--outfile=dist/bundle.js"
+            ],
+            "cwd": ".",
+            "output": "dist/bundle.js"
+          },
+          {
+            "tool": "node",
+            "args": [
+              "node_modules/@bytecodealliance/jco/dist/jco.js",
+              "componentize",
+              "dist/bundle.js",
+              "--wit",
+              "wit",
+              "--world-name",
+              "contribution",
+              "--disable",
+              "all",
+              "--cwd",
+              ".",
+              "--out",
+              "dist/glixo-extension.component.wasm"
+            ],
+            "cwd": ".",
+            "output": "dist/glixo-extension.component.wasm"
+          }
+        ],
+        "verification": {
+          "tool": "wasm-tools",
+          "args": [
+            "component",
+            "wit",
+            "dist/glixo-extension.component.wasm"
+          ],
+          "output": "dist/glixo-extension.component.wasm"
+        }
+      },
+      "kind": "contribution"
+    }
+  },
+  "acceptance": {
+    "installedHost": "not-yet-verified",
+    "realOllamaEndpoint": "not-yet-verified",
+    "toolRoundTrip": "not-yet-verified",
+    "cancellation": "not-yet-verified",
+    "sizeLimitBytes": 8388608
+  }
+}

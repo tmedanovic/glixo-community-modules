@@ -73,7 +73,7 @@ for (const item of index.references ?? []) {
         if (scaffold[key] !== value) errors.push(`${item.id}: scaffold.${key} must be ${value}`);
       }
       if (!Array.isArray(scaffold.sharedPaths) || scaffold.sharedPaths.some((path) => !path || typeof path.sourcePath !== 'string' || !path.sourcePath.startsWith('references/_shared/') || path.sourcePath.split(/[\\/]/).includes('..') || typeof path.destination !== 'string' || path.destination.startsWith('/') || path.destination.split(/[\\/]/).includes('..'))) errors.push(`${item.id}: scaffold.sharedPaths must map explicit shared assets to safe project-relative destinations`);
-      else for (const path of scaffold.sharedPaths) if (!existsSync(join(root, path.sourcePath))) errors.push(`${item.id}: shared asset source is missing: ${path.sourcePath}`);
+      else if (item.status !== 'planned') for (const path of scaffold.sharedPaths) if (!existsSync(join(root, path.sourcePath))) errors.push(`${item.id}: shared asset source is missing: ${path.sourcePath}`);
       if (!scaffold.substitutions || scaffold.substitutions['{{PACKAGE_ID}}'] !== 'package.id' || scaffold.substitutions['{{NAME}}'] !== 'package.name' || scaffold.substitutions['{{PUBLISHER}}'] !== 'package.publisher') errors.push(`${item.id}: scaffold metadata substitutions are incomplete`);
     }
   }
@@ -84,6 +84,10 @@ for (const item of index.references ?? []) {
   const languages = item.languages ?? [];
   if (languages.length !== allowedLanguages.size || [...languages].some((language) => !allowedLanguages.has(language))) {
     errors.push(`${item.id}: executable reference must declare C#, Go, Rust, and TypeScript`);
+    continue;
+  }
+  if (item.status === 'planned') {
+    warnings.push(`${item.id}: source projects are still planned`);
     continue;
   }
   const base = join(root, 'references', item.id);
