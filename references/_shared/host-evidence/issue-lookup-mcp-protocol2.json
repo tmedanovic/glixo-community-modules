@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "referenceId": "issue-lookup-mcp",
+  "sourceCommit": "1c53c3478279576e9e012e39708d034d02bbd5a1",
+  "classification": "fixture-only; no production MCP service, credentials, or external network",
+  "golden": "references/_shared/goldens/issue-lookup-mcp/stateless-streamable-http.json",
+  "host": {
+    "sourceCommit": "190204d0723125d8e7ba62485596ea5471326bbf",
+    "sha256": "9cbb7da99521d65b88955653d2e2e55aca41fc588d9f1a8b8f4e4a2f86627d30",
+    "protocolVersion": 2,
+    "wasmtimeVersion": "48.0.2",
+    "maxFrameBytes": 2097152
+  },
+  "fixture": {
+    "endpoint": "https://issues.example.test/mcp",
+    "method": "POST",
+    "operation": "tools/call",
+    "issueKey": "DEMO-17",
+    "expectedPayload": {
+      "issueKey": "DEMO-17",
+      "summary": "bounded issue metadata"
+    },
+    "positive": {
+      "result": "passed",
+      "httpRequests": 1,
+      "brokerOperations": ["http.start", "http.response-headers", "http.read", "http.drop"],
+      "deniedOperations": 0,
+      "unusedRoutes": 0
+    },
+    "negative": {
+      "result": "passed",
+      "condition": "approved endpoint handle omitted",
+      "error": "approved_issues_endpoint_missing",
+      "httpRequests": 0
+    }
+  },
+  "languages": {
+    "csharp": {
+      "component": "references/issue-lookup-mcp/csharp/dist/glixo-extension.component.wasm",
+      "sha256": "8d887344ccfc403bda296c68243671daf1e9488602a6b274adc9852d8d0c63ee",
+      "bytes": 7010270,
+      "positive": "passed",
+      "negative": "passed"
+    },
+    "go": {
+      "component": "references/issue-lookup-mcp/go/dist/glixo-extension.component.wasm",
+      "sha256": "2092df20881f68e7292be5221e6c611cc4d177549df583e96afcb2b74e05af3c",
+      "bytes": 5081017,
+      "positive": "passed",
+      "negative": "passed"
+    },
+    "rust": {
+      "component": "references/issue-lookup-mcp/rust/dist/glixo-extension.component.wasm",
+      "sha256": "6e6bbf94d9081fd55f7d5979645372cb7e1d98660e7bb33794e244cead612af3",
+      "bytes": 424353,
+      "positive": "passed",
+      "negative": "passed"
+    },
+    "typescript": {
+      "component": "references/issue-lookup-mcp/typescript/dist/glixo-extension.component.wasm",
+      "sha256": "b11bb1fd9c8c149dd34926852fc2d0bd6c1c0a5abe38f1b27618e9d0af505b57",
+      "bytes": 12087337,
+      "positive": "passed",
+      "negative": "passed"
+    }
+  }
+}
