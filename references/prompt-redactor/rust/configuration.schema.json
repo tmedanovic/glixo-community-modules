@@ -7,7 +7,6 @@
   "properties": {
     "rules": {
       "type": "array",
-      "maxItems": 64,
       "items": {
         "type": "object",
         "additionalProperties": false,
