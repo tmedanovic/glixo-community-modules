@@ -1,8 +1,15 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": false,
+  "required": ["oauth"],
   "properties": {
-    "maxPagesPerWake": { "type": "integer", "minimum": 1, "maximum": 5, "default": 5 }
+    "maxPagesPerWake": { "type": "integer", "minimum": 1, "maximum": 5, "default": 5 },
+    "oauth": {
+      "type": "string",
+      "minLength": 1,
+      "x-secret": true,
+      "x-oauth": true,
+      "description": "Delegated Microsoft Graph access with Mail.ReadBasic for this account."
+    }
   }
 }

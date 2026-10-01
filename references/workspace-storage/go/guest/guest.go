@@ -5,7 +5,7 @@ import (
 
 	"github.com/glixo-community/glixo-contribution-guest-go/generated/wit/glixo_contribution_broker"
 	"github.com/glixo-community/glixo-contribution-guest-go/storage"
-	"go.bytecodealliance.org/pkg/wit/types"
+	wit_types "go.bytecodealliance.org/pkg/wit/types"
 )
 
 type hostState struct{}
@@ -34,8 +34,8 @@ func (hostState) Delete(key string) (bool, error) {
 }
 
 // Invoke is called by componentize-go's generated generic guest export shim.
-func Invoke(requestJSON string) types.Result[string, string] {
+func Invoke(requestJSON string) wit_types.Result[string, string] {
 	response, err := storage.Handle(requestJSON, hostState{})
-	if err != nil { return types.Err[string, string](err.Error()) }
-	return types.Ok[string, string](response)
+	if err != nil { return wit_types.Err[string, string](err.Error()) }
+	return wit_types.Ok[string, string](response)
 }

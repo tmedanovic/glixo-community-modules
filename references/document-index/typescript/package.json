@@ -2,7 +2,23 @@
   "name": "@glixo/reference-document-index",
   "private": true,
   "type": "module",
-  "scripts": { "build": "tsc -p tsconfig.json && esbuild dist/js/guest.js --bundle --format=esm --external:glixo:* --outfile=dist/bundle.js && jco componentize dist/bundle.js --wit wit --world-name contribution --disable all --cwd . --out dist/glixo-extension.component.wasm", "test": "npm run build && node --test test/*.test.mjs" },
-  "devDependencies": { "@bytecodealliance/componentize-js": "0.23.0", "@bytecodealliance/jco": "1.35.0", "esbuild": "0.28.2", "typescript": "6.0.3" },
-  "dependencies": { "@glixo/extension-sdk": "file:../../../packages/extension-sdk/typescript" }
+  "scripts": {
+    "build": "tsc -p tsconfig.json && esbuild dist/js/guest.js --bundle --format=esm --external:glixo:* --outfile=dist/bundle.js && jco componentize dist/bundle.js --wit wit --world-name contribution --disable all --cwd . --out dist/glixo-extension.component.wasm",
+    "test": "npm run build && node --test test/*.test.mjs"
+  },
+  "devDependencies": {
+    "@bytecodealliance/componentize-js": "0.23.0",
+    "@bytecodealliance/jco": "1.35.0",
+    "esbuild": "0.28.2",
+    "typescript": "6.0.3",
+    "@bytecodealliance/preview2-shim": "0.25.0"
+  },
+  "dependencies": {
+    "@glixo/extension-sdk": "file:../../../packages/extension-sdk/typescript"
+  },
+  "overrides": {
+    "@bytecodealliance/jco": {
+      "@bytecodealliance/componentize-js": "0.23.0"
+    }
+  }
 }

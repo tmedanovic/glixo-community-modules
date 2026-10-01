@@ -122,6 +122,10 @@
       "esbuild": {
         "version": "0.28.2",
         "kind": "bundler"
+      },
+      "preview2Shim": {
+        "version": "0.25.0",
+        "kind": "componentize dependency"
       }
     }
   },

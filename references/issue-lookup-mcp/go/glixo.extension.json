@@ -21,7 +21,17 @@
     "requested": [
       {
         "id": "http.connection",
-        "scope": { "endpoints": ["issues"], "methods": ["POST"], "paths": ["/mcp"] },
+        "scope": {
+          "endpoints": [
+            "issues"
+          ],
+          "methods": [
+            "POST"
+          ],
+          "paths": [
+            "/mcp"
+          ]
+        },
         "reason": "Call only the locally approved issues MCP endpoint using its invocation-scoped opaque connection handle."
       }
     ]
@@ -31,7 +41,7 @@
       "id": "issue-lookup",
       "scope": "installation",
       "schema": "configuration.schema.json",
-      "schemaDigest": "sha256:5f6d0a0f08ee2aff43ac2861b0a12b155ad39b3578d8bd1cf9b5d7ce57e658aa"
+      "schemaDigest": "sha256:67fbae7ab73a4af2edf41deb2de8980eb67453f8dc7b5f688a82b45c0bb6e87b"
     }
   ],
   "contributions": {
@@ -44,18 +54,32 @@
         "inputSchema": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["issueKey"],
+          "required": [
+            "issueKey"
+          ],
           "properties": {
-            "issueKey": { "type": "string", "pattern": "^[A-Z][A-Z0-9]{0,9}-[1-9][0-9]{0,8}(?![\\s\\S])", "maxLength": 20 }
+            "issueKey": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Z0-9]{0,9}-[1-9][0-9]{0,8}(?![\\s\\S])",
+              "maxLength": 20
+            }
           }
         },
         "outputSchema": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["issueKey", "summary"],
+          "required": [
+            "issueKey",
+            "summary"
+          ],
           "properties": {
-            "issueKey": { "type": "string" },
-            "summary": { "type": "string", "maxLength": 65536 }
+            "issueKey": {
+              "type": "string"
+            },
+            "summary": {
+              "type": "string",
+              "maxLength": 65536
+            }
           }
         },
         "safety": "readonly",
@@ -67,4 +91,3 @@
     ]
   }
 }
-

@@ -59,7 +59,7 @@
       "id": "redaction-rules",
       "scope": "account",
       "schema": "configuration.schema.json",
-      "schemaDigest": "sha256:c3b1d83eb46f15ff4e2dcb359c79ba00d68c23d4f8211742bcfc39847c7ba5b0"
+      "schemaDigest": "sha256:22f3bcf29981668e32044e0857a5dec73f3f560ad21aea97b96ce94c80404095"
     }
   ]
 }

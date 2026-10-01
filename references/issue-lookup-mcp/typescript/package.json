@@ -15,6 +15,12 @@
     "@bytecodealliance/componentize-js": "0.23.0",
     "@bytecodealliance/jco": "1.35.0",
     "esbuild": "0.28.2",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "@bytecodealliance/preview2-shim": "0.25.0"
+  },
+  "overrides": {
+    "@bytecodealliance/jco": {
+      "@bytecodealliance/componentize-js": "0.23.0"
+    }
   }
 }

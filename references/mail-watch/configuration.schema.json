@@ -1,5 +1,4 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": false,
   "required": ["oauth"],
@@ -10,7 +9,6 @@
       "minLength": 1,
       "x-secret": true,
       "x-oauth": true,
-      "title": "Microsoft Graph account connection",
       "description": "Delegated Microsoft Graph access with Mail.ReadBasic for this account."
     }
   }

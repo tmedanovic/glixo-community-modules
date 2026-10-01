@@ -27,7 +27,7 @@
       "id": "provider-account",
       "scope": "account",
       "schema": "schemas/account.json",
-      "schemaDigest": "sha256:3152ec5dbcdfecae787b75bf7baa08ddbb3c380ec470580cc3e131730b645df4"
+      "schemaDigest": "sha256:4b47779c2adf2d4d24d1b375a2a291d836c518e0db6f25394e3ed8a5bcd38ae3"
     }
   ],
   "permissions": {
@@ -35,9 +35,18 @@
       {
         "id": "http.connection",
         "scope": {
-          "endpointNames": ["ollama"],
-          "methods": ["GET", "POST"],
-          "paths": ["/api/tags", "/api/show", "/api/chat"]
+          "endpointNames": [
+            "ollama"
+          ],
+          "methods": [
+            "GET",
+            "POST"
+          ],
+          "paths": [
+            "/api/tags",
+            "/api/show",
+            "/api/chat"
+          ]
         },
         "reason": "Connect to the host-approved Ollama endpoint for model discovery, capability lookup, and chat."
       }
