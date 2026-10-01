@@ -19,7 +19,7 @@
       ],
       "status": "planned",
       "owner": "provider-sdk",
-      "contract": "glixo:llm-provider-compat@3.0.0 + glixo:http/broker@3.0.0",
+      "contract": "glixo:llm-provider-compat/provider-compat@3.0.0 + glixo:http/broker@3.0.0",
       "hostAcceptance": "pending",
       "scaffold": {
         "sourcePath": "references/ollama-provider/{language}",
@@ -49,7 +49,7 @@
       ],
       "status": "planned",
       "owner": "references",
-      "contract": "glixo:contribution/guest@1.0.0",
+      "contract": "glixo:contribution/contribution@1.0.0",
       "hostAcceptance": "pending",
       "scaffold": {
         "sourcePath": "references/workspace-health/{language}",
@@ -79,7 +79,7 @@
       ],
       "status": "planned",
       "owner": "references",
-      "contract": "glixo:contribution/guest@1.0.0 + host-scoped workspace query",
+      "contract": "glixo:contribution/contribution@1.0.0 + host-scoped workspace query",
       "hostAcceptance": "pending",
       "scaffold": {
         "sourcePath": "references/document-index/{language}",
@@ -109,7 +109,7 @@
       ],
       "status": "planned",
       "owner": "references",
-      "contract": "glixo:contribution/guest@1.0.0 + prefix-scoped storage.extension",
+      "contract": "glixo:contribution/contribution@1.0.0 + prefix-scoped storage.extension",
       "hostAcceptance": "pending",
       "scaffold": {
         "sourcePath": "references/workspace-storage/{language}",
@@ -139,7 +139,7 @@
       ],
       "status": "planned",
       "owner": "references",
-      "contract": "glixo:contribution/guest@1.0.0 + approved HTTPS Streamable HTTP",
+      "contract": "glixo:contribution/contribution@1.0.0 + approved HTTPS Streamable HTTP",
       "hostAcceptance": "pending",
       "scaffold": {
         "sourcePath": "references/issue-lookup-mcp/{language}",
@@ -169,7 +169,7 @@
       ],
       "status": "planned",
       "owner": "services",
-      "contract": "background-service/event contract revision pending",
+      "contract": "glixo:contribution/contribution@1.0.0 + background-service/event contract revision pending",
       "hostAcceptance": "pending",
       "scaffold": {
         "sourcePath": "references/mail-watch/{language}",
@@ -199,7 +199,7 @@
       ],
       "status": "planned",
       "owner": "middleware",
-      "contract": "message-middleware contract revision pending",
+      "contract": "glixo:contribution/contribution@1.0.0 + message-middleware contract revision pending",
       "hostAcceptance": "pending",
       "scaffold": {
         "sourcePath": "references/conversation-insights/{language}",
@@ -229,7 +229,7 @@
       ],
       "status": "planned",
       "owner": "middleware",
-      "contract": "message-middleware contract revision pending",
+      "contract": "glixo:contribution/contribution@1.0.0 + message-middleware contract revision pending",
       "hostAcceptance": "pending",
       "scaffold": {
         "sourcePath": "references/prompt-redactor/{language}",

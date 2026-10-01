@@ -9,6 +9,8 @@ const supportPath = join(root, 'packages', 'extension-sdk', 'support-matrix.json
 const errors = [];
 const warnings = [];
 const allowedLanguages = new Set(['csharp', 'go', 'rust', 'typescript']);
+const support = existsSync(supportPath) ? JSON.parse(readFileSync(supportPath, 'utf8')) : undefined;
+const recipes = support?.recipes;
 const forbiddenRoots = ['bundled', 'catalog', 'examples', 'integrations', 'archive'];
 for (const path of forbiddenRoots) {
   if (existsSync(join(root, path))) errors.push(`retired active tree remains: ${path}/`);
@@ -33,11 +35,22 @@ checkLegacyFiles(join(root, 'references'));
 if (index.schemaVersion !== 1 || !Array.isArray(index.references)) errors.push('unsupported or malformed reference index');
 if (!existsSync(supportPath)) errors.push('public SDK support matrix is missing');
 else {
-  const support = JSON.parse(readFileSync(supportPath, 'utf8'));
+  if (!recipes || typeof recipes !== 'object' || Array.isArray(recipes)) errors.push('SDK support matrix is missing its recipe registry');
+  if (!support.toolchains || typeof support.toolchains !== 'object') errors.push('SDK support matrix is missing pinned toolchain definitions');
   for (const language of ['csharp', 'go', 'rust', 'typescript']) {
     const row = support.languages?.[language];
-    if (!row || !Array.isArray(row.toolchain) || !row.toolchain.length || !row.recipeId) errors.push(`SDK support matrix is missing pinned ${language} build data`);
+    if (!row || typeof row.sdkPath !== 'string' || !row.recipeId || !recipes?.[row.recipeId]) errors.push(`SDK support matrix is missing ${language} SDK or recipe data`);
     if (row && !['supported', 'preview', 'planned'].includes(row.status)) errors.push(`${language}: invalid support status`);
+  }
+  for (const [recipeId, recipe] of Object.entries(recipes ?? {})) {
+    if (!['csharp', 'go', 'rust', 'typescript'].includes(recipe.language)) errors.push(`${recipeId}: unsupported recipe language`);
+    if (recipe.kind !== 'component') errors.push(`${recipeId}: only component recipes are accepted`);
+    if (typeof recipe.world !== 'string' || !recipe.world.includes('@')) errors.push(`${recipeId}: exact versioned world is required`);
+    if (!Array.isArray(recipe.build?.steps) || !recipe.build.steps.length) errors.push(`${recipeId}: build steps are required`);
+    if (!recipe.build?.verification || typeof recipe.build.verification.tool !== 'string' || !Array.isArray(recipe.build.verification.args)) errors.push(`${recipeId}: component verification recipe is required`);
+    for (const step of [...(recipe.build?.steps ?? []), recipe.build?.verification ?? {}]) {
+      if (typeof step.tool !== 'string' || !Array.isArray(step.args) || step.args.some((arg) => typeof arg !== 'string')) errors.push(`${recipeId}: malformed immutable argv step`);
+    }
   }
 }
 const seen = new Set();
@@ -98,8 +111,21 @@ for (const item of index.references ?? []) {
     }
     const metadata = JSON.parse(readFileSync(projectFile, 'utf8'));
     if (metadata.referenceId !== item.id || metadata.language !== language) errors.push(`${item.id}/${language}: reference.json identity mismatch`);
-    if (!Array.isArray(metadata.build) || !metadata.build.length) errors.push(`${item.id}/${language}: build command is required`);
-    if (!Array.isArray(metadata.contractChecks) || !metadata.contractChecks.length) errors.push(`${item.id}/${language}: meaningful contractChecks are required`);
+    const recipeId = metadata.build?.recipeId;
+    const recipe = recipes?.[recipeId];
+    if (!recipeId || !recipe) errors.push(`${item.id}/${language}: build.recipeId must resolve through the public SDK recipe registry`);
+    else {
+      if (recipe.language !== language) errors.push(`${item.id}/${language}: recipe ${recipeId} targets ${recipe.language}`);
+      if (item.contract && !item.contract.includes(recipe.world)) errors.push(`${item.id}/${language}: indexed contract does not include recipe world ${recipe.world}`);
+    }
+    const projectManifest = join(project, 'glixo.project.json');
+    if (!existsSync(projectManifest)) errors.push(`${item.id}/${language}: glixo.project.json is required for glxdev scaffolding`);
+    else {
+      const declaration = JSON.parse(readFileSync(projectManifest, 'utf8'));
+      const componentRecipes = declaration.components?.map((component) => component.recipe) ?? [];
+      if (!componentRecipes.includes(recipeId)) errors.push(`${item.id}/${language}: glixo.project.json must select recipe ${recipeId}`);
+    }
+    if (!existsSync(join(project, 'glixo.extension.json'))) errors.push(`${item.id}/${language}: glixo.extension.json is required for scaffolding`);
     if (metadata.placeholder === true) errors.push(`${item.id}/${language}: placeholder implementations are forbidden`);
     if (metadata.hostAcceptance === 'passed' && metadata.status !== 'supported') warnings.push(`${item.id}/${language}: host acceptance is passed; update the reference-level status after aggregate review`);
   }
