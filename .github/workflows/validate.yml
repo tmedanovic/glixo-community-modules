@@ -16,6 +16,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - run: npm run test:build-runner
       - run: npm run verify
 
   guest-builds:
