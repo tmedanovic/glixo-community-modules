@@ -5,6 +5,7 @@
   "scripts": {
     "verify": "node scripts/verify-references.mjs",
     "verify:manifests": "node scripts/verify-manifests.mjs",
+    "verify:evidence": "node scripts/verify-host-evidence.mjs",
     "build:references": "node scripts/build-references.mjs",
     "test:build-runner": "node --test scripts/build-references.test.mjs"
   },
