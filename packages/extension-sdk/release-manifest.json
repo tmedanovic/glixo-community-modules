@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "packages": {
+    "typescript": {
+      "ecosystem": "npm",
+      "name": "@glixo/extension-sdk",
+      "version": "0.1.0",
+      "registry": "https://registry.npmjs.org/",
+      "publication": "not-performed"
+    },
+    "csharp": {
+      "ecosystem": "nuget",
+      "name": "Glixo.ExtensionSdk",
+      "version": "0.1.0",
+      "registry": "https://api.nuget.org/v3/index.json",
+      "publication": "not-performed"
+    },
+    "rust": {
+      "ecosystem": "cargo",
+      "name": "glixo-extension-sdk",
+      "version": "0.1.0",
+      "registry": "https://crates.io/",
+      "publication": "not-performed"
+    },
+    "go": {
+      "ecosystem": "go-module",
+      "name": "github.com/glixo/extension-sdk-go",
+      "version": "0.1.0",
+      "distribution": "versioned-source-commit",
+      "publication": "not-performed"
+    }
+  }
+}

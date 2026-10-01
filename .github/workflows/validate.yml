@@ -18,6 +18,8 @@ jobs:
           node-version: 22
       - run: node scripts/ci-compiler-pin.mjs --all
       - run: npm run test:build-runner
+      - run: npm run verify:sdk-packages
+      - run: npm run test:sdk-package-install
       - run: npm run verify
 
   guest-builds:
