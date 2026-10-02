@@ -9,7 +9,11 @@
     { "id": "panel-ui", "cell": "browser", "runtime": "sandboxed-web", "artifact": "ui/index.html", "digest": "sha256:5d2d8ed766e079f38705a015323c007eb26e76c3a5c5fa52e648324cfb298831" },
     { "id": "panel-actions", "cell": "server", "runtime": "wasm-component", "artifact": "dist/glixo-extension.component.wasm", "world": "glixo:contribution/contribution@1.0.0" }
   ],
-  "permissions": { "requested": [ { "id": "storage.extension", "scope": { "prefixes": ["accessible-theme/preferences/"] }, "reason": "Persist only the panel's selected appearance preference in this extension's namespaced storage." } ] },
+  "permissions": { "requested": [
+    { "id": "storage.extension", "scope": { "prefixes": ["accessible-theme/preferences/"] }, "reason": "Persist only the panel's selected appearance preference in this extension's namespaced storage." },
+    { "id": "ui.surface", "scope": { "contributions": ["themed-custom-panel"], "placements": ["settings.extensions"] }, "reason": "Materialize this sandboxed settings panel only at its declared extension-settings placement." },
+    { "id": "host.action", "scope": { "actions": ["save-preferences"] }, "reason": "Invoke only the panel's declared preference-saving action through the host bridge." }
+  ] },
   "contributions": {
     "surfaces": [
       { "id": "themed-custom-panel", "uiTier": "sandboxed-web", "title": "Personal appearance", "placements": ["settings.extensions"], "origin": "opaque-extension", "component": "panel-ui", "assets": [{ "path": "ui/index.html", "digest": "sha256:5d2d8ed766e079f38705a015323c007eb26e76c3a5c5fa52e648324cfb298831", "mediaType": "text/html" }], "actions": [{ "kind": "action", "id": "save-preferences" }], "compatibility": { "schema": 2, "uiBridge": "sandboxed-web.v1", "requiresRuntime": false } }

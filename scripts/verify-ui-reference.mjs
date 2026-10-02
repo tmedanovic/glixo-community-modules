@@ -90,6 +90,16 @@ for (const language of languages) {
   if (manifest.permissions?.requested?.find((permission) => permission.id === 'storage.extension')?.scope?.prefixes?.join() !== 'accessible-theme/preferences/') {
     fail(`${language}: preference persistence must stay inside its declared extension storage prefix`);
   }
+  const permissions = manifest.permissions?.requested ?? [];
+  const uiSurface = permissions.find((permission) => permission.id === 'ui.surface');
+  if (!uiSurface?.scope?.contributions?.includes('themed-custom-panel')
+    || !uiSurface.scope.placements?.includes('settings.extensions')) {
+    fail(`${language}: ui.surface permission must be scoped to themed-custom-panel at settings.extensions`);
+  }
+  const hostAction = permissions.find((permission) => permission.id === 'host.action');
+  if (!hostAction?.scope?.actions?.includes('save-preferences')) {
+    fail(`${language}: host.action permission must be scoped to save-preferences`);
+  }
   const recipe = `contribution-${language}-v1`;
   if (!projectManifest.components?.some((component) => component.recipe === recipe)
     || metadata.build?.recipeId !== recipe || metadata.hostAcceptance !== 'pending') {

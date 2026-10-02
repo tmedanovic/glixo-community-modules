@@ -33,6 +33,11 @@
           ]
         },
         "reason": "Call only the locally approved issues MCP endpoint using its invocation-scoped opaque connection handle."
+      },
+      {
+        "id": "tool.invoke",
+        "scope": { "tools": ["issue-lookup"] },
+        "reason": "Expose only the declared bounded issue-lookup tool for explicit invocation."
       }
     ]
   },

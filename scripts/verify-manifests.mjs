@@ -17,6 +17,7 @@ const validate = ajv.compile(schema);
 const errors = [];
 let checked = 0;
 let checkedSchemas = 0;
+let checkedContributionPermissions = 0;
 
 const hostConfigurationSchemaKeys = new Set([
   'type', 'properties', 'required', 'enum', 'default', 'minimum', 'maximum',
@@ -91,6 +92,45 @@ function validatePermissionRequests(manifest, label) {
       }
     } catch (error) {
       errors.push(`${label}/permissions/requested/${requested.id}: invalid canonical scope schema (${error instanceof Error ? error.message : String(error)})`);
+    }
+  }
+}
+
+function requireContributionPermission(manifest, permissionId, scopeKey, requiredValues, label) {
+  const requested = manifest.permissions?.requested ?? [];
+  const permission = requested.find((item) => item.id === permissionId);
+  const declaredValues = permission?.scope?.[scopeKey];
+  if (!Array.isArray(declaredValues)) {
+    errors.push(`${label}: contribution requires ${permissionId} scoped to ${scopeKey}`);
+    return;
+  }
+  for (const value of requiredValues) {
+    if (!declaredValues.includes(value)) {
+      errors.push(`${label}: ${permissionId} scope.${scopeKey} must include ${value}`);
+    }
+  }
+  checkedContributionPermissions += 1;
+}
+
+function validateContributionPermissions(manifest, label) {
+  const contributions = manifest.contributions ?? {};
+  for (const item of contributions.surfaces ?? []) {
+    requireContributionPermission(manifest, 'ui.surface', 'contributions', [item.id], label);
+    requireContributionPermission(manifest, 'ui.surface', 'placements', item.placements ?? [], label);
+  }
+  for (const item of contributions.actions ?? []) {
+    requireContributionPermission(manifest, 'host.action', 'actions', [item.id], label);
+  }
+  for (const item of contributions.tools ?? []) {
+    requireContributionPermission(manifest, 'tool.invoke', 'tools', [item.id], label);
+  }
+  for (const item of contributions.dataSources ?? []) {
+    requireContributionPermission(manifest, 'data.query', 'sources', [item.id], label);
+  }
+  for (const item of contributions.backgroundServices ?? []) {
+    requireContributionPermission(manifest, 'service.activate', 'services', [item.id], label);
+    if (item.archetype) {
+      requireContributionPermission(manifest, 'service.activate', 'archetypes', [item.archetype], label);
     }
   }
 }
@@ -181,6 +221,7 @@ for (const reference of index.references) {
       for (const error of validate.errors ?? []) errors.push(`${reference.id}/${language}${error.instancePath || '/'}: ${error.message}`);
     }
     validatePermissionRequests(manifest, `${reference.id}/${language}`);
+    validateContributionPermissions(manifest, `${reference.id}/${language}`);
 
     for (const configuration of manifest.configurations ?? []) {
       const digest = validateDeclaredSchema(
@@ -213,5 +254,5 @@ if (errors.length) {
   for (const error of errors) console.error(`  - ${error}`);
   process.exitCode = 1;
 } else {
-  console.log(`Validated ${checked} v2 guest manifest template(s) and ${checkedSchemas} declared configuration/event schema file(s), including shared-source digests.`);
+  console.log(`Validated ${checked} v2 guest manifest template(s), ${checkedSchemas} declared configuration/event schema file(s), and ${checkedContributionPermissions} contribution permission-scope checks, including shared-source digests.`);
 }
