@@ -1,0 +1,10 @@
+{
+  "referenceId": "workspace-storage",
+  "language": "csharp",
+  "contractRevision": "glixo:contribution/contribution@1.0.0",
+  "build": { "recipeId": "contribution-csharp-v1" },
+  "checks": ["workspace-storage/namespace-isolation.json"],
+  "status": "preview",
+  "hostAcceptance": "pending",
+  "placeholder": false
+}

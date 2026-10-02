@@ -1,0 +1,7 @@
+# Workflow text stats (Rust)
+
+This pure `tools` contribution is an example of a workflow node backed by an installed Glixo tool. The host exposes the signed `text-stats` descriptor in its workflow palette; a node can save `includeWhitespace` and `minimumWordLength` defaults and bind `text` from an earlier step with `inputBindings: { "text": "$.text" }`. The host merges the binding over those defaults and validates the final input against the signed schema before invoking the guest.
+
+The guest needs only the scoped `tool.invoke` grant for `text-stats`. It does not read files, call a service, or store state. Counts use Unicode scalar values (so a surrogate pair counts once and a combined letter plus accent counts twice). Words are non-empty runs separated by the fixed Unicode White_Space set in `shared/goldens/workflow-text-stats/cases.json`; punctuation remains part of a word. `minimumWordLength` filters the word count only. `includeWhitespace` changes the character count only.
+
+Build the component from the repository root with `node scripts/build-references.mjs --reference=workflow-text-stats --language=rust`. Run native handler tests with `cargo test --locked`. The host-side signed workflow fixture is tracked separately; this reference remains preview until that installed workflow path is verified.

@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 2,
+  "id": "{{PACKAGE_ID}}",
+  "version": "0.1.0",
+  "metadata": { "name": "{{NAME}}", "description": "Counts Unicode words and characters for workflow text." },
+  "compatibility": { "schema": 2, "witWorld": "glixo:contribution/contribution@1.0.0" },
+  "components": [
+    { "id": "text-stats", "cell": "server", "runtime": "wasm-component", "artifact": "dist/glixo-extension.component.wasm", "world": "glixo:contribution/contribution@1.0.0" }
+  ],
+  "permissions": {
+    "requested": [
+      { "id": "tool.invoke", "scope": { "tools": ["text-stats"] }, "reason": "Allow an explicit workflow node to run this read-only text summary." }
+    ]
+  },
+  "contributions": {
+    "tools": [
+      {
+        "id": "text-stats",
+        "component": "text-stats",
+        "world": "glixo:contribution/contribution@1.0.0",
+        "description": "Count words and Unicode scalar characters in workflow text.",
+        "inputSchema": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["text"],
+          "properties": {
+            "text": { "type": "string", "maxLength": 65536, "description": "Text supplied by a workflow input binding or a saved default." },
+            "includeWhitespace": { "type": "boolean", "default": true, "description": "Include whitespace scalar values in characterCount." },
+            "minimumWordLength": { "type": "integer", "minimum": 1, "maximum": 128, "default": 1, "description": "Count only whitespace-delimited words at least this many Unicode scalar values long." }
+          }
+        },
+        "outputSchema": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["wordCount", "characterCount"],
+          "properties": {
+            "wordCount": { "type": "integer", "minimum": 0 },
+            "characterCount": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "safety": "readonly",
+        "timeoutMs": 2000,
+        "cancellable": true,
+        "idempotent": true
+      }
+    ]
+  }
+}

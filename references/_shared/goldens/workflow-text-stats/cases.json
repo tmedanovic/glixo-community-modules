@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "semantics": {
+    "characters": "Unicode scalar values, not UTF-16 code units or grapheme clusters",
+    "words": "Non-empty runs separated by the fixed Unicode White_Space set; punctuation stays in a run",
+    "whitespace": "U+0009-U+000D, U+0020, U+0085, U+00A0, U+1680, U+2000-U+200A, U+2028, U+2029, U+202F, U+205F, U+3000",
+    "minimumWordLength": "Counts Unicode scalar values in each run and filters only wordCount"
+  },
+  "cases": [
+    {
+      "id": "unicode-scalars-and-whitespace",
+      "request": {
+        "kind": "tools",
+        "contributionId": "text-stats",
+        "configuration": {},
+        "input": { "text": "A  🧭é" },
+        "context": { "sessionId": "fixture-session", "resourceHandles": {}, "endpoints": [] }
+      },
+      "expectedResponse": { "wordCount": 2, "characterCount": 6 }
+    },
+    {
+      "id": "minimum-length-and-whitespace-exclusion",
+      "request": {
+        "kind": "tools",
+        "contributionId": "text-stats",
+        "configuration": {},
+        "input": { "text": "A wide 🧭é\n!", "includeWhitespace": false, "minimumWordLength": 2 },
+        "context": { "sessionId": "fixture-session", "resourceHandles": {}, "endpoints": [] }
+      },
+      "expectedResponse": { "wordCount": 2, "characterCount": 9 }
+    },
+    {
+      "id": "fixed-whitespace-codepoint-set",
+      "request": {
+        "kind": "tools",
+        "contributionId": "text-stats",
+        "configuration": {},
+        "input": { "text": "a\u0009b\u000Db c\u0085d e f g h i j k l　m" },
+        "context": { "sessionId": "fixture-session", "resourceHandles": {}, "endpoints": [] }
+      },
+      "expectedResponse": { "wordCount": 14, "characterCount": 27 }
+    },
+    {
+      "id": "empty-text",
+      "request": {
+        "kind": "tools",
+        "contributionId": "text-stats",
+        "configuration": {},
+        "input": { "text": "" },
+        "context": { "sessionId": "fixture-session", "resourceHandles": {}, "endpoints": [] }
+      },
+      "expectedResponse": { "wordCount": 0, "characterCount": 0 }
+    }
+  ]
+}

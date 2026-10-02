@@ -1,0 +1,45 @@
+{
+  "$schema": "https://schemas.glixo.dev/extension-manifest/v2.json",
+  "schemaVersion": 2,
+  "id": "{{PACKAGE_ID}}",
+  "version": "0.1.0",
+  "metadata": {
+    "name": "{{NAME}}",
+    "description": "Aggregate conversation metrics without retaining prompt content.",
+    "license": "MIT"
+  },
+  "components": [
+    {
+      "id": "insights",
+      "cell": "server",
+      "runtime": "wasm-component",
+      "artifact": "dist/glixo-extension.component.wasm",
+      "world": "glixo:contribution/contribution@1.0.0"
+    }
+  ],
+  "permissions": {
+    "requested": [
+      {
+        "id": "message.metadata.read",
+        "reason": "Record aggregate message metadata and provider-reported usage without reading prompt or response text."
+      }
+    ]
+  },
+  "contributions": {
+    "messageMiddleware": [
+      {
+        "id": "conversation-insights",
+        "component": "insights",
+        "world": "glixo:contribution/contribution@1.0.0",
+        "hooks": [
+          "committed",
+          "completed"
+        ],
+        "order": 100,
+        "failurePolicy": "continue",
+        "timeoutMs": 1000,
+        "maxBytes": 16384
+      }
+    ]
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "evidenceId": "mail-watch-installed-scheduler-protocol2",
+  "publicSource": {
+    "repository": "glixo-community-references",
+    "binarySourceSnapshot": "1c53c3478279576e9e012e39708d034d02bbd5a1",
+    "currentManifestSnapshot": "224046912967cd38c6c1ccab6b3be58ab73e8bbd"
+  },
+  "runtime": {
+    "sourceCommit": "190204d0723125d8e7ba62485596ea5471326bbf",
+    "sha256": "9cbb7da99521d65b88955653d2e2e55aca41fc588d9f1a8b8f4e4a2f86627d30",
+    "protocolVersion": 2,
+    "maxFrameBytes": 2097152,
+    "wasmtimeVersion": "48.0.2"
+  },
+  "test": {
+    "sourceCommit": "160f631d67d7073325c4a1d4acb47d177ccaa2ef",
+    "path": "platform/tests/Glixo.Code.Server.Tests/InstalledMailWatchSchedulerE2ETests.cs",
+    "case": "Glixo.Code.Server.Tests.InstalledMailWatchSchedulerE2ETests.Installed_guest_runs_initialize_wake_duplicate_health_and_stop_through_real_scheduler_and_durable_outbox",
+    "result": {
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "durationSeconds": 20
+    },
+    "runnerPinPackageEvidenceCommit": "fffd98578c2b381e774843fea181cb91c243048b"
+  },
+  "artifact": {
+    "path": "references/mail-watch/typescript/dist/glixo-extension.component.wasm",
+    "sha256": "466438b454fdc396161cb519114fdefa36b92820e9322f89da6ca18d00f3673b",
+    "bytes": 12087268
+  },
+  "scopes": {
+    "framedFixture": {
+      "result": "passed",
+      "languages": {
+        "csharp": {
+          "artifact": "references/mail-watch/csharp/dist/glixo-extension.component.wasm",
+          "sourceCommit": "248ca7256a923c346e28d82b159beadc7ba34a04",
+          "sha256": "b700b3b62355af6fcdc43621c0ac1a3e2cff7ebca26e373b8d02e29c9bb1fe41",
+          "result": "passed"
+        },
+        "go": {
+          "artifact": "references/mail-watch/go/dist/glixo-extension.component.wasm",
+          "sourceCommit": "248ca7256a923c346e28d82b159beadc7ba34a04",
+          "sha256": "bb8d421ddb7f7f68bff068494a2ec84685e82a5752772873284e0cee47cff729",
+          "result": "passed"
+        },
+        "rust": {
+          "artifact": "references/mail-watch/rust/dist/glixo-extension.component.wasm",
+          "sourceCommit": "248ca7256a923c346e28d82b159beadc7ba34a04",
+          "sha256": "a8709a4e20a619bbcbba2d4eb7a41b4b84dc63035c462ac3b9672e44e932abbc",
+          "result": "passed"
+        },
+        "typescript": {
+          "artifact": "references/mail-watch/typescript/dist/glixo-extension.component.wasm",
+          "sourceCommit": "1c53c3478279576e9e012e39708d034d02bbd5a1",
+          "sha256": "466438b454fdc396161cb519114fdefa36b92820e9322f89da6ca18d00f3673b",
+          "result": "passed"
+        }
+      },
+      "fixtureSha256": "6d5fd35eacdcdfed9fbd57875f142151766235180ff5c07a26f1bb074b9c85d2",
+      "fixtureOnly": true,
+      "credentialsUsed": false,
+      "externalNetworkUsed": false,
+      "production": false,
+      "persisted": false
+    },
+    "installedScheduler": {
+      "result": "passed",
+      "language": "typescript",
+      "persisted": true,
+      "fixtureOnly": true,
+      "details": {
+        "installation": "A signed fixture package was materialized in the installed-module layout and resolved through InstalledPackageDirectory and ModuleLifecycleManager.",
+        "invocation": "Concrete InstalledContributionInvoker and BackgroundServiceRuntime scheduled the backgroundServices contribution using the final pinned packaged WASM host.",
+        "authorization": "A real SQLite-backed account/principal and ExtensionAccountGrantStore exercised explicit service.activate consent, exact package digest and contribution scoping, HTTP host/method grant, secret-slot grant, and account-scoped event grant. Configuration was denied before activation and writable after consent.",
+        "secretHandling": "A synthetic fixture OAuth value was stored in the host secret vault and injected into the Graph HTTP request by the broker. It was absent from normalized configuration, secret-slot metadata, vault file text, checkpoint, and outbox event data.",
+        "graphFixture": {
+          "transport": "In-memory HTTPS broker fixture; no DNS or network socket was opened.",
+          "endpoint": "GET https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages/delta",
+          "authorizedRequests": 3,
+          "fixtureAssertions": [
+            "Only the declared Graph inbox delta endpoint was requested.",
+            "The host injected the scoped OAuth bearer value for each request.",
+            "A bounded cursor was persisted, one mail.received event was emitted, and replaying the same Graph row reused the stable idempotency key mail:7c98aad506ad5737 without adding a second outbox or DomainEvent row."
+          ]
+        },
+        "lifecycle": [
+          "Initialize completed and persisted a healthy checkpoint.",
+          "Scheduled wake completed, persisted the checkpoint, and delivered the durable outbox item into DomainEventStore.",
+          "Duplicate wake was idempotent; checkpoint remained healthy and the lease was released.",
+          "Health succeeded and stop persisted stopped state."
+        ]
+      },
+      "testResult": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "durationSeconds": 20
+      }
+    },
+    "liveGraph": {
+      "status": "not-tested",
+      "credentialsUsed": false,
+      "externalNetworkUsed": false
+    }
+  },
+  "limits": [
+    "This is a synthetic Graph protocol fixture, not an authenticated Microsoft Graph account test; no live mailbox or Graph credentials were used.",
+    "The framed component matrix covers C#, Go, Rust, and TypeScript, while the concrete persisted installed-scheduler E2E uses the public TypeScript component only.",
+    "No email was sent, no LLM was invoked, and no network transport was used by the fixture."
+  ]
+}

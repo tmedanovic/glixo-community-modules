@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "language": "rust",
+  "components": [
+    {
+      "id": "inspect",
+      "recipe": "contribution-rust-v1",
+      "language": "rust",
+      "artifact": "dist/glixo-extension.component.wasm"
+    }
+  ]
+}

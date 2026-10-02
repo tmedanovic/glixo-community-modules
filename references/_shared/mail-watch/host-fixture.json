@@ -1,0 +1,151 @@
+{
+  "fixtureId": "mail-watch-graph-delta-host-v1",
+  "classification": "fixture-only; no mailbox, credential, DNS, or network access",
+  "world": "glixo:contribution/contribution@1.0.0",
+  "entry": "guest.invoke",
+  "guestRequestContext": {
+    "resourceHandles": {
+      "oauth": "fixture-slot-present"
+    }
+  },
+  "requests": [
+    {
+      "id": "health",
+      "request": {
+        "kind": "backgroundServices",
+        "contributionId": "mail-watch",
+        "configuration": { "maxPagesPerWake": 1 },
+        "input": { "operation": "health", "checkpoint": { "initialized": false, "initializing": false } },
+        "context": { "resourceHandles": {} }
+      },
+      "expected": { "health": "healthy", "eventCount": 0, "checkpoint.initialized": false },
+      "expectedHttpRequests": 0
+    },
+    {
+      "id": "initialize",
+      "request": {
+        "kind": "backgroundServices",
+        "contributionId": "mail-watch",
+        "configuration": { "maxPagesPerWake": 1 },
+        "input": { "operation": "initialize", "checkpoint": null },
+        "context": { "resourceHandles": { "oauth": "fixture-slot-present" } }
+      },
+      "httpFixture": {
+        "routes": [
+          {
+            "method": "GET",
+            "url": "https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages/delta?$select=id,receivedDateTime,from&$top=10",
+            "requestHeaders": { "accept": "application/json" },
+            "authHeader": "Authorization",
+            "authScheme": "Bearer",
+            "secretSlot": "oauth",
+            "status": 200,
+            "responseHeaders": [{ "name": "content-type", "value": "application/json" }],
+            "bodyText": "{\"value\":[],\"@odata.deltaLink\":\"https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages/delta?$deltatoken=fixture-cursor\"}"
+          }
+        ]
+      },
+      "expected": { "health": "healthy", "eventCount": 0, "checkpoint.initialized": true, "checkpoint.deltaUrl": "https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages/delta?$deltatoken=fixture-cursor" },
+      "expectedHttpRequests": 1
+    },
+    {
+      "id": "wake",
+      "request": {
+        "kind": "backgroundServices",
+        "contributionId": "mail-watch",
+        "configuration": { "maxPagesPerWake": 1 },
+        "input": {
+          "operation": "wake",
+          "checkpoint": {
+            "initialized": true,
+            "initializing": false,
+            "deltaUrl": "https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages/delta?$deltatoken=fixture-cursor",
+            "pendingUrl": null
+          }
+        },
+        "context": { "resourceHandles": { "oauth": "fixture-slot-present" } }
+      },
+      "httpFixture": {
+        "routes": [
+          {
+            "method": "GET",
+            "url": "https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages/delta?$deltatoken=fixture-cursor",
+            "requestHeaders": { "accept": "application/json" },
+            "authHeader": "Authorization",
+            "authScheme": "Bearer",
+            "secretSlot": "oauth",
+            "status": 200,
+            "responseHeaders": [{ "name": "content-type", "value": "application/json" }],
+            "bodyText": "{\"value\":[{\"id\":\"fixture-mail-42\",\"receivedDateTime\":\"2026-10-01T12:00:00Z\",\"from\":{\"emailAddress\":{\"address\":\"alice@example.test\"}}}],\"@odata.deltaLink\":\"https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages/delta?$deltatoken=fixture-cursor\"}"
+          }
+        ]
+      },
+      "expected": {
+        "health": "healthy",
+        "eventCount": 1,
+        "checkpoint.initialized": true,
+        "checkpoint.deltaUrl": "https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages/delta?$deltatoken=fixture-cursor",
+        "events[0].type": "mail.received",
+        "events[0].idempotencyKey": "mail:7c98aad506ad5737",
+        "events[0].payload.messageId": "fixture-mail-42",
+        "events[0].payload.receivedAt": "2026-10-01T12:00:00Z",
+        "events[0].payload.sender": "alice@example.test"
+      },
+      "expectedHttpRequests": 1
+    },
+    {
+      "id": "duplicate-replay",
+      "request": {
+        "kind": "backgroundServices",
+        "contributionId": "mail-watch",
+        "configuration": { "maxPagesPerWake": 1 },
+        "input": {
+          "operation": "wake",
+          "checkpoint": {
+            "initialized": true,
+            "initializing": false,
+            "deltaUrl": "https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages/delta?$deltatoken=fixture-cursor",
+            "pendingUrl": null
+          }
+        },
+        "context": { "resourceHandles": { "oauth": "fixture-slot-present" } }
+      },
+      "httpFixture": {
+        "routes": [
+          {
+            "method": "GET",
+            "url": "https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages/delta?$deltatoken=fixture-cursor",
+            "requestHeaders": { "accept": "application/json" },
+            "authHeader": "Authorization",
+            "authScheme": "Bearer",
+            "secretSlot": "oauth",
+            "status": 200,
+            "responseHeaders": [{ "name": "content-type", "value": "application/json" }],
+            "bodyText": "{\"value\":[{\"id\":\"fixture-mail-42\",\"receivedDateTime\":\"2026-10-01T12:00:00Z\",\"from\":{\"emailAddress\":{\"address\":\"alice@example.test\"}}}],\"@odata.deltaLink\":\"https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages/delta?$deltatoken=fixture-cursor\"}"
+          }
+        ]
+      },
+      "expected": { "health": "healthy", "eventCount": 1, "events[0].idempotencyKey": "mail:7c98aad506ad5737" },
+      "expectedHttpRequests": 1,
+      "note": "The guest returns the same event key; host outbox persistence/deduplication is covered by InstalledBackgroundServiceRuntimeTests."
+    }
+  ],
+  "negativeRequest": {
+    "id": "reject-non-graph-cursor",
+    "request": {
+      "kind": "backgroundServices",
+      "contributionId": "mail-watch",
+      "configuration": { "maxPagesPerWake": 1 },
+      "input": {
+        "operation": "wake",
+        "checkpoint": {
+          "initialized": true,
+          "initializing": false,
+          "deltaUrl": "https://attacker.example/v1.0/me/mailFolders/inbox/messages/delta?$deltatoken=fixture-cursor"
+        }
+      },
+      "context": { "resourceHandles": { "oauth": "fixture-slot-present" } }
+    },
+    "expected": { "ok": false, "code": "graph_delta_url_outside_scope", "httpRequestCount": 0 }
+  }
+}

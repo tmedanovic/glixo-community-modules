@@ -1,0 +1,44 @@
+{
+  "input": {
+    "schemaVersion": 1,
+    "operation": "completed",
+    "completion": {
+      "latencyMilliseconds": 123,
+      "userMessageCount": 2,
+      "assistantMessageCount": 1,
+      "toolCallCount": 1,
+      "toolResultCount": 1,
+      "attachmentCount": 0,
+      "actualUsage": {
+        "inputTokens": 31,
+        "outputTokens": 12,
+        "totalTokens": 43
+      },
+      "estimatedInputCharacters": 250,
+      "estimatedOutputCharacters": 82
+    }
+  },
+  "expected": {
+    "observation": {
+      "schemaVersion": 1,
+      "latencyMilliseconds": 123,
+      "userMessageCount": 2,
+      "assistantMessageCount": 1,
+      "toolCallCount": 1,
+      "toolResultCount": 1,
+      "attachmentCount": 0,
+      "actualUsageAvailable": true,
+      "actualUsage": {
+        "inputTokens": 31,
+        "outputTokens": 12,
+        "cachedTokens": null,
+        "reasoningTokens": null,
+        "totalTokens": 43
+      },
+      "estimatedInputCharacters": 250,
+      "estimatedOutputCharacters": 82,
+      "textStatisticsAreEstimates": true
+    },
+    "auditDescription": "analysis-complete"
+  }
+}
