@@ -1,7 +1,7 @@
 use glixo_extension_sdk::http::{Broker, Header as SdkHeader, NdjsonStream, Request as HttpRequest};
 use serde_json::{json, Value};
 use std::cell::RefCell;
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap, HashSet, VecDeque};
 use std::sync::atomic::{AtomicU32, Ordering};
 
 wit_bindgen::generate!({ path: "wit", world: "provider-compat", generate_all });
@@ -27,7 +27,8 @@ impl Broker for HostBroker {
     fn cancel(&mut self, handle: u32) { glixo::http::broker::http_cancel(handle); }
     fn drop_response(&mut self, handle: u32) { glixo::http::broker::http_drop(handle); }
 }
-struct Session { stream: NdjsonStream<HostBroker>, request_id: String, done: bool, terminal_sent: bool, cancelled: bool, tool_index: u32, tool_calls_seen: bool, pending_terminal: Option<glixo::llm_types::types::ProviderEvent> }
+struct PendingEvent { event: glixo::llm_types::types::ProviderEvent, terminal: bool }
+struct Session { stream: NdjsonStream<HostBroker>, request_id: String, done: bool, terminal_sent: bool, cancelled: bool, tool_index: u32, tool_calls_seen: bool, pending: VecDeque<PendingEvent> }
 thread_local! { static STREAMS: RefCell<HashMap<u32, Session>> = RefCell::new(HashMap::new()); }
 static NEXT_STREAM: AtomicU32 = AtomicU32::new(1);
 const DEFAULT_CONTEXT_WINDOW_TOKENS: u32 = 8192;
@@ -201,7 +202,7 @@ impl exports::glixo::llm_provider_compat::provider::Guest for OllamaProvider {
         let status = stream.status()?;
         if !(200..=299).contains(&status) { stream.close(); return Err(format!("ollama_http_{status}")); }
         let handle = NEXT_STREAM.fetch_add(1, Ordering::Relaxed).max(1);
-        STREAMS.with(|streams| { streams.borrow_mut().insert(handle, Session { stream, request_id: req.request_id, done: false, terminal_sent: false, cancelled: false, tool_index: 0, tool_calls_seen: false, pending_terminal: None }); });
+        STREAMS.with(|streams| { streams.borrow_mut().insert(handle, Session { stream, request_id: req.request_id, done: false, terminal_sent: false, cancelled: false, tool_index: 0, tool_calls_seen: false, pending: VecDeque::new() }); });
         Ok(handle)
     }
     // docs:snippet-end provider-request:rust
@@ -210,31 +211,62 @@ impl exports::glixo::llm_provider_compat::provider::Guest for OllamaProvider {
             let mut all = all.borrow_mut();
             let session = all.get_mut(&handle).ok_or_else(|| "provider_stream_missing".to_owned())?;
             if session.terminal_sent { return Ok(None); }
-            if let Some(pending) = session.pending_terminal.take() { session.terminal_sent = true; session.done = true; session.stream.close(); return Ok(Some(pending)); }
-            if session.cancelled { session.terminal_sent = true; return Ok(Some(glixo::llm_types::types::ProviderEvent { finish: Some(glixo::llm_types::types::FinishReason::Cancelled), ..event(&session.request_id) })); }
+            if session.cancelled {
+                session.terminal_sent = true;
+                session.pending.clear();
+                session.stream.close();
+                return Ok(Some(glixo::llm_types::types::ProviderEvent { finish: Some(glixo::llm_types::types::FinishReason::Cancelled), ..event(&session.request_id) }));
+            }
+            if let Some(pending) = session.pending.pop_front() {
+                if pending.terminal { session.terminal_sent = true; session.done = true; session.stream.close(); }
+                return Ok(Some(pending.event));
+            }
             loop {
                 if session.done { session.terminal_sent = true; session.stream.close(); return Ok(Some(glixo::llm_types::types::ProviderEvent { finish: Some(glixo::llm_types::types::FinishReason::Stop), ..event(&session.request_id) })); }
                 let line = match session.stream.next_line()? { Some(v) if v.is_empty() => continue, Some(v) => v, None => return Err("ollama_stream_ended_before_done".into()) };
                 let record: Value = serde_json::from_slice(&line).map_err(|_| "ollama_ndjson_record_invalid".to_owned())?;
                 if let Some(upstream_error) = record.get("error").and_then(Value::as_str) { session.terminal_sent = true; session.stream.close(); return Ok(Some(glixo::llm_types::types::ProviderEvent { finish: Some(glixo::llm_types::types::FinishReason::Error), error: Some(glixo::llm_types::types::TypedError { code: "ollama_error".into(), message: upstream_error.chars().take(256).collect(), retryable: false, retry_after_ms: None }), ..event(&session.request_id) })); }
                 let msg = &record["message"];
-                if let Some(text) = msg["thinking"].as_str().filter(|s| !s.is_empty()) { return Ok(Some(event_with_part(&session.request_id, glixo::llm_types::types::ContentPart::Reasoning(text.into())))); }
-                if let Some(text) = msg["content"].as_str().filter(|s| !s.is_empty()) { return Ok(Some(event_with_part(&session.request_id, glixo::llm_types::types::ContentPart::Text(text.into())))); }
-                if let Some(call) = msg["tool_calls"].as_array().and_then(|a| a.first()) {
+                let calls = msg["tool_calls"].as_array().map(Vec::as_slice).unwrap_or(&[]);
+                if calls.len() > 32 {
+                    session.pending.clear();
+                    session.stream.close();
+                    session.terminal_sent = true;
+                    return Ok(Some(glixo::llm_types::types::ProviderEvent {
+                        finish: Some(glixo::llm_types::types::FinishReason::Error),
+                        error: Some(glixo::llm_types::types::TypedError {
+                            code: "ollama_tool_call_limit_exceeded".into(),
+                            message: "Ollama returned more than 32 tool calls in one record".into(),
+                            retryable: false,
+                            retry_after_ms: None,
+                        }),
+                        ..event(&session.request_id)
+                    }));
+                }
+                if let Some(text) = msg["thinking"].as_str().filter(|s| !s.is_empty()) {
+                    session.pending.push_back(PendingEvent { event: event_with_part(&session.request_id, glixo::llm_types::types::ContentPart::Reasoning(text.into())), terminal: false });
+                }
+                if let Some(text) = msg["content"].as_str().filter(|s| !s.is_empty()) {
+                    session.pending.push_back(PendingEvent { event: event_with_part(&session.request_id, glixo::llm_types::types::ContentPart::Text(text.into())), terminal: false });
+                }
+                for call in calls {
                     let name = call["function"]["name"].as_str().unwrap_or("");
-                    if !name.is_empty() { session.tool_calls_seen = true; let args = call["function"]["arguments"].to_string(); let id = format!("{}:ollama:{}", session.request_id, session.tool_index); session.tool_index += 1;
-                        if record["done"].as_bool() == Some(true) { session.pending_terminal = Some(terminal_event(&session.request_id, &record, session.tool_calls_seen)); }
-                        let detail = glixo::llm_types::types::ToolCallDetails { id, name: name.into(), arguments_fragment: Some(args), complete: true };
-                        return Ok(Some(event_with_part(&session.request_id, glixo::llm_types::types::ContentPart::ToolCallDetails(detail)))); }
+                    if name.is_empty() { continue; }
+                    session.tool_calls_seen = true;
+                    let args = call["function"]["arguments"].to_string();
+                    let id = format!("{}:ollama:{}", session.request_id, session.tool_index);
+                    session.tool_index += 1;
+                    let detail = glixo::llm_types::types::ToolCallDetails { id, name: name.into(), arguments_fragment: Some(args), complete: true };
+                    session.pending.push_back(PendingEvent { event: event_with_part(&session.request_id, glixo::llm_types::types::ContentPart::ToolCallDetails(detail)), terminal: false });
                 }
                 if record["done"].as_bool() == Some(true) {
-                    session.done = true; session.terminal_sent = true; session.stream.close();
-                    return Ok(Some(terminal_event(&session.request_id, &record, session.tool_calls_seen)));
+                    session.pending.push_back(PendingEvent { event: terminal_event(&session.request_id, &record, session.tool_calls_seen), terminal: true });
                 }
+                if let Some(pending) = session.pending.pop_front() { return Ok(Some(pending.event)); }
             }
         })
     }
-    fn cancel(handle: u32) { STREAMS.with(|all| { if let Some(session) = all.borrow_mut().get_mut(&handle) { if !session.terminal_sent { session.stream.cancel(); session.cancelled = true; } } }); }
+    fn cancel(handle: u32) { STREAMS.with(|all| { if let Some(session) = all.borrow_mut().get_mut(&handle) { if !session.terminal_sent { session.pending.clear(); session.stream.cancel(); session.cancelled = true; } } }); }
     fn drop(handle: u32) { STREAMS.with(|all| { if let Some(mut session) = all.borrow_mut().remove(&handle) { session.stream.close(); } }); }
 }
 

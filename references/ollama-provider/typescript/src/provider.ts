@@ -272,11 +272,13 @@ function next(handle: number): Maybe<Record<string, unknown>> {
   const session = streamSessions.get(handle);
   if (!session) throwWitError("provider_stream_missing");
   if (session.terminalSent) return none;
-  if (session.pending.length) return deliver(session, session.pending.shift()!);
   if (session.cancelled) {
     session.terminalSent = true;
+    session.pending.length = 0;
+    session.stream.close();
     return event(session.requestId, { finish: some({ tag: "cancelled" }) });
   }
+  if (session.pending.length) return deliver(session, session.pending.shift()!);
   try {
     for (;;) {
       const line = session.stream.nextLine();
@@ -362,6 +364,7 @@ export const provider = {
   cancel(handle: number): void {
     const session = streamSessions.get(handle);
     if (!session || session.terminalSent) return;
+    session.pending.length = 0;
     session.stream.cancel(); session.cancelled = true;
   },
   drop(handle: number): void {
