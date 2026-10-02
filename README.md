@@ -1,6 +1,8 @@
-# Glixo extension examples
+# Glixo extensions
 
-Build extensions for Glixo using **C#, Go, Rust, or TypeScript**. This repository contains examples you can read, build, and adapt for your own project.
+Glixo extensions maintained by [Tomislav Medanovic](https://github.com/tmedanovic). This is the home for extensions we select to ship with Glixo, and for examples other developers can use to build their own.
+
+Write extensions in **C#, Go, Rust, or TypeScript**. Browse the projects below, choose your preferred language, and adapt the code for your own extension. Inclusion in an app release is decided separately; being in this repository does not mean an extension is already bundled.
 
 ## Choose an example
 
