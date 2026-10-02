@@ -96,7 +96,12 @@ type session struct {
 	terminal, cancelled bool
 	toolIndex           uint32
 	toolCallsSeen       bool
-	pendingTerminal     *glixo_llm_types_types.ProviderEvent
+	pending             []pendingEvent
+}
+
+type pendingEvent struct {
+	event    glixo_llm_types_types.ProviderEvent
+	terminal bool
 }
 
 var sessions = struct {
@@ -548,18 +553,16 @@ func Next(id uint32) types.Result[types.Option[glixo_llm_types_types.ProviderEve
 	if s.terminal {
 		return types.Ok[types.Option[glixo_llm_types_types.ProviderEvent], string](types.None[glixo_llm_types_types.ProviderEvent]())
 	}
-	if s.pendingTerminal != nil {
-		s.terminal = true
-		s.stream.Close()
-		e := *s.pendingTerminal
-		s.pendingTerminal = nil
-		return types.Ok[types.Option[glixo_llm_types_types.ProviderEvent], string](types.Some(e))
-	}
 	if s.cancelled {
 		s.terminal = true
+		s.pending = nil
+		s.stream.Close()
 		e := event(s.requestID)
 		e.Finish = types.Some(glixo_llm_types_types.MakeFinishReasonCancelled())
 		return types.Ok[types.Option[glixo_llm_types_types.ProviderEvent], string](types.Some(e))
+	}
+	if len(s.pending) > 0 {
+		return deliverPending(s)
 	}
 	for {
 		line, e := s.stream.NextLine()
@@ -595,32 +598,43 @@ func Next(id uint32) types.Result[types.Option[glixo_llm_types_types.ProviderEve
 			return terminal(s, "ollama_error:"+rec.Error)
 		}
 		if rec.Message.Thinking != "" {
-			return types.Ok[types.Option[glixo_llm_types_types.ProviderEvent], string](types.Some(partEvent(s.requestID, glixo_llm_types_types.MakeContentPartReasoning(rec.Message.Thinking))))
+			s.pending = append(s.pending, pendingEvent{event: partEvent(s.requestID, glixo_llm_types_types.MakeContentPartReasoning(rec.Message.Thinking))})
 		}
 		if rec.Message.Content != "" {
-			return types.Ok[types.Option[glixo_llm_types_types.ProviderEvent], string](types.Some(partEvent(s.requestID, glixo_llm_types_types.MakeContentPartText(rec.Message.Content))))
+			s.pending = append(s.pending, pendingEvent{event: partEvent(s.requestID, glixo_llm_types_types.MakeContentPartText(rec.Message.Content))})
 		}
-		if len(rec.Message.ToolCalls) > 0 {
-			f := rec.Message.ToolCalls[0].Function
-			if f.Name != "" {
-				s.toolCallsSeen = true
-				a, _ := json.Marshal(f.Arguments)
-				d := glixo_llm_types_types.ToolCallDetails{Id: fmt.Sprintf("%s:ollama:%d", s.requestID, s.toolIndex), Name: f.Name, ArgumentsFragment: types.Some(string(a)), Complete: true}
-				s.toolIndex++
-				if rec.Done {
-					e := finishEvent(s.requestID, rec.DoneReason, rec.Prompt, rec.Eval, s.toolCallsSeen)
-					s.pendingTerminal = &e
-				}
-				return types.Ok[types.Option[glixo_llm_types_types.ProviderEvent], string](types.Some(partEvent(s.requestID, glixo_llm_types_types.MakeContentPartToolCallDetails(d))))
+		if len(rec.Message.ToolCalls) > 32 {
+			return terminal(s, "ollama_tool_call_limit_exceeded")
+		}
+		for _, call := range rec.Message.ToolCalls {
+			f := call.Function
+			if f.Name == "" {
+				continue
 			}
+			s.toolCallsSeen = true
+			a, _ := json.Marshal(f.Arguments)
+			d := glixo_llm_types_types.ToolCallDetails{Id: fmt.Sprintf("%s:ollama:%d", s.requestID, s.toolIndex), Name: f.Name, ArgumentsFragment: types.Some(string(a)), Complete: true}
+			s.toolIndex++
+			s.pending = append(s.pending, pendingEvent{event: partEvent(s.requestID, glixo_llm_types_types.MakeContentPartToolCallDetails(d))})
 		}
 		if rec.Done {
-			s.terminal = true
-			s.stream.Close()
 			ev := finishEvent(s.requestID, rec.DoneReason, rec.Prompt, rec.Eval, s.toolCallsSeen)
-			return types.Ok[types.Option[glixo_llm_types_types.ProviderEvent], string](types.Some(ev))
+			s.pending = append(s.pending, pendingEvent{event: ev, terminal: true})
+		}
+		if len(s.pending) > 0 {
+			return deliverPending(s)
 		}
 	}
+}
+
+func deliverPending(s *session) types.Result[types.Option[glixo_llm_types_types.ProviderEvent], string] {
+	next := s.pending[0]
+	s.pending = s.pending[1:]
+	if next.terminal {
+		s.terminal = true
+		s.stream.Close()
+	}
+	return types.Ok[types.Option[glixo_llm_types_types.ProviderEvent], string](types.Some(next.event))
 }
 
 func finishEvent(requestID, reason string, prompt, eval *uint32, toolCallsSeen bool) glixo_llm_types_types.ProviderEvent {
@@ -669,6 +683,7 @@ func Cancel(id uint32) {
 	sessions.Lock()
 	defer sessions.Unlock()
 	if s := sessions.items[id]; s != nil && !s.terminal {
+		s.pending = nil
 		s.stream.Cancel()
 		s.cancelled = true
 	}

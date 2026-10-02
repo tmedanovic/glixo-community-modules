@@ -35,13 +35,14 @@ public static class ProviderExportsImpl
     {
         public NdjsonStream Stream { get; } = stream;
         public string RequestId { get; } = requestId;
-        public bool Done { get; set; }
         public bool TerminalSent { get; set; }
         public bool Cancelled { get; set; }
         public int ToolIndex { get; set; }
         public bool ToolCallsSeen { get; set; }
-        public L.ProviderEvent? PendingTerminal { get; set; }
+        public Queue<PendingEvent> Pending { get; } = new();
     }
+
+    private sealed record PendingEvent(L.ProviderEvent Event, bool Terminal = false);
 
     private static readonly ConcurrentDictionary<uint, Session> Sessions = new();
     private static int _nextHandle;
@@ -378,29 +379,18 @@ public static class ProviderExportsImpl
     {
         if (!Sessions.TryGetValue(handle, out var session)) throw new WitException<string>("provider_stream_missing", 0);
         if (session.TerminalSent) return null;
-        if (session.PendingTerminal is { } pendingTerminal)
-        {
-            session.PendingTerminal = null;
-            session.TerminalSent = true;
-            session.Stream.Dispose();
-            return pendingTerminal;
-        }
         if (session.Cancelled)
         {
             session.TerminalSent = true;
+            session.Pending.Clear();
             session.Stream.Dispose();
             return Event(session.RequestId, finish: L.FinishReason.Cancelled());
         }
+        if (session.Pending.Count > 0) return DeliverPending(session);
         try
         {
             while (true)
             {
-                if (session.Done)
-                {
-                    session.TerminalSent = true;
-                    session.Stream.Dispose();
-                    return Event(session.RequestId, finish: L.FinishReason.Stop());
-                }
                 var line = session.Stream.ReadLine();
                 if (line is null) throw new InvalidOperationException("ollama_stream_ended_before_done");
                 if (line.Length == 0) continue;
@@ -414,36 +404,48 @@ public static class ProviderExportsImpl
                 }
                 if (root.TryGetProperty("message", out var message))
                 {
-                    if (message.TryGetProperty("thinking", out var thinking) && thinking.GetString() is { Length: > 0 } thought) return Event(session.RequestId, L.ContentPart.Reasoning(thought));
-                    if (message.TryGetProperty("content", out var content) && content.GetString() is { Length: > 0 } text) return Event(session.RequestId, L.ContentPart.Text(text));
-                    if (message.TryGetProperty("tool_calls", out var calls) && calls.ValueKind == JsonValueKind.Array && calls.GetArrayLength() > 0)
+                    if (message.TryGetProperty("thinking", out var thinking) && thinking.GetString() is { Length: > 0 } thought)
+                        session.Pending.Enqueue(new(Event(session.RequestId, L.ContentPart.Reasoning(thought))));
+                    if (message.TryGetProperty("content", out var content) && content.GetString() is { Length: > 0 } text)
+                        session.Pending.Enqueue(new(Event(session.RequestId, L.ContentPart.Text(text))));
+                    if (message.TryGetProperty("tool_calls", out var calls) && calls.ValueKind == JsonValueKind.Array)
                     {
-                        var call = calls[0].GetProperty("function");
-                        var name = call.GetProperty("name").GetString();
-                        var args = call.TryGetProperty("arguments", out var arguments) ? arguments.GetRawText() : "{}";
-                        if (!string.IsNullOrWhiteSpace(name))
+                        if (calls.GetArrayLength() > 32) throw new InvalidOperationException("ollama_tool_call_limit_exceeded");
+                        foreach (var callEntry in calls.EnumerateArray())
                         {
+                            var call = callEntry.GetProperty("function");
+                            var name = call.GetProperty("name").GetString();
+                            if (string.IsNullOrWhiteSpace(name)) continue;
+                            var args = call.TryGetProperty("arguments", out var arguments) ? arguments.GetRawText() : "{}";
                             session.ToolCallsSeen = true;
-                            if (root.TryGetProperty("done", out var toolDone) && toolDone.ValueKind == JsonValueKind.True)
-                                session.PendingTerminal = TerminalEvent(session, root);
-                            return Event(session.RequestId, L.ContentPart.ToolCallDetails(new($"{session.RequestId}:ollama:{session.ToolIndex++}", name, args, true)));
+                            var details = new L.ToolCallDetails($"{session.RequestId}:ollama:{session.ToolIndex++}", name, args, true);
+                            session.Pending.Enqueue(new(Event(session.RequestId, L.ContentPart.ToolCallDetails(details))));
                         }
                     }
                 }
                 if (root.TryGetProperty("done", out var done) && done.ValueKind == JsonValueKind.True)
-                {
-                    session.TerminalSent = true;
-                    session.Stream.Dispose();
-                    return TerminalEvent(session, root);
-                }
+                    session.Pending.Enqueue(new(TerminalEvent(session, root), Terminal: true));
+                if (session.Pending.Count > 0) return DeliverPending(session);
             }
         }
         catch (Exception ex)
         {
             session.TerminalSent = true;
+            session.Pending.Clear();
             session.Stream.Dispose();
             return Event(session.RequestId, finish: L.FinishReason.Error(), error: new("ollama_stream_error", ex.Message.Length > 256 ? ex.Message[..256] : ex.Message, false, null));
         }
+    }
+
+    private static L.ProviderEvent DeliverPending(Session session)
+    {
+        var pending = session.Pending.Dequeue();
+        if (pending.Terminal)
+        {
+            session.TerminalSent = true;
+            session.Stream.Dispose();
+        }
+        return pending.Event;
     }
 
     private static L.ProviderEvent TerminalEvent(Session session, JsonElement root)
@@ -463,6 +465,6 @@ public static class ProviderExportsImpl
     }
 
     private static uint Count(JsonElement obj, string property) => obj.TryGetProperty(property, out var value) && value.TryGetUInt32(out var count) ? count : 0;
-    public static void Cancel(uint handle) { if (Sessions.TryGetValue(handle, out var s) && !s.TerminalSent) { s.Stream.Cancel(); s.Cancelled = true; } }
+    public static void Cancel(uint handle) { if (Sessions.TryGetValue(handle, out var s) && !s.TerminalSent) { s.Pending.Clear(); s.Stream.Cancel(); s.Cancelled = true; } }
     public static void Drop(uint handle) { if (Sessions.TryRemove(handle, out var s)) s.Stream.Dispose(); }
 }
