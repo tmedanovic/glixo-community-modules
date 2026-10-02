@@ -6,6 +6,7 @@ import {
 } from "glixo:llm-provider-compat/provider-host@3.0.0";
 import { NdjsonStream, type Broker, type BrokerRequest, type Header } from "@glixo/extension-sdk/http";
 import { throwWitError, witErrorText } from "@glixo/extension-sdk/wit";
+import { mapFinishReason } from "./finish-reason.js";
 
 type Maybe<T> = T | undefined;
 type Endpoint = { name: string; handle: string; baseUrl: string };
@@ -29,7 +30,7 @@ type OllamaRecord = {
   error?: string;
 };
 type PendingEvent = { event: Record<string, unknown>; terminal: boolean };
-type Session = { stream: NdjsonStream; requestId: string; model: string; terminalSent: boolean; cancelled: boolean; toolIndex: number; pending: PendingEvent[] };
+type Session = { stream: NdjsonStream; requestId: string; model: string; terminalSent: boolean; cancelled: boolean; toolIndex: number; toolCallsSeen: boolean; pending: PendingEvent[] };
 
 const providerId = "community.ollama";
 const DEFAULT_CONTEXT_WINDOW_TOKENS = 8192;
@@ -218,9 +219,8 @@ function parseObject(json: string, code: string): Record<string, unknown> {
   throw new Error(code);
 }
 function terminalReason(reason: string | undefined, hasTools: boolean): Part {
-  if (hasTools || reason === "tool_calls" || reason === "tool") return { tag: "tool" };
-  if (reason === "length") return { tag: "length" };
-  if (reason === "stop" || !reason) return { tag: "stop" };
+  const tag = mapFinishReason(reason, hasTools);
+  if (tag !== "unknown") return { tag };
   return { tag: "unknown", val: { name: reason, payloadJson: none } };
 }
 function event(requestId: string, init: Record<string, unknown>): Record<string, unknown> {
@@ -257,7 +257,7 @@ function start(request: Request, context: Context): number {
     const status = stream.status();
     if (status < 200 || status > 299) throw new Error(`ollama_http_${status}`);
     const id = nextHandle++;
-    streamSessions.set(id, { stream, requestId: request.requestId, model: request.model, terminalSent: false, cancelled: false, toolIndex: 0, pending: [] });
+    streamSessions.set(id, { stream, requestId: request.requestId, model: request.model, terminalSent: false, cancelled: false, toolIndex: 0, toolCallsSeen: false, pending: [] });
     return id;
   } catch (error) { stream?.close(); throwWitError(error); }
 }
@@ -300,6 +300,7 @@ function next(handle: number): Maybe<Record<string, unknown>> {
       for (const call of calls) {
         const fn = call?.function;
         if (!fn?.name) continue;
+        session.toolCallsSeen = true;
         const payload = JSON.stringify(fn.arguments ?? {});
         const id = `${session.requestId}:ollama:${session.toolIndex++}`;
         produced.push({ event: event(session.requestId, { part: some({ tag: "tool-call-details", val: { id, name: fn.name, argumentsFragment: some(payload), complete: true } }) }), terminal: false });
@@ -310,7 +311,7 @@ function next(handle: number): Maybe<Record<string, unknown>> {
           cachedTokens: none, reasoningTokens: none,
           totalTokens: record.prompt_eval_count === undefined || record.eval_count === undefined ? none : some(boundedCount(record.prompt_eval_count + record.eval_count)),
         });
-        produced.push({ event: event(session.requestId, { usage, finish: some(terminalReason(record.done_reason, calls.length > 0)) }), terminal: true });
+        produced.push({ event: event(session.requestId, { usage, finish: some(terminalReason(record.done_reason, session.toolCallsSeen)) }), terminal: true });
       }
       if (!produced.length) continue;
       session.pending.push(...produced.slice(1));
@@ -371,6 +372,3 @@ export const provider = {
 };
 
 function unusedLog(messageText: string): void { log("debug", messageText); }
-
-
-

@@ -86,6 +86,7 @@ func (brokerAdapter) HTTPDrop(h uint32)   { glixo_http_broker.HttpDrop(h) }
 
 type ctx = glixo_llm_types_types.ProviderContext
 type request = glixo_llm_types_types.LlmRequest
+
 const defaultContextWindowTokens = 8192
 const maximumContextWindowTokens = 32768
 
@@ -94,6 +95,8 @@ type session struct {
 	requestID           string
 	terminal, cancelled bool
 	toolIndex           uint32
+	toolCallsSeen       bool
+	pendingTerminal     *glixo_llm_types_types.ProviderEvent
 }
 
 var sessions = struct {
@@ -413,6 +416,7 @@ func partEvent(id string, p glixo_llm_types_types.ContentPart) glixo_llm_types_t
 	e.Part = types.Some(p)
 	return e
 }
+
 // docs:snippet-start provider-discovery:go
 func Describe(c ctx) types.Result[glixo_llm_types_types.ProviderDescriptor, string] {
 	cfg, ep, e := cfgEndpoint(c)
@@ -486,6 +490,7 @@ func ListModels(c ctx) types.Result[[]string, string] {
 	}
 	return types.Ok[[]string, string](ms)
 }
+
 // docs:snippet-end provider-discovery:go
 
 // docs:snippet-start provider-request:go
@@ -543,6 +548,13 @@ func Next(id uint32) types.Result[types.Option[glixo_llm_types_types.ProviderEve
 	if s.terminal {
 		return types.Ok[types.Option[glixo_llm_types_types.ProviderEvent], string](types.None[glixo_llm_types_types.ProviderEvent]())
 	}
+	if s.pendingTerminal != nil {
+		s.terminal = true
+		s.stream.Close()
+		e := *s.pendingTerminal
+		s.pendingTerminal = nil
+		return types.Ok[types.Option[glixo_llm_types_types.ProviderEvent], string](types.Some(e))
+	}
 	if s.cancelled {
 		s.terminal = true
 		e := event(s.requestID)
@@ -591,42 +603,58 @@ func Next(id uint32) types.Result[types.Option[glixo_llm_types_types.ProviderEve
 		if len(rec.Message.ToolCalls) > 0 {
 			f := rec.Message.ToolCalls[0].Function
 			if f.Name != "" {
+				s.toolCallsSeen = true
 				a, _ := json.Marshal(f.Arguments)
 				d := glixo_llm_types_types.ToolCallDetails{Id: fmt.Sprintf("%s:ollama:%d", s.requestID, s.toolIndex), Name: f.Name, ArgumentsFragment: types.Some(string(a)), Complete: true}
 				s.toolIndex++
+				if rec.Done {
+					e := finishEvent(s.requestID, rec.DoneReason, rec.Prompt, rec.Eval, s.toolCallsSeen)
+					s.pendingTerminal = &e
+				}
 				return types.Ok[types.Option[glixo_llm_types_types.ProviderEvent], string](types.Some(partEvent(s.requestID, glixo_llm_types_types.MakeContentPartToolCallDetails(d))))
 			}
 		}
 		if rec.Done {
 			s.terminal = true
 			s.stream.Close()
-			ev := event(s.requestID)
-			fin := glixo_llm_types_types.MakeFinishReasonStop()
-			switch rec.DoneReason {
-			case "length":
-				fin = glixo_llm_types_types.MakeFinishReasonLength()
-			case "tool", "tool_calls":
-				fin = glixo_llm_types_types.MakeFinishReasonTool()
-			case "stop", "":
-			default:
-				fin = glixo_llm_types_types.MakeFinishReasonUnknown(glixo_llm_types_types.UnknownRepresentation{Name: rec.DoneReason, PayloadJson: types.None[string]()})
-			}
-			ev.Finish = types.Some(fin)
-			if rec.Prompt != nil || rec.Eval != nil {
-				u := glixo_llm_types_types.Usage{CachedTokens: types.None[uint32](), ReasoningTokens: types.None[uint32](), TotalTokens: types.None[uint32]()}
-				if rec.Prompt != nil {
-					u.InputTokens = *rec.Prompt
-				}
-				if rec.Eval != nil {
-					u.OutputTokens = *rec.Eval
-				}
-				if rec.Prompt != nil && rec.Eval != nil {
-					u.TotalTokens = types.Some(u.InputTokens + u.OutputTokens)
-				}
-				ev.Usage = types.Some(u)
-			}
+			ev := finishEvent(s.requestID, rec.DoneReason, rec.Prompt, rec.Eval, s.toolCallsSeen)
 			return types.Ok[types.Option[glixo_llm_types_types.ProviderEvent], string](types.Some(ev))
 		}
+	}
+}
+
+func finishEvent(requestID, reason string, prompt, eval *uint32, toolCallsSeen bool) glixo_llm_types_types.ProviderEvent {
+	ev := event(requestID)
+	ev.Finish = types.Some(finishReason(reason, toolCallsSeen))
+	if prompt != nil || eval != nil {
+		u := glixo_llm_types_types.Usage{CachedTokens: types.None[uint32](), ReasoningTokens: types.None[uint32](), TotalTokens: types.None[uint32]()}
+		if prompt != nil {
+			u.InputTokens = *prompt
+		}
+		if eval != nil {
+			u.OutputTokens = *eval
+		}
+		if prompt != nil && eval != nil {
+			u.TotalTokens = types.Some(u.InputTokens + u.OutputTokens)
+		}
+		ev.Usage = types.Some(u)
+	}
+	return ev
+}
+
+func finishReason(reason string, toolCallsSeen bool) glixo_llm_types_types.FinishReason {
+	if toolCallsSeen {
+		return glixo_llm_types_types.MakeFinishReasonTool()
+	}
+	switch reason {
+	case "length":
+		return glixo_llm_types_types.MakeFinishReasonLength()
+	case "tool", "tool_calls":
+		return glixo_llm_types_types.MakeFinishReasonTool()
+	case "stop", "":
+		return glixo_llm_types_types.MakeFinishReasonStop()
+	default:
+		return glixo_llm_types_types.MakeFinishReasonUnknown(glixo_llm_types_types.UnknownRepresentation{Name: reason, PayloadJson: types.None[string]()})
 	}
 }
 func terminal(s *session, msg string) types.Result[types.Option[glixo_llm_types_types.ProviderEvent], string] {
