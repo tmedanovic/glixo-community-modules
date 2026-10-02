@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
+import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
-import { Script } from 'node:vm';
+import { createContext, Script } from 'node:vm';
 import { join, resolve, sep } from 'node:path';
 import process from 'node:process';
 
@@ -28,18 +29,95 @@ const digest = source && existsSync(source)
   ? `sha256:${createHash('sha256').update(readFileSync(source)).digest('hex')}`
   : '';
 for (const [label, pattern] of [
-  ['host bridge bootstrap', /__GLIXO_SANDBOXED_WEB__/],
-  ['versioned host bridge envelope', /contractKind:'sandboxed-web-bridge'/],
-  ['guest ready event', /operation:'guest\.ready'/],
-  ['manifest action', /id:'save-preferences'/],
+  ['host bridge API', /window\.glixoExtension/],
+  ['host action invocation', /host\.invoke\('save-preferences'/],
+  ['completion acknowledgement handling', /result\?\.completed === true/],
   ['user custom control', /glixo-user-custom-control/],
-  ['semantic host theme tokens', /--glixo-color-background/],
+  ['host theme event', /glixo-theme/],
+  ['camel-case host theme tokens', /fontFamily/],
 ]) if (!pattern.test(html)) fail(`browser UI is missing ${label}`);
 if (/<(?:script|link|img)\b[^>]+(?:src|href)\s*=\s*["']https?:/i.test(html)) fail('browser UI must not load remote assets');
 if (/window\.open\s*\(|location\.(?:href|assign|replace)\s*=|\bfetch\s*\(/i.test(html)) fail('browser UI must use only the host bridge for external operations');
+if (/window\.parent|postMessage|MessageChannel|contractKind\s*:\s*['"]sandboxed-web-bridge/i.test(html)) {
+  fail('browser UI must use the injected glixoExtension API instead of implementing a second frame bridge');
+}
+const themeHelperPath = join(root, 'references', 'accessible-theme', 'src', 'theme.ts');
+if (!existsSync(themeHelperPath)) fail('the reusable TypeScript theme helper is missing');
+else {
+  const themeHelper = readFileSync(themeHelperPath, 'utf8');
+  if (!/readonly glixoExtension\??:\s*GlixoSandboxedWebApi/.test(themeHelper)
+    || !/host\.invoke\(actionId, payload\)/.test(themeHelper)
+    || !/window\.addEventListener\('glixo-theme'/.test(themeHelper)) {
+    fail('the reusable TypeScript helper must use the injected host API and theme event');
+  }
+  if (/__GLIXO_SANDBOXED_WEB__|window\.parent|postMessage|MessageChannel|action\.invoke.*\bid:/i.test(themeHelper)) {
+    fail('the reusable TypeScript helper must not implement a second, incompatible frame bridge');
+  }
+}
+function exerciseInjectedHostBridge(scriptText) {
+  const listeners = new Map();
+  const styles = new Map();
+  const invoked = [];
+  let readyCalls = 0;
+  let saveHandler;
+  const saveButton = {
+    disabled: true,
+    addEventListener(name, handler) { if (name === 'click') saveHandler = handler; },
+  };
+  const status = { textContent: '' };
+  const customControl = { value: '#204060' };
+  const largeControls = { checked: true };
+  const host = {
+    theme: {},
+    locale: 'en',
+    styleNonce: 'host-nonce',
+    async ready() { readyCalls += 1; return { ready: true }; },
+    async invoke(actionId, payload) { invoked.push({ actionId, payload }); return { completed: true }; },
+  };
+  const document = {
+    documentElement: { lang: 'en', style: { setProperty(name, value) { styles.set(name, value); } } },
+    querySelector(selector) {
+      return ({ '#status': status, '#save': saveButton, 'glixo-user-custom-control': customControl,
+        '#large-controls': largeControls })[selector] ?? null;
+    },
+    createElement() { return { append() {}, setAttribute() {}, addEventListener() {} }; },
+  };
+  const window = {
+    glixoExtension: host,
+    addEventListener(name, handler) {
+      const group = listeners.get(name) ?? [];
+      group.push(handler);
+      listeners.set(name, group);
+    },
+  };
+  const customElements = { get() { return undefined; }, define() {} };
+  class HTMLElement {}
+  const context = createContext({ window, document, customElements, HTMLElement, CustomEvent: class CustomEvent {} });
+  new Script(scriptText, { filename: 'accessible-theme/ui/index.html' }).runInContext(context);
+  assert.equal(typeof saveHandler, 'function', 'UI must register a save action');
+  assert.equal(saveButton.disabled, true, 'save stays disabled until the host bridge is ready');
+
+  for (const handler of listeners.get('glixo-theme') ?? []) {
+    handler({ detail: { background: '#121416', accent: '#44aa88', fontFamily: 'system-ui, sans-serif' } });
+  }
+  return Promise.resolve().then(async () => {
+    await new Promise((resolvePromise) => setImmediate(resolvePromise));
+    assert.equal(readyCalls, 1, 'UI must use the host ready method after receiving its theme event');
+    assert.equal(saveButton.disabled, false, 'save is enabled only after host.ready resolves');
+    assert.equal(styles.get('--glixo-color-background'), '#121416', 'UI consumes the host camel-case theme tokens');
+    await saveHandler({ currentTarget: saveButton });
+    assert.equal(JSON.stringify(invoked), JSON.stringify([{
+      actionId: 'save-preferences',
+      payload: { accent: '#204060', largeControls: true },
+    }]), 'UI must invoke the host action with actionId and payload arguments');
+    assert.equal(status.textContent, 'Preference saved.', 'UI must handle the host completed acknowledgement');
+  });
+}
 for (const match of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)) {
   try { new Script(match[1], { filename: 'accessible-theme/ui/index.html' }); }
   catch (error) { fail(`browser UI script has a syntax error: ${error instanceof Error ? error.message : String(error)}`); }
+  try { await exerciseInjectedHostBridge(match[1]); }
+  catch (error) { fail(`browser UI does not work with the injected host bridge API: ${error instanceof Error ? error.message : String(error)}`); }
 }
 
 const placementsPath = join(root, 'references', 'accessible-theme', 'placements.json');
@@ -123,5 +201,5 @@ if (errors.length) {
   for (const error of errors) console.error(`  - ${error}`);
   process.exitCode = 1;
 } else {
-  console.log('Verified static sandboxed-web UI digest, supported placement, action bridge declaration, four language guest mappings, and scoped storage metadata.');
+  console.log('Verified the digest-bound sandboxed-web UI, supported placement, four language mappings, scoped grants, and an action/theme round trip through the injected host bridge API.');
 }

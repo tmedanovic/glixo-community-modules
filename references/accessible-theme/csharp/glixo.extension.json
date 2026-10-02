@@ -6,7 +6,7 @@
   "metadata": { "name": "{{NAME}}", "description": "An installable sandboxed appearance panel with a host-themed user control and a persisted example preference.", "license": "MIT" },
   "compatibility": { "schema": 2, "witWorld": "glixo:contribution/contribution@1.0.0", "uiBridge": "sandboxed-web.v1" },
   "components": [
-    { "id": "panel-ui", "cell": "browser", "runtime": "sandboxed-web", "artifact": "ui/index.html", "digest": "sha256:5d2d8ed766e079f38705a015323c007eb26e76c3a5c5fa52e648324cfb298831" },
+    { "id": "panel-ui", "cell": "browser", "runtime": "sandboxed-web", "artifact": "ui/index.html", "digest": "sha256:8016f7bb1b1a6e72c1da22cc01d3b6534b32a68f308e0135d2219180ef6d529b" },
     { "id": "panel-actions", "cell": "server", "runtime": "wasm-component", "artifact": "dist/glixo-extension.component.wasm", "world": "glixo:contribution/contribution@1.0.0" }
   ],
   "permissions": { "requested": [
@@ -16,7 +16,7 @@
   ] },
   "contributions": {
     "surfaces": [
-      { "id": "themed-custom-panel", "uiTier": "sandboxed-web", "title": "Personal appearance", "placements": ["settings.extensions"], "origin": "opaque-extension", "component": "panel-ui", "assets": [{ "path": "ui/index.html", "digest": "sha256:5d2d8ed766e079f38705a015323c007eb26e76c3a5c5fa52e648324cfb298831", "mediaType": "text/html" }], "actions": [{ "kind": "action", "id": "save-preferences" }], "compatibility": { "schema": 2, "uiBridge": "sandboxed-web.v1", "requiresRuntime": false } }
+      { "id": "themed-custom-panel", "uiTier": "sandboxed-web", "title": "Personal appearance", "placements": ["settings.extensions"], "origin": "opaque-extension", "component": "panel-ui", "assets": [{ "path": "ui/index.html", "digest": "sha256:8016f7bb1b1a6e72c1da22cc01d3b6534b32a68f308e0135d2219180ef6d529b", "mediaType": "text/html" }], "actions": [{ "kind": "action", "id": "save-preferences" }], "compatibility": { "schema": 2, "uiBridge": "sandboxed-web.v1", "requiresRuntime": false } }
     ],
     "actions": [
       { "id": "save-preferences", "title": "Save appearance preference", "component": "panel-actions", "placements": ["settings.extensions"], "context": "project", "parameters": { "type": "object", "additionalProperties": false, "required": ["accent", "largeControls"], "properties": { "accent": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" }, "largeControls": { "type": "boolean" } } }, "result": { "type": "object", "additionalProperties": false, "required": ["accepted"], "properties": { "accepted": { "type": "boolean" } } }, "timeoutMs": 5000, "cancellable": true }

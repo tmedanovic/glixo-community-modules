@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Personal appearance</title></head>
   <body>
     <style>
-      :root{color-scheme:dark;--glixo-color-background:#101214;--glixo-color-panel:#191c21;--glixo-color-surface:#1e2229;--glixo-color-text:#edf1f7;--glixo-color-muted:#a4adbb;--glixo-color-accent:#10b981;--glixo-color-border:rgba(255,255,255,.14);--glixo-color-danger:#ef5a5a;--glixo-font-family:system-ui,-apple-system,"Segoe UI",sans-serif;--glixo-radius-control:8px;--glixo-space-scale:4px 8px 12px 16px 24px;font-family:var(--glixo-font-family);color:var(--glixo-color-text);background:var(--glixo-color-background)}
+      :root{color-scheme:dark;--glixo-color-background:#101214;--glixo-color-panel:#191c21;--glixo-color-surface:#1e2229;--glixo-color-text:#edf1f7;--glixo-color-muted:#a4adbb;--glixo-color-accent:#10b981;--glixo-color-border:rgba(255,255,255,.14);--glixo-color-danger:#ef5a5a;--glixo-color-warning:#e7ad47;--glixo-color-success:#38b784;--glixo-font-family:system-ui,-apple-system,"Segoe UI",sans-serif;--glixo-radius-control:8px;--glixo-space-scale:4px 8px 12px 16px 24px;font-family:var(--glixo-font-family);color:var(--glixo-color-text);background:var(--glixo-color-background)}
       *{box-sizing:border-box}body{margin:0;padding:18px;background:var(--glixo-color-background);color:var(--glixo-color-text);font:14px/1.45 var(--glixo-font-family)}main{display:grid;gap:14px}header{display:grid;gap:4px}h1{font-size:17px;line-height:1.25;margin:0;font-weight:650}p{margin:0;color:var(--glixo-color-muted)}fieldset{display:grid;gap:12px;padding:14px;border:1px solid var(--glixo-color-border);border-radius:var(--glixo-radius-control);background:var(--glixo-color-panel)}legend{padding:0 5px;font-weight:600}label{display:grid;gap:6px;color:var(--glixo-color-muted);font-size:12px}input[type=color]{width:100%;height:38px;padding:4px;border:1px solid var(--glixo-color-border);border-radius:var(--glixo-radius-control);background:var(--glixo-color-surface)}.toggle{display:flex;align-items:center;gap:9px;color:var(--glixo-color-text);font-size:13px}.toggle input{accent-color:var(--glixo-color-accent);width:16px;height:16px}button{min-height:36px;padding:7px 12px;border:1px solid transparent;border-radius:var(--glixo-radius-control);background:var(--glixo-color-accent);color:#07130f;font:600 13px var(--glixo-font-family);cursor:pointer}button:disabled{opacity:.55;cursor:wait}:focus-visible{outline:2px solid var(--glixo-color-accent);outline-offset:3px}output{min-height:20px;color:var(--glixo-color-muted);font-size:12px}
     </style>
     <main aria-labelledby="title">
@@ -13,16 +13,14 @@
         <glixo-user-custom-control label="Accent color" value="#10b981"></glixo-user-custom-control>
         <label class="toggle"><input id="large-controls" type="checkbox"> Use larger controls</label>
       </fieldset>
-      <button id="save" type="button">Save preference</button>
-      <output id="status" role="status" aria-live="polite">Host theme will appear when the panel connects.</output>
+      <button id="save" type="button" disabled>Save preference</button>
+      <output id="status" role="status" aria-live="polite">Connecting to Glixo…</output>
     </main>
     <script>
       'use strict';
-      const bootstrap = window.__GLIXO_SANDBOXED_WEB__;
-      let sequence = 0;
-      let requestSequence = 0;
-      const pending = new Map();
+      const host = window.glixoExtension;
       const status = document.querySelector('#status');
+      const saveButton = document.querySelector('#save');
       class GlixoUserCustomControl extends HTMLElement {
         connectedCallback() {
           if (this.firstChild) return;
@@ -30,56 +28,68 @@
           const caption = document.createElement('span');
           const input = document.createElement('input');
           caption.textContent = this.getAttribute('label') || 'Custom value';
-          input.type = 'color'; input.value = this.getAttribute('value') || '#10b981';
+          input.type = 'color';
+          input.value = this.getAttribute('value') || '#10b981';
           input.setAttribute('aria-label', caption.textContent);
-          input.addEventListener('input', () => this.dispatchEvent(new CustomEvent('glixo-change', {detail:{value:input.value},bubbles:true,composed:true})));
-          label.append(caption,input); this.append(label);
+          input.addEventListener('input', () => this.dispatchEvent(new CustomEvent('glixo-change', { detail: { value: input.value }, bubbles: true, composed: true })));
+          label.append(caption, input);
+          this.append(label);
         }
         get value() { return this.querySelector('input')?.value || '#10b981'; }
       }
       if (!customElements.get('glixo-user-custom-control')) customElements.define('glixo-user-custom-control', GlixoUserCustomControl);
-      function request(operation, payload) {
-        if (!bootstrap || window.parent === window) return Promise.reject(new Error('sandbox_bridge_unavailable'));
-        const id = `req.${Date.now().toString(36)}_${(++requestSequence).toString(36)}`;
-        const envelope = {contractKind:'sandboxed-web-bridge',protocol:bootstrap.protocol,schema:bootstrap.schema,kind:'request',instanceNonce:bootstrap.instanceNonce,sequence:++sequence,requestId:id,operation,payload};
-        return new Promise((resolve,reject) => { pending.set(id,{resolve,reject}); window.parent.postMessage(envelope,'*'); window.setTimeout(()=>{const item=pending.get(id);if(item){pending.delete(id);item.reject(new Error('bridge_request_timeout'));}},5000); });
-      }
-      window.addEventListener('message', event => {
-        if (!bootstrap || event.source !== window.parent || event.origin !== 'null') return;
-        const message = event.data;
-        if (!message || message.contractKind !== 'sandboxed-web-bridge' || message.protocol !== bootstrap.protocol || message.schema !== bootstrap.schema || message.instanceNonce !== bootstrap.instanceNonce) return;
-        if (message.kind === 'event' && message.operation === 'host.theme') {
-          const tokens = message.payload?.tokens || {};
-          const names = {'color.background':'--glixo-color-background','color.panel':'--glixo-color-panel','color.surface':'--glixo-color-surface','color.text':'--glixo-color-text','color.muted':'--glixo-color-muted','color.accent':'--glixo-color-accent','color.border':'--glixo-color-border','font.family':'--glixo-font-family','control.radius':'--glixo-radius-control'};
-          for (const [key,name] of Object.entries(names)) if (typeof tokens[key] === 'string' && tokens[key].length < 256 && !/[<>;]/.test(tokens[key])) document.documentElement.style.setProperty(name,tokens[key]);
-          return;
+
+      const themeProperties = {
+        background: '--glixo-color-background', panel: '--glixo-color-panel', surface: '--glixo-color-surface',
+        text: '--glixo-color-text', muted: '--glixo-color-muted', accent: '--glixo-color-accent',
+        border: '--glixo-color-border', danger: '--glixo-color-danger', warning: '--glixo-color-warning',
+        success: '--glixo-color-success', fontFamily: '--glixo-font-family', radius: '--glixo-radius-control',
+        spacing: '--glixo-space-scale',
+      };
+      function applyTheme(tokens) {
+        for (const [key, property] of Object.entries(themeProperties)) {
+          const value = tokens?.[key];
+          if (typeof value === 'string' && value.length < 256 && !/[<>;]/.test(value)) {
+            document.documentElement.style.setProperty(property, value);
+          }
         }
-        const pendingRequest = pending.get(message.requestId);
-        if (!pendingRequest || (message.kind !== 'response' && message.kind !== 'error')) return;
-        pending.delete(message.requestId);
-        if (message.kind === 'error') pendingRequest.reject(new Error(message.error?.code || 'bridge_request_failed'));
-        else pendingRequest.resolve(message.payload || {});
-      });
-      function announceReady() {
-        if (!bootstrap || window.parent === window) return;
-        window.parent.postMessage({contractKind:'sandboxed-web-bridge',protocol:bootstrap.protocol,schema:bootstrap.schema,kind:'event',instanceNonce:bootstrap.instanceNonce,sequence:++sequence,operation:'guest.ready'},'*');
       }
-      announceReady();
-      void request('lifecycle.ready').then(()=>request('theme.tokens')).then(result=>{
-        const tokens = result.tokens || {};
-        const names = {'color.background':'--glixo-color-background','color.panel':'--glixo-color-panel','color.surface':'--glixo-color-surface','color.text':'--glixo-color-text','color.muted':'--glixo-color-muted','color.accent':'--glixo-color-accent','color.border':'--glixo-color-border','font.family':'--glixo-font-family','control.radius':'--glixo-radius-control'};
-        for (const [key,name] of Object.entries(names)) if (typeof tokens[key] === 'string' && tokens[key].length < 256 && !/[<>;]/.test(tokens[key])) document.documentElement.style.setProperty(name,tokens[key]);
-        status.textContent = 'Connected to the host theme.';
-      }).catch(()=>{ status.textContent = 'Using the accessible default theme.'; });
-      document.querySelector('#save').addEventListener('click', async event => {
+
+      if (!host || typeof host.invoke !== 'function' || typeof host.ready !== 'function') {
+        status.textContent = 'This panel needs the Glixo sandbox bridge.';
+      } else {
+        saveButton.disabled = true;
+        window.addEventListener('glixo-theme', event => applyTheme(event.detail || host.theme));
+        window.addEventListener('glixo-theme', () => {
+          void host.ready().then(() => {
+            saveButton.disabled = false;
+            status.textContent = 'Connected to the Glixo theme.';
+          }).catch(() => {
+            status.textContent = 'The Glixo bridge could not be reached.';
+          });
+        }, { once: true });
+        window.addEventListener('glixo-locale', event => {
+          document.documentElement.lang = String(event.detail || host.locale || 'en');
+        });
+      }
+
+      saveButton.addEventListener('click', async event => {
         const button = event.currentTarget;
-        button.disabled = true; status.textContent = 'Saving preference…';
+        if (!host || typeof host.invoke !== 'function') return;
+        button.disabled = true;
+        status.textContent = 'Saving preference…';
         try {
           const custom = document.querySelector('glixo-user-custom-control');
-          const result = await request('action.invoke',{id:'save-preferences',params:{accent:custom.value,largeControls:document.querySelector('#large-controls').checked}});
-          status.textContent = result.accepted === true ? 'Preference saved by the extension action.' : 'The extension action completed.';
-        } catch { status.textContent = 'The host could not complete this action.'; }
-        finally { button.disabled = false; }
+          const result = await host.invoke('save-preferences', {
+            accent: custom.value,
+            largeControls: document.querySelector('#large-controls').checked,
+          });
+          status.textContent = result?.completed === true ? 'Preference saved.' : 'The action finished without confirmation.';
+        } catch {
+          status.textContent = 'The host could not complete this action.';
+        } finally {
+          button.disabled = false;
+        }
       });
     </script>
   </body>
