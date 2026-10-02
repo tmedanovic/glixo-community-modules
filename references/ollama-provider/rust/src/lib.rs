@@ -262,7 +262,10 @@ impl exports::glixo::llm_provider_compat::provider::Guest for OllamaProvider {
                 if record["done"].as_bool() == Some(true) {
                     session.pending.push_back(PendingEvent { event: terminal_event(&session.request_id, &record, session.tool_calls_seen), terminal: true });
                 }
-                if let Some(pending) = session.pending.pop_front() { return Ok(Some(pending.event)); }
+                if let Some(pending) = session.pending.pop_front() {
+                    if pending.terminal { session.terminal_sent = true; session.done = true; session.stream.close(); }
+                    return Ok(Some(pending.event));
+                }
             }
         })
     }
