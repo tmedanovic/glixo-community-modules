@@ -1,59 +1,62 @@
-# Glixo extension references
+# Glixo extension examples
 
-This repository is the public source for maintained Glixo extension-author references. The active tree contains executable teaching projects and shared, versioned assets. Git history retains the retired module-v0 catalog and adapter examples; they are not part of the current authoring path.
+Build extensions for Glixo using **C#, Go, Rust, or TypeScript**. This repository contains examples you can read, build, and adapt for your own project.
 
-- Extension authoring tool: `glxdev` (see the public SDK and developer docs)
-- Supported contribution package contract: manifest v2 with versioned guest contracts and SDK assets shipped beside these references
-- Reference languages: C#, Go, Rust, and TypeScript
-- Marketplace: none of the teaching projects is listed; host installation and acceptance are reported separately
+## Choose an example
 
-`glixo.extension.json` describes the guest extension manifest (schema v2). The host-install distribution envelope is generated separately by the current `glxdev` tooling; it is not a guest module descriptor. Historical module-v0 descriptors in Git history are not accepted by these projects.
+Each code example has a folder for all four languages.
 
-## References
+| Example | What it does |
+| --- | --- |
+| [Ollama provider](references/ollama-provider) | Connects Glixo to Ollama for model discovery, chat, and tool calls. |
+| [Workspace health](references/workspace-health) | Checks a workspace and reports problems. |
+| [Document search](references/document-index) | Searches project files and returns matching excerpts. |
+| [Extension storage](references/workspace-storage) | Saves and reads extension data. |
+| [Issue lookup](references/issue-lookup-mcp) | Looks up issues through an MCP server. |
+| [Mail watcher](references/mail-watch) | Watches a Microsoft 365 inbox and sends new-mail events to Glixo. |
+| [Conversation insights](references/conversation-insights) | Counts messages and tool usage without saving prompt text. |
+| [Prompt redactor](references/prompt-redactor) | Removes configured text from outgoing messages. |
+| [Custom settings panel](references/accessible-theme) | Adds a panel with a custom Web Component, Glixo's colors, and saved preferences. |
 
-| Reference | What it teaches | Executable projects |
-| --- | --- | --- |
-| `ollama-provider` | Connect to a user-approved Ollama endpoint, discover models, stream chat, and handle tool calls | C#, Go, Rust, TypeScript |
-| `workspace-health` | Read host-scoped workspace facts and report actionable health findings | C#, Go, Rust, TypeScript |
-| `document-index` | Search host-authorized project files and return bounded results with provenance | C#, Go, Rust, TypeScript |
-| `workspace-storage` | Store and retrieve values through an approved test namespace | C#, Go, Rust, TypeScript |
-| `issue-lookup-mcp` | Use the approved local Streamable HTTP MCP connection to look up issues | C#, Go, Rust, TypeScript |
-| `mail-watch` | Poll Microsoft Graph Inbox delta metadata and publish idempotent events | C#, Go, Rust, TypeScript |
-| `conversation-insights` | Report message and tool-use statistics without logging prompts | C#, Go, Rust, TypeScript |
-| `prompt-redactor` | Preview and apply explicitly configured outbound redactions | C#, Go, Rust, TypeScript |
-| `accessible-theme` | Install a theme-aware appearance panel with an extension-authored Web Component, host action bridge, and scoped preference storage | Browser UI assets are static; C#, Go, Rust, and TypeScript provide the separate contribution action guest |
-| `review-checklist` | Review extensions without executing package code | Shared checklist; no guest runtime |
+There is also a [review checklist](references/review-checklist) for checking an extension before sharing it.
 
-Reference status and source/toolchain evidence are in [`references/reference-index.json`](references/reference-index.json). A listed project is not a claim of host acceptance: each row identifies the source implementation and its current contract status. Public repository CI builds each implemented guest target and runs its contract checks; real host installation, provider, Microsoft Graph, and platform acceptance remain separately reported.
+## Build an example
 
-## Layout
+Start with the Ollama provider in your preferred language: [C#](references/ollama-provider/csharp), [Go](references/ollama-provider/go), [Rust](references/ollama-provider/rust), or [TypeScript](references/ollama-provider/typescript).
 
-```text
-references/
-  <reference-id>/{csharp,go,rust,typescript}/  Complete, runnable guest projects
-  _shared/                                    Versioned UI, schemas and goldens
-  reference-index.json                        Inventory and support evidence
-packages/extension-sdk/support-matrix.json   Single source for SDK and compiler pins
-scripts/verify-references.mjs                 Inventory, provenance and stale-tree checks
+Clone this repository and install its JavaScript dependencies:
+
+```sh
+git clone https://github.com/tmedanovic/glixo-community-modules.git
+cd glixo-community-modules
+npm ci
 ```
 
-No active `bundled/`, `catalog/`, native-process adapter, stdio MCP, or placeholder-echo category is maintained here. Historical recovery belongs in Git history, not an archive folder.
+Use Node.js 22.14 or newer. Before building, install the compiler and WebAssembly tools listed for your language in [required tool versions](packages/extension-sdk/support-matrix.json).
 
-## Build and validate
+For example, build and check the TypeScript Ollama provider:
 
-Install the pinned toolchains from `packages/extension-sdk/support-matrix.json`, then run the per-project commands in each project's `README.md`. From the repository root:
+```sh
+npm run build:references -- --reference=ollama-provider --language=typescript
+```
 
-```powershell
+Replace `typescript` with `csharp`, `go`, or `rust`. Replace `ollama-provider` with another example's folder name to try it. The command builds in a temporary directory and checks the result.
+
+To check all example manifests and shared files:
+
+```sh
 npm run verify
-npm run build:references
 ```
 
-A successful build means the source projects compile and their declared component artifacts verify. CI also runs the reference and manifest checks. For `accessible-theme`, CI checks the packaged HTML digest and bridge/placement declarations separately from building each language's WASM contribution guest. These checks do not prove that a Glixo host is available, an extension is signed, a package is published, or an external account/provider accepted the integration.
+The examples are under active development. Building one does not install it in Glixo; using services such as Ollama or Microsoft 365 also requires their own setup.
 
-## Use with glxdev
+## Make it your own
 
-Create a package from the matching contribution template with a `glxdev` version that supports the indexed manifest and recipe, then copy the project source and the public SDK version pinned by this repository. The consuming application records the public source commit and each template tree hash in its lock file. Update templates only from a full public Git SHA and verify the included hashes. Do not copy from an unpinned branch or make a release/publishing claim from a local build.
+- The source code is in `references/<example>/<language>/`.
+- `glixo.extension.json` describes what the extension adds and which permissions it needs.
+- [The SDK](packages/extension-sdk) provides shared helpers for each language.
+- [`glxdev`](https://www.npmjs.com/package/@glixo/glxdev) is Glixo's command-line tool for creating, building, and packaging extensions. See the [developer docs](https://docs.glixo.dev/) for its commands and the installation process.
 
-## License and attribution
+## License
 
-New reference source and shared fixtures are released under the MIT License in [`LICENSE`](LICENSE), unless a reference directory includes its own third-party notice. Upstream API names and product marks belong to their respective owners. Microsoft Graph, Ollama, MCP and Glixo are cited only as interoperability targets; this repository does not imply endorsement.
+[MIT](LICENSE), unless a directory includes a separate third-party notice.
