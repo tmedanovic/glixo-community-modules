@@ -69,6 +69,36 @@
       }
     },
     {
+      "id": "workflow-text-stats",
+      "kind": "executable",
+      "languages": [
+        "csharp",
+        "go",
+        "rust",
+        "typescript"
+      ],
+      "status": "preview",
+      "owner": "provider-sdk",
+      "contract": "glixo:contribution/contribution@1.0.0 + tool.invoke + installed workflow-extension-node binding",
+      "hostAcceptance": "pending",
+      "scaffold": {
+        "sourcePath": "references/workflow-text-stats/{language}",
+        "manifestPath": "references/workflow-text-stats/{language}/glixo.extension.json",
+        "projectManifestPath": "references/workflow-text-stats/{language}/glixo.project.json",
+        "sharedPaths": [
+          {
+            "destination": "shared/goldens/workflow-text-stats",
+            "sourcePath": "references/_shared/goldens/workflow-text-stats"
+          }
+        ],
+        "substitutions": {
+          "{{PACKAGE_ID}}": "package.id",
+          "{{NAME}}": "package.name",
+          "{{PUBLISHER}}": "package.publisher"
+        }
+      }
+    },
+    {
       "id": "document-index",
       "kind": "executable",
       "languages": [

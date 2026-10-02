@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { existsSync, mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -19,7 +20,10 @@ function fixture(stepCwd = '.') {
     referenceId: 'sample-reference', language: 'typescript', build: { recipeId: 'contribution-typescript-v1' },
   }));
   const output = 'dist/glixo-extension.component.wasm';
-  const create = "require('node:fs').mkdirSync('dist',{recursive:true});require('node:fs').writeFileSync('dist/glixo-extension.component.wasm','component')";
+  writeFileSync(join(project, 'glixo.project.json'), JSON.stringify({ schemaVersion: 1, language: 'typescript', components: [
+    { id: 'sample-component', language: 'typescript', recipe: 'contribution-typescript-v1', artifact: output },
+  ] }));
+  const create = "const fs=require('node:fs');if(fs.existsSync('ignored-secret.txt'))process.exit(3);fs.mkdirSync('dist',{recursive:true});fs.writeFileSync('dist/glixo-extension.component.wasm','component')";
   const verification = "if(require('node:fs').readFileSync('dist/glixo-extension.component.wasm','utf8')!=='component')process.exit(2)";
   mkdirSync(join(root, 'packages', 'extension-sdk'), { recursive: true });
   writeFileSync(join(root, 'packages', 'extension-sdk', 'support-matrix.json'), JSON.stringify({ recipes: {
@@ -29,6 +33,19 @@ function fixture(stepCwd = '.') {
     } },
   } }));
   return root;
+}
+
+function initializeCleanGitRepository(root) {
+  const invoke = (args) => {
+    const result = spawnSync('git', args, { cwd: root, encoding: 'utf8', shell: false });
+    assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+  };
+  invoke(['init', '-q']);
+  invoke(['config', 'user.name', 'Reference Build Test']);
+  invoke(['config', 'user.email', 'reference-build-test@example.invalid']);
+  invoke(['remote', 'add', 'origin', 'https://github.com/tmedanovic/glixo-community-modules']);
+  invoke(['add', '-A']);
+  invoke(['commit', '-qm', 'fixture source']);
 }
 
 test('build runner executes only the resolved SDK recipe and checks its declared artifact', (t) => {
@@ -47,6 +64,64 @@ test('build runner rejects recipe working directories outside the project before
   assert.equal(result.status, 1);
   assert.match(result.stderr, /cwd escapes project root/);
   assert.equal(result.stdout, '');
+});
+
+test('opt-in export retains only verified components and a deterministic source receipt', (t) => {
+  const root = fixture();
+  const exportDirectory = join(tmpdir(), `glixo-reference-export-${process.pid}-${Date.now()}`);
+  t.after(() => {
+    rmSync(root, { recursive: true, force: true });
+    rmSync(exportDirectory, { recursive: true, force: true });
+  });
+  writeFileSync(join(root, '.gitignore'), 'references/sample-reference/typescript/ignored-secret.txt\n');
+  initializeCleanGitRepository(root);
+  writeFileSync(join(root, 'references', 'sample-reference', 'typescript', 'ignored-secret.txt'), 'must not enter the build input');
+  mkdirSync(exportDirectory);
+  const result = spawnSync(process.execPath, [script, '--language=typescript', '--export-dir', exportDirectory], { cwd: root, encoding: 'utf8' });
+  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+  assert.match(result.stdout, /exported 1 verified components from [0-9a-f]{40}/);
+  const componentPath = join(exportDirectory, 'components', 'sample-reference', 'typescript', 'sample-component', 'glixo-extension.component.wasm');
+  assert.equal(readFileSync(componentPath, 'utf8'), 'component');
+  const digest = createHash('sha256').update(readFileSync(componentPath)).digest('hex');
+  const receipt = JSON.parse(readFileSync(join(exportDirectory, 'receipt.json'), 'utf8'));
+  const git = (args) => spawnSync('git', args, { cwd: root, encoding: 'utf8', shell: false }).stdout.trim();
+  assert.deepEqual(receipt, {
+    schemaVersion: 1,
+    source: {
+      repository: 'https://github.com/tmedanovic/glixo-community-modules',
+      commit: git(['rev-parse', 'HEAD^{commit}']),
+      tree: git(['rev-parse', 'HEAD^{tree}']),
+    },
+    language: 'typescript',
+    components: [{
+      referenceId: 'sample-reference',
+      componentId: 'sample-component',
+      language: 'typescript',
+      recipeId: 'contribution-typescript-v1',
+      sourceArtifact: 'dist/glixo-extension.component.wasm',
+      artifact: 'components/sample-reference/typescript/sample-component/glixo-extension.component.wasm',
+      bytes: Buffer.byteLength('component'),
+      sha256: digest,
+    }],
+  });
+  assert.deepEqual(readdirSync(exportDirectory).sort(), ['components', 'receipt.json']);
+  assert.equal(existsSync(join(exportDirectory, 'packages')), false);
+  assert.equal(existsSync(join(exportDirectory, 'references')), false);
+});
+
+test('opt-in export rejects a dirty source tree before creating output', (t) => {
+  const root = fixture();
+  const exportDirectory = join(tmpdir(), `glixo-reference-dirty-export-${process.pid}-${Date.now()}`);
+  t.after(() => {
+    rmSync(root, { recursive: true, force: true });
+    rmSync(exportDirectory, { recursive: true, force: true });
+  });
+  initializeCleanGitRepository(root);
+  writeFileSync(join(root, 'dirty-change.txt'), 'not part of the source commit');
+  const result = spawnSync(process.execPath, [script, '--language=typescript', '--export-dir', exportDirectory], { cwd: root, encoding: 'utf8' });
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /artifact export requires a clean source worktree/);
+  assert.equal(existsSync(exportDirectory), false);
 });
 
 test('Go SDK source copy does not trigger automatic Go module vendoring', (t) => {

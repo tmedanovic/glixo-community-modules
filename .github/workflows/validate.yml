@@ -65,4 +65,11 @@ jobs:
           (cd packages/extension-sdk/go && go test ./...)
           (cd packages/extension-sdk/go-import-consumer && go test ./...)
       - name: Build and check all ${{ matrix.language }} references
-        run: node scripts/build-references.mjs --language=${{ matrix.language }}
+        run: node scripts/build-references.mjs --language=${{ matrix.language }} --export-dir=${{ runner.temp }}/glixo-reference-components-${{ matrix.language }}
+      - name: Retain verified ${{ matrix.language }} components
+        uses: actions/upload-artifact@v4
+        with:
+          name: extension-components-${{ matrix.language }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/glixo-reference-components-${{ matrix.language }}/
+          if-no-files-found: error
+          retention-days: 14
