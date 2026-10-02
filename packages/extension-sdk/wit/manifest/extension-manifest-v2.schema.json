@@ -1,0 +1,590 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.glixo.dev/extension-manifest/v2.json",
+  "title": "Extension Manifest v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "version", "metadata"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "type": "integer", "const": 2 },
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+" },
+    "metadata": { "$ref": "#/$defs/ExtensionMetadata" },
+    "compatibility": { "$ref": "#/$defs/ExtensionCompatibility" },
+    "artifacts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/ExtensionArtifact" }
+    },
+    "components": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/ExtensionComponent" }
+    },
+    "cells": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["server", "desktop", "os", "mobile", "browser"] }
+    },
+    "permissions": { "$ref": "#/$defs/ExtensionPermissions" },
+    "events": { "$ref": "#/$defs/ExtensionEvents" },
+    "configurations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/ExtensionConfigurationRef" }
+    },
+    "contributions": { "$ref": "#/$defs/ExtensionContributions" }
+  },
+  "$defs": {
+    "ExtensionMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "description": { "type": "string" },
+        "license": { "type": "string" }
+      }
+    },
+    "ExtensionCompatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "host": { "type": "string", "minLength": 1 },
+        "schema": { "type": "integer", "const": 2 },
+        "witWorld": { "type": "string" },
+        "uiBridge": { "type": "string" },
+        "packageSignature": { "type": "string" },
+        "trustTier": { "type": "string", "enum": ["marketplace", "local-trusted", "admin"] },
+        "compositionKind": { "$ref": "#/$defs/PackageCompositionKind" },
+        "productId": { "type": "string", "enum": ["glixo-code", "glixo-os", "glixo-mobile", "glixo-workflow-designer"] }
+      }
+    },
+    "ExtensionArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "digest"],
+      "properties": {
+        "path": { "type": "string", "pattern": "^(?!\\/)(?!.*\\.\\.).+$" },
+        "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "mediaType": {
+          "type": "string",
+          "enum": [
+            "application/wasm",
+            "text/html",
+            "text/css",
+            "text/javascript",
+            "application/json",
+            "image/png",
+            "image/svg+xml",
+            "image/webp",
+            "application/json+a2ui",
+            "application/json+theme-tokens"
+          ]
+        }
+      }
+    },
+    "ExtensionComponent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "cell", "runtime"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "cell": { "type": "string", "enum": ["server", "desktop", "os", "mobile", "browser"] },
+        "runtime": { "type": "string", "enum": ["wasm-component", "sandboxed-web", "local-process"] },
+        "artifact": { "type": "string" },
+        "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "world": { "type": "string" },
+        "entry": { "type": "string" }
+      }
+    },
+    "ExtensionPermissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requested": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/RequestedPermission" }
+        }
+      }
+    },
+    "RequestedPermission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "reason"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "scope": { "type": "object", "additionalProperties": true },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ExtensionEvents": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "publish": { "type": "array", "items": { "$ref": "#/$defs/EventPublishDeclaration" } },
+        "subscribe": { "type": "array", "items": { "$ref": "#/$defs/EventSubscribeDeclaration" } }
+      }
+    },
+    "EventPublishDeclaration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "schemaVersion", "scope", "reason"],
+      "properties": {
+        "type": { "type": "string", "minLength": 1 },
+        "schema": { "type": "string" },
+        "schemaVersion": { "type": "integer", "minimum": 1 },
+        "scope": { "type": "string", "enum": ["account", "workspace", "project", "installation"] },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "EventSubscribeDeclaration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "schemaVersions", "scope", "reason"],
+      "properties": {
+        "type": { "type": "string", "minLength": 1 },
+        "schemaVersions": { "type": "array", "items": { "type": "integer", "minimum": 1 } },
+        "scope": { "type": "string", "enum": ["account", "workspace", "project", "installation"] },
+        "delivery": { "type": "string", "enum": ["durable", "wake"] },
+        "component": { "type": "string" },
+        "handler": { "type": "string" },
+        "publisherPackageId": { "type": "string", "minLength": 1 },
+        "publisherKinds": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["extension", "extension-service", "platform", "workflow", "application"] }
+        },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ExtensionConfigurationRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "scope", "schema", "schemaDigest"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "scope": { "type": "string", "enum": ["installation", "account", "user", "workspace", "project", "session"] },
+        "schema": { "type": "string" },
+        "schemaDigest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "ui": { "type": "string" },
+        "uiDigest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      },
+      "allOf": [{ "if": { "required": ["ui"] }, "then": { "required": ["uiDigest"] } }]
+    },
+    "ExtensionContributions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "llmProviders": { "type": "array", "items": { "$ref": "#/$defs/ContributionRef" } },
+        "storageProviders": { "type": "array", "items": { "$ref": "#/$defs/ContributionRef" } },
+        "skills": { "type": "array", "items": { "$ref": "#/$defs/ContributionRef" } },
+        "themes": { "type": "array", "items": { "$ref": "#/$defs/SurfaceContribution" } },
+        "a2ui": { "type": "array", "items": { "$ref": "#/$defs/SurfaceContribution" } },
+        "sandboxedWebUi": { "type": "array", "items": { "$ref": "#/$defs/SurfaceContribution" } },
+        "actions": { "type": "array", "items": { "$ref": "#/$defs/ActionContribution" } },
+        "surfaces": { "type": "array", "items": { "$ref": "#/$defs/SurfaceContribution" } },
+        "tools": { "type": "array", "items": { "$ref": "#/$defs/ToolContribution" } },
+        "mcp": { "type": "array", "items": { "$ref": "#/$defs/McpContribution" } },
+        "dataSources": { "type": "array", "items": { "$ref": "#/$defs/DataSourceContribution" } },
+        "backgroundServices": { "type": "array", "items": { "$ref": "#/$defs/BackgroundServiceContribution" } },
+        "messageMiddleware": { "type": "array", "items": { "$ref": "#/$defs/MessageMiddlewareContribution" } }
+      }
+    },
+    "DataSourceContribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "component", "querySchema", "resultSchema", "pagination", "freshnessMs", "provenance", "cache", "cancellable", "redaction", "maxResults"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
+        "component": { "type": "string", "minLength": 1 },
+        "configuration": { "type": "string" },
+        "world": { "type": "string" },
+        "cell": { "type": "string", "enum": ["server", "desktop", "os", "mobile", "browser"] },
+        "targetApplications": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^app\\.[a-z0-9][a-z0-9.-]{1,127}$" }
+        },
+        "querySchema": { "type": "object" },
+        "resultSchema": { "type": "object" },
+        "pagination": { "type": "string", "enum": ["none", "page", "cursor", "stream"] },
+        "freshnessMs": { "type": "integer", "minimum": 1 },
+        "provenance": { "type": "boolean" },
+        "cache": { "type": "string", "enum": ["none", "private", "shared"] },
+        "cancellable": { "type": "boolean" },
+        "redaction": { "type": "string", "enum": ["none", "secrets", "pii"] },
+        "maxResults": { "type": "integer", "minimum": 1, "maximum": 1000 },
+        "timeoutMs": { "type": "integer", "minimum": 1 },
+        "export": { "type": "string", "minLength": 1 }
+      }
+    },
+    "MessageMiddlewareContribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "component", "hooks", "order", "failurePolicy"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
+        "component": { "type": "string", "minLength": 1 },
+        "world": { "type": "string", "const": "glixo:contribution/contribution@1.0.0" },
+        "configuration": { "type": "string", "minLength": 1 },
+        "targetApplications": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^app\\.[a-z0-9][a-z0-9.-]{1,127}$" } },
+        "hooks": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "enum": ["before-provider", "completed", "committed", "transform-response"] } },
+        "order": { "type": "integer", "minimum": -1000, "maximum": 1000 },
+        "failurePolicy": { "type": "string", "enum": ["block", "continue"] },
+        "timeoutMs": { "type": "integer", "minimum": 1, "maximum": 30000 },
+        "maxBytes": { "type": "integer", "minimum": 1, "maximum": 131072 }
+      }
+    },
+    "BackgroundServiceContribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "component", "archetype", "activation", "quota", "retry", "idempotent", "health", "shutdown"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
+        "component": { "type": "string", "minLength": 1 },
+        "configuration": { "type": "string" },
+        "world": { "type": "string" },
+        "cell": { "type": "string", "enum": ["server", "desktop", "os", "mobile", "browser"] },
+        "archetype": { "type": "string", "enum": ["event-handler", "scheduled", "webhook-ingest"] },
+        "schedule": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["intervalMs"],
+          "properties": {
+            "intervalMs": { "type": "integer", "minimum": 1000, "maximum": 86400000 }
+          }
+        },
+        "activation": { "type": "string", "enum": ["install", "grant", "manual"] },
+        "quota": { "type": "integer", "minimum": 1, "maximum": 64 },
+        "retry": { "type": "integer", "minimum": 0, "maximum": 8 },
+        "idempotent": { "type": "boolean" },
+        "health": { "type": "string", "enum": ["none", "export", "event"] },
+        "shutdown": { "type": "string", "enum": ["graceful", "immediate"] },
+        "timeoutMs": { "type": "integer", "minimum": 1, "maximum": 30000 },
+        "export": { "type": "string", "minLength": 1 }
+      },
+      "allOf": [
+        { "if": { "properties": { "archetype": { "const": "scheduled" } }, "required": ["archetype"] }, "then": { "required": ["schedule"] }, "else": { "not": { "required": ["schedule"] } } }
+      ]
+    },
+    "ToolContribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "description", "inputSchema", "outputSchema"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
+        "component": { "type": "string" },
+        "configuration": { "type": "string" },
+        "world": { "type": "string" },
+        "targetApplications": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^app\\.[a-z0-9][a-z0-9.-]{1,127}$" }
+        },
+        "description": { "type": "string", "minLength": 1 },
+        "inputSchema": { "type": "object" },
+        "outputSchema": { "type": "object" },
+        "safety": { "type": "string", "enum": ["readonly", "mutating", "privileged"] },
+        "timeoutMs": { "type": "integer", "minimum": 1 },
+        "cancellable": { "type": "boolean" },
+        "idempotent": { "type": "boolean" },
+        "export": { "type": "string", "minLength": 1 },
+        "confirmation": { "type": "string", "enum": ["install", "invoke"] }
+      }
+    },
+    "McpContribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "transport"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
+        "component": { "type": "string" },
+        "configuration": { "type": "string" },
+        "transport": { "type": "string", "enum": ["remote-http", "wasm-component", "stdio"] },
+        "endpoint": { "type": "string", "minLength": 1 },
+        "command": { "type": "string", "minLength": 1 }
+      }
+    },
+    "PackageCompositionKind": {
+      "type": "string",
+      "description": "Host product composition, not publisher reputation. local-trusted and admin trust tiers never grant in-process UI.",
+      "enum": ["marketplace", "signed-host-product"]
+    },
+    "UiTier": {
+      "type": "string",
+      "description": "Canonical UI trust tiers. native-privileged is signed first-party product composition compiled into the host, never marketplace or publisher-trusted packages.",
+      "enum": ["declarative", "a2ui", "sandboxed-web", "theme", "native-privileged"]
+    },
+    "UiOriginPolicy": {
+      "type": "string",
+      "enum": ["opaque-extension", "host-product"]
+    },
+    "UiAsset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "digest", "mediaType"],
+      "properties": {
+        "path": { "type": "string", "pattern": "^(?!\\/)(?!.*\\.\\.)(?![a-z][a-z0-9+.-]*:)[a-z0-9][a-z0-9./_-]*$" },
+        "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "mediaType": {
+          "type": "string",
+          "enum": [
+            "text/html",
+            "text/css",
+            "text/javascript",
+            "application/json",
+            "image/png",
+            "image/svg+xml",
+            "image/webp",
+            "application/json+a2ui",
+            "application/json+theme-tokens"
+          ]
+        }
+      }
+    },
+    "UiContributionRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id"],
+      "properties": {
+        "kind": { "type": "string", "enum": ["configuration", "data", "action"] },
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" }
+      }
+    },
+    "UiLimits": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "maxTreeDepth": { "type": "integer", "minimum": 1, "maximum": 32 },
+        "maxNodes": { "type": "integer", "minimum": 1, "maximum": 4096 },
+        "maxStringBytes": { "type": "integer", "minimum": 1, "maximum": 65536 },
+        "maxAssetBytes": { "type": "integer", "minimum": 1, "maximum": 1048576 },
+        "maxAssets": { "type": "integer", "minimum": 1, "maximum": 32 }
+      }
+    },
+    "UiContributionCompatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema": { "type": "integer", "const": 2 },
+        "uiBridge": { "type": "string", "minLength": 1 },
+        "requiresRuntime": { "type": "boolean", "const": false }
+      }
+    },
+    "DeclarativeSurfaceContribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "uiTier", "placements"],
+      "properties": {
+        "id": { "type": "string" },
+        "uiTier": { "type": "string", "const": "declarative" },
+        "title": { "type": "string" },
+        "placements": { "type": "array", "items": { "type": "string" } },
+        "configuration": { "type": "string" },
+        "data": { "type": "array", "items": { "$ref": "#/$defs/UiContributionRef" } },
+        "actions": { "type": "array", "items": { "$ref": "#/$defs/UiContributionRef" } },
+        "limits": { "$ref": "#/$defs/UiLimits" },
+        "compatibility": { "$ref": "#/$defs/UiContributionCompatibility" },
+        "targetApplications": { "type": "array", "items": { "type": "string" } },
+        "context": { "type": "string" }
+      }
+    },
+    "A2uiSurfaceContribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "uiTier", "placements", "assets"],
+      "properties": {
+        "id": { "type": "string" },
+        "uiTier": { "type": "string", "const": "a2ui" },
+        "title": { "type": "string" },
+        "placements": { "type": "array", "items": { "type": "string" } },
+        "assets": { "type": "array", "items": { "$ref": "#/$defs/UiAsset" } },
+        "configuration": { "type": "string" },
+        "data": { "type": "array", "items": { "$ref": "#/$defs/UiContributionRef" } },
+        "actions": { "type": "array", "items": { "$ref": "#/$defs/UiContributionRef" } },
+        "limits": { "$ref": "#/$defs/UiLimits" },
+        "compatibility": { "$ref": "#/$defs/UiContributionCompatibility" },
+        "targetApplications": { "type": "array", "items": { "type": "string" } },
+        "context": { "type": "string" }
+      }
+    },
+    "SandboxedWebSurfaceContribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "uiTier", "placements", "origin", "component"],
+      "properties": {
+        "id": { "type": "string" },
+        "uiTier": { "type": "string", "const": "sandboxed-web" },
+        "title": { "type": "string" },
+        "placements": { "type": "array", "items": { "type": "string" } },
+        "origin": { "type": "string", "const": "opaque-extension" },
+        "component": { "type": "string" },
+        "assets": { "type": "array", "items": { "$ref": "#/$defs/UiAsset" } },
+        "configuration": { "type": "string" },
+        "data": { "type": "array", "items": { "$ref": "#/$defs/UiContributionRef" } },
+        "actions": { "type": "array", "items": { "$ref": "#/$defs/UiContributionRef" } },
+        "limits": { "$ref": "#/$defs/UiLimits" },
+        "compatibility": { "$ref": "#/$defs/UiContributionCompatibility" },
+        "targetApplications": { "type": "array", "items": { "type": "string" } },
+        "context": { "type": "string" }
+      }
+    },
+    "ThemeSurfaceContribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "uiTier", "placements", "assets"],
+      "properties": {
+        "id": { "type": "string" },
+        "uiTier": { "type": "string", "const": "theme" },
+        "title": { "type": "string" },
+        "placements": { "type": "array", "items": { "type": "string" } },
+        "assets": { "type": "array", "items": { "$ref": "#/$defs/UiAsset" } },
+        "limits": { "$ref": "#/$defs/UiLimits" },
+        "compatibility": { "$ref": "#/$defs/UiContributionCompatibility" },
+        "targetApplications": { "type": "array", "items": { "type": "string" } },
+        "context": { "type": "string" }
+      }
+    },
+    "NativePrivilegedSurfaceContribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "uiTier", "placements", "component", "origin"],
+      "properties": {
+        "id": { "type": "string" },
+        "uiTier": { "type": "string", "const": "native-privileged" },
+        "title": { "type": "string" },
+        "placements": { "type": "array", "items": { "type": "string" } },
+        "origin": { "type": "string", "const": "host-product" },
+        "component": { "type": "string", "pattern": "^host\\.surface\\.[a-z0-9][a-z0-9.-]{1,127}$" },
+        "configuration": { "type": "string" },
+        "data": { "type": "array", "items": { "$ref": "#/$defs/UiContributionRef" } },
+        "actions": { "type": "array", "items": { "$ref": "#/$defs/UiContributionRef" } },
+        "compatibility": { "$ref": "#/$defs/UiContributionCompatibility" },
+        "targetApplications": { "type": "array", "items": { "type": "string" } },
+        "context": { "type": "string" }
+      }
+    },
+    "ActionTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": { "type": "string", "enum": ["host-operation", "component-export"] },
+        "operation": { "type": "string", "minLength": 1 },
+        "export": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ActionEnablement": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "when": { "type": "string" },
+        "disabledReason": { "type": "string" }
+      }
+    },
+    "ContributionRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
+        "component": { "type": "string" },
+        "configuration": { "type": "string" },
+        "world": { "type": "string" },
+        "targetApplications": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^app\\.[a-z0-9][a-z0-9.-]{1,127}$" }
+        },
+        "placements": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^(suite|code|os|settings|command-palette|context-menu)(\\.[a-z0-9][a-z0-9.-]*)*$" }
+        },
+        "context": { "type": "string", "enum": ["machine", "project", "session"] }
+      }
+    },
+    "ActionContribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "component": { "type": "string" },
+        "configuration": { "type": "string" },
+        "world": { "type": "string" },
+        "targetApplications": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^app\\.[a-z0-9][a-z0-9.-]{1,127}$" }
+        },
+        "placements": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^(suite|code|os|settings|command-palette|context-menu)(\\.[a-z0-9][a-z0-9.-]*)*$" }
+        },
+        "context": { "type": "string", "enum": ["machine", "project", "session"] },
+        "parameters": { "type": "object" },
+        "result": { "type": "object" },
+        "enablement": { "$ref": "#/$defs/ActionEnablement" },
+        "target": { "$ref": "#/$defs/ActionTarget" },
+        "timeoutMs": { "type": "integer", "minimum": 1 },
+        "cancellable": { "type": "boolean" }
+      }
+    },
+    "SurfaceContribution": {
+      "type": "object",
+      "description": "Closed UI contribution union discriminated by uiTier. Variant shapes are DeclarativeSurfaceContribution, A2uiSurfaceContribution, SandboxedWebSurfaceContribution, ThemeSurfaceContribution, and NativePrivilegedSurfaceContribution. Invalid tier/placement/origin/reference combinations fail before assets load. native-privileged requires signed-host-product composition, not trustTier.",
+      "additionalProperties": false,
+      "required": ["id", "uiTier"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
+        "component": { "type": "string" },
+        "configuration": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
+        "world": { "type": "string" },
+        "targetApplications": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^app\\.[a-z0-9][a-z0-9.-]{1,127}$" }
+        },
+        "placements": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "pattern": "^(suite|code|os|settings|command-palette|context-menu)(\\.[a-z0-9][a-z0-9.-]*)*$" }
+        },
+        "context": { "type": "string", "enum": ["machine", "project", "session"] },
+        "uiTier": { "$ref": "#/$defs/UiTier" },
+        "title": { "type": "string", "minLength": 1 },
+        "assets": {
+          "type": "array",
+          "maxItems": 32,
+          "items": { "$ref": "#/$defs/UiAsset" }
+        },
+        "data": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/UiContributionRef" }
+        },
+        "actions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/UiContributionRef" }
+        },
+        "origin": { "$ref": "#/$defs/UiOriginPolicy" },
+        "limits": { "$ref": "#/$defs/UiLimits" },
+        "compatibility": { "$ref": "#/$defs/UiContributionCompatibility" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "uiTier": { "const": "native-privileged" } }, "required": ["uiTier"] },
+          "then": { "required": ["component", "origin", "placements"] }
+        },
+        {
+          "if": { "properties": { "uiTier": { "const": "sandboxed-web" } }, "required": ["uiTier"] },
+          "then": { "required": ["component", "origin", "placements"] }
+        },
+        {
+          "if": { "properties": { "uiTier": { "const": "a2ui" } }, "required": ["uiTier"] },
+          "then": { "required": ["assets", "placements"] }
+        },
+        {
+          "if": { "properties": { "uiTier": { "const": "theme" } }, "required": ["uiTier"] },
+          "then": { "required": ["placements", "assets"] }
+        },
+        {
+          "if": { "properties": { "uiTier": { "const": "declarative" } }, "required": ["uiTier"] },
+          "then": { "required": ["placements"] }
+        }
+      ]
+    }
+  }
+}

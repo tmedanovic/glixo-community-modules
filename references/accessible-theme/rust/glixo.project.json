@@ -1,0 +1,11 @@
+{
+  "components": [
+    {
+      "recipe": "contribution-rust-v1",
+      "language": "rust",
+      "artifact": "dist/glixo-extension.component.wasm",
+      "id": "panel-actions"
+    }
+  ],
+  "schemaVersion": 1
+}

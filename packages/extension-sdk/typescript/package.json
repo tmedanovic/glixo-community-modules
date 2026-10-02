@@ -1,0 +1,65 @@
+{
+  "name": "@glixo/extension-sdk",
+  "version": "0.1.0",
+  "description": "Typed guest-side helpers for Glixo WebAssembly extensions",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tmedanovic/glixo-community-modules.git",
+    "directory": "packages/extension-sdk/typescript"
+  },
+  "homepage": "https://docs.glixo.dev",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "README.md",
+    "LICENSE",
+    "dist"
+  ],
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./http": {
+      "types": "./dist/http.d.ts",
+      "import": "./dist/http.js"
+    },
+    "./state": {
+      "types": "./dist/state.d.ts",
+      "import": "./dist/state.js"
+    },
+    "./logging": {
+      "types": "./dist/logging.d.ts",
+      "import": "./dist/logging.js"
+    },
+    "./workspace": {
+      "types": "./dist/workspace.d.ts",
+      "import": "./dist/workspace.js"
+    },
+    "./guest": {
+      "types": "./dist/guest.d.ts",
+      "import": "./dist/guest.js"
+    },
+    "./llm": {
+      "types": "./dist/llm.d.ts",
+      "import": "./dist/llm.js"
+    },
+    "./wit": {
+      "types": "./dist/wit.d.ts",
+      "import": "./dist/wit.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "typecheck": "tsc --noEmit --project tsconfig.json",
+    "prepack": "npm run build"
+  },
+  "devDependencies": {
+    "typescript": "6.0.3"
+  }
+}

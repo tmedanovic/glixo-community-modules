@@ -1,0 +1,372 @@
+{
+  "schemaVersion": 1,
+  "evidenceId": "workspace-storage-and-mail-watch-protocol2",
+  "publicSource": {
+    "repository": "glixo-community-references",
+    "binarySourceSnapshot": "1c53c3478279576e9e012e39708d034d02bbd5a1",
+    "currentManifestSnapshot": "224046912967cd38c6c1ccab6b3be58ab73e8bbd",
+    "note": "TypeScript artifacts were built from public snapshot 1c53; Mail Watch C#, Go, and Rust artifacts trace to the per-language services source commit below, and Workspace Storage C#, Go, and Rust trace to the per-language tooling source commit. The guest source content remains present in public source; subsequent commits changed middleware prebuild metadata and the Ollama permission-scope key."
+  },
+  "runtime": {
+    "sourceCommit": "190204d0723125d8e7ba62485596ea5471326bbf",
+    "sha256": "9cbb7da99521d65b88955653d2e2e55aca41fc588d9f1a8b8f4e4a2f86627d30",
+    "protocolVersion": 2,
+    "maxFrameBytes": 2097152,
+    "wasmtimeVersion": "48.0.2"
+  },
+  "driver": {
+    "repository": "glixo-ext-tooling",
+    "path": "packages/public-api/src/extensions/glixoExtHostDriver.mjs",
+    "sourceCommit": "f7b278cf615da65ba72d2a895f1c6f08258bf4a8",
+    "sha256": "99bb228a95f8268343f25e74827d1c05ad9377a6a91ebaa6d796044b772b8571",
+    "maxFrameBytes": 2097152
+  },
+  "scopes": {
+    "framedFixture": {
+      "result": "passed",
+      "fixtureOnly": true,
+      "credentialsUsed": false,
+      "externalNetworkUsed": false,
+      "production": false,
+      "persisted": false
+    },
+    "installedHost": {
+      "status": "not-tested"
+    },
+    "liveServices": {
+      "status": "not-tested"
+    }
+  },
+  "workspaceStorage": {
+    "statePrefix": "workspace-storage/test/",
+    "initialState": {
+      "workspace-storage/test/seed": "fixture"
+    },
+    "operations": [
+      "set",
+      "get",
+      "list",
+      "delete"
+    ],
+    "languages": {
+      "csharp": {
+        "artifact": "references/workspace-storage/csharp/dist/glixo-extension.component.wasm",
+        "sha256": "f5fa5ec527f397e162d2b351c4a849df51ff570b0a4474c17a5fd9a88c1ad386",
+        "bytes": 6596642,
+        "result": "passed",
+        "buildSourceCommit": "bde41285555f1fbc6d1d088f89bd4b0bdf0b2676",
+        "operations": [
+          "set",
+          "get",
+          "list",
+          "delete"
+        ],
+        "statePrefix": "workspace-storage/test/",
+        "toolchain": null
+      },
+      "go": {
+        "artifact": "references/workspace-storage/go/dist/glixo-extension.component.wasm",
+        "sha256": "5060a99fca7fdbdbe01a10c78f017a04ceb5376b59d3c0395b617fe8b1773497",
+        "bytes": 4593609,
+        "result": "passed",
+        "buildSourceCommit": "bde41285555f1fbc6d1d088f89bd4b0bdf0b2676",
+        "operations": [
+          "set",
+          "get",
+          "list",
+          "delete"
+        ],
+        "statePrefix": "workspace-storage/test/",
+        "toolchain": {
+          "go": "go version go1.27.1 windows/amd64",
+          "componentizeGo": "0.4.3",
+          "wasmTools": "1.239.0"
+        }
+      },
+      "rust": {
+        "artifact": "references/workspace-storage/rust/dist/glixo-extension.component.wasm",
+        "sha256": "cef269e60a3a131110ad91e5fb1986482bb7b207f8f59b3e9ebc972819910bd9",
+        "bytes": 170064,
+        "result": "passed",
+        "buildSourceCommit": "bde41285555f1fbc6d1d088f89bd4b0bdf0b2676",
+        "operations": [
+          "set",
+          "get",
+          "list",
+          "delete"
+        ],
+        "statePrefix": "workspace-storage/test/",
+        "toolchain": null
+      },
+      "typescript": {
+        "artifact": "references/workspace-storage/typescript/dist/glixo-extension.component.wasm",
+        "sha256": "3b8bfe698c85c8f574ecfa35b8671012fb8396fd16a510502984c72666ce4ca5",
+        "bytes": 12080430,
+        "result": "passed",
+        "buildSourceCommit": "1c53c3478279576e9e012e39708d034d02bbd5a1",
+        "operations": [
+          "set",
+          "get",
+          "list",
+          "delete"
+        ],
+        "statePrefix": "workspace-storage/test/",
+        "toolchain": {
+          "node": "v22.14.0",
+          "npm": "10.9.2",
+          "typescript": "6.0.3",
+          "jco": "1.35.0"
+        }
+      }
+    }
+  },
+  "mailWatch": {
+    "fixture": "references/_shared/mail-watch/host-fixture.json",
+    "fixtureSha256": "6d5fd35eacdcdfed9fbd57875f142151766235180ff5c07a26f1bb074b9c85d2",
+    "cases": [
+      "health",
+      "initialize",
+      "wake",
+      "duplicate-replay",
+      "reject-non-graph-cursor"
+    ],
+    "languages": {
+      "csharp": {
+        "artifact": "references/mail-watch/csharp/dist/glixo-extension.component.wasm",
+        "sha256": "b700b3b62355af6fcdc43621c0ac1a3e2cff7ebca26e373b8d02e29c9bb1fe41",
+        "bytes": 7493536,
+        "result": "passed",
+        "positiveCases": 4,
+        "httpRequests": 3,
+        "deniedHttpOperations": 0,
+        "duplicateReplayKey": "mail:7c98aad506ad5737",
+        "negative": {
+          "guestError": "graph_delta_url_outside_scope",
+          "httpRequests": 0,
+          "unusedRoutes": 1
+        },
+        "buildSourceCommit": "248ca7256a923c346e28d82b159beadc7ba34a04"
+      },
+      "go": {
+        "artifact": "references/mail-watch/go/dist/glixo-extension.component.wasm",
+        "sha256": "bb8d421ddb7f7f68bff068494a2ec84685e82a5752772873284e0cee47cff729",
+        "bytes": 4932474,
+        "result": "passed",
+        "positiveCases": 4,
+        "httpRequests": 3,
+        "deniedHttpOperations": 0,
+        "duplicateReplayKey": "mail:7c98aad506ad5737",
+        "negative": {
+          "guestError": "graph_delta_url_outside_scope",
+          "httpRequests": 0,
+          "unusedRoutes": 1
+        },
+        "buildSourceCommit": "248ca7256a923c346e28d82b159beadc7ba34a04"
+      },
+      "rust": {
+        "artifact": "references/mail-watch/rust/dist/glixo-extension.component.wasm",
+        "sha256": "a8709a4e20a619bbcbba2d4eb7a41b4b84dc63035c462ac3b9672e44e932abbc",
+        "bytes": 476993,
+        "result": "passed",
+        "positiveCases": 4,
+        "httpRequests": 3,
+        "deniedHttpOperations": 0,
+        "duplicateReplayKey": "mail:7c98aad506ad5737",
+        "negative": {
+          "guestError": "graph_delta_url_outside_scope",
+          "httpRequests": 0,
+          "unusedRoutes": 1
+        },
+        "buildSourceCommit": "248ca7256a923c346e28d82b159beadc7ba34a04"
+      },
+      "typescript": {
+        "artifact": "references/mail-watch/typescript/dist/glixo-extension.component.wasm",
+        "sha256": "466438b454fdc396161cb519114fdefa36b92820e9322f89da6ca18d00f3673b",
+        "bytes": 12080430,
+        "result": "passed",
+        "positiveCases": 4,
+        "httpRequests": 3,
+        "deniedHttpOperations": 0,
+        "duplicateReplayKey": "mail:7c98aad506ad5737",
+        "negative": {
+          "guestError": "graph_delta_url_outside_scope",
+          "httpRequests": 0,
+          "unusedRoutes": 1
+        },
+        "buildSourceCommit": "1c53c3478279576e9e012e39708d034d02bbd5a1"
+      }
+    },
+    "scope": {
+      "fixtureOnly": true,
+      "credentialsUsed": false,
+      "externalNetworkUsed": false,
+      "production": false,
+      "persisted": false
+    }
+  },
+  "workspaceHealthAndDocumentIndex": {
+    "sourceSnapshot": "1c53c3478279576e9e012e39708d034d02bbd5a1",
+    "rows": [
+      {
+        "family": "workspace-health",
+        "language": "csharp",
+        "artifact": "references/workspace-health/csharp/dist/glixo-extension.component.wasm",
+        "sha256": "fbd93fde8639ba7ccdc3455f036e8789364cdd02896176f637e6b7ceb6740eff",
+        "result": "passed",
+        "checks": [
+          "three bounded fixture files sampled",
+          "UTF-8 byte count 10",
+          "extension counts and largest files returned",
+          "workspace search broker called"
+        ],
+        "buildSourceCommit": "1c53c3478279576e9e012e39708d034d02bbd5a1"
+      },
+      {
+        "family": "document-index",
+        "language": "csharp",
+        "artifact": "references/document-index/csharp/dist/glixo-extension.component.wasm",
+        "sha256": "fe67efe8bb2b8b89fa01e4815d1670c488e94a8b33b6856294cc44b8b2bceb4d",
+        "result": "passed",
+        "checks": [
+          "README.md indexed",
+          "UTF-8 content length 9",
+          "excerpt preserved hello euro",
+          "workspace search and bounded read broker called"
+        ],
+        "buildSourceCommit": "1c53c3478279576e9e012e39708d034d02bbd5a1"
+      },
+      {
+        "family": "workspace-health",
+        "language": "go",
+        "artifact": "references/workspace-health/go/dist/glixo-extension.component.wasm",
+        "sha256": "36ca3e397b946228a637037a91257506cf8de6aaba12d214b022cbe1bb945233",
+        "bytes": 4621575,
+        "result": "passed",
+        "buildSourceCommit": "a4612ace30d78daacec93aedd80a5f78da686e55",
+        "recipeId": "contribution-go-v1",
+        "checks": [
+          "bounded-partial-sample",
+          "incomplete-total-remains-unknown",
+          "exact-workspace-handle"
+        ],
+        "requests": 1,
+        "workspaceOperations": [
+          "fs.workspace.search"
+        ],
+        "deniedBrokerCalls": 0
+      },
+      {
+        "family": "workspace-health",
+        "language": "rust",
+        "artifact": "references/workspace-health/rust/dist/glixo-extension.component.wasm",
+        "sha256": "02690f022991582e1791fb546a13a3c7ba785b09cb32c03d3a150cdefd13af60",
+        "bytes": 270031,
+        "result": "passed",
+        "buildSourceCommit": "a4612ace30d78daacec93aedd80a5f78da686e55",
+        "recipeId": "contribution-rust-v1",
+        "checks": [
+          "bounded-partial-sample",
+          "incomplete-total-remains-unknown",
+          "exact-workspace-handle"
+        ],
+        "requests": 1,
+        "workspaceOperations": [
+          "fs.workspace.search"
+        ],
+        "deniedBrokerCalls": 0
+      },
+      {
+        "family": "workspace-health",
+        "language": "typescript",
+        "artifact": "references/workspace-health/typescript/dist/glixo-extension.component.wasm",
+        "sha256": "d31ca2ea67e7e6a9752904cd42adeea0b42931e382bec9b018007000998ca08c",
+        "bytes": 12077746,
+        "result": "passed",
+        "buildSourceCommit": "1c53c3478279576e9e012e39708d034d02bbd5a1",
+        "recipeId": "contribution-typescript-v1",
+        "checks": [
+          "bounded-partial-sample",
+          "incomplete-total-remains-unknown",
+          "exact-workspace-handle"
+        ],
+        "requests": 1,
+        "workspaceOperations": [
+          "fs.workspace.search"
+        ],
+        "deniedBrokerCalls": 0
+      },
+      {
+        "family": "document-index",
+        "language": "go",
+        "artifact": "references/document-index/go/dist/glixo-extension.component.wasm",
+        "sha256": "2b0a43528a62af1e6f2fadd7d9c81c05119051e65213dbe9db09c9d8a0e17b40",
+        "bytes": 4625214,
+        "result": "passed",
+        "buildSourceCommit": "a4612ace30d78daacec93aedd80a5f78da686e55",
+        "recipeId": "contribution-go-v1",
+        "checks": [
+          "relative-path-filter",
+          "bytewise-sort",
+          "bounded-reads",
+          "utf8-safe-excerpt"
+        ],
+        "requests": 1,
+        "workspaceOperations": [
+          "fs.workspace.search",
+          "fs.workspace.read",
+          "fs.workspace.read",
+          "fs.workspace.read"
+        ],
+        "deniedBrokerCalls": 0
+      },
+      {
+        "family": "document-index",
+        "language": "rust",
+        "artifact": "references/document-index/rust/dist/glixo-extension.component.wasm",
+        "sha256": "c310daa5ad941c97ddb1d7d1d09fb0595898e19d2216b084d78faa4f05bb1f14",
+        "bytes": 244915,
+        "result": "passed",
+        "buildSourceCommit": "a4612ace30d78daacec93aedd80a5f78da686e55",
+        "recipeId": "contribution-rust-v1",
+        "checks": [
+          "relative-path-filter",
+          "bytewise-sort",
+          "bounded-reads",
+          "utf8-safe-excerpt"
+        ],
+        "requests": 1,
+        "workspaceOperations": [
+          "fs.workspace.search",
+          "fs.workspace.read",
+          "fs.workspace.read",
+          "fs.workspace.read"
+        ],
+        "deniedBrokerCalls": 0
+      },
+      {
+        "family": "document-index",
+        "language": "typescript",
+        "artifact": "references/document-index/typescript/dist/glixo-extension.component.wasm",
+        "sha256": "845a90380b2b5718548577280eb9fce9964182613e90333c266a32545e34c10a",
+        "bytes": 12081593,
+        "result": "passed",
+        "buildSourceCommit": "1c53c3478279576e9e012e39708d034d02bbd5a1",
+        "recipeId": "contribution-typescript-v1",
+        "checks": [
+          "relative-path-filter",
+          "bytewise-sort",
+          "bounded-reads",
+          "utf8-safe-excerpt"
+        ],
+        "requests": 1,
+        "workspaceOperations": [
+          "fs.workspace.search",
+          "fs.workspace.read",
+          "fs.workspace.read",
+          "fs.workspace.read"
+        ],
+        "deniedBrokerCalls": 0
+      }
+    ]
+  }
+}

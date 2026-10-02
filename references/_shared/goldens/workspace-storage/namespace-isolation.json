@@ -1,0 +1,12 @@
+{
+  "description": "Logical test keys are mapped into one declared test namespace and never accepted as raw storage prefixes.",
+  "approvedPrefix": "workspace-storage/test/",
+  "operations": [
+    { "operation": "set", "key": "sample-1", "value": "green" },
+    { "operation": "get", "key": "sample-1", "expected": "green" },
+    { "operation": "list", "prefix": "", "expectedKeys": ["sample-1"] },
+    { "operation": "delete", "key": "sample-1", "expectedDeleted": true },
+    { "operation": "get", "key": "sample-1", "expected": null }
+  ],
+  "invalidKeys": ["../outside", "nested/key", "", ".", ".."]
+}

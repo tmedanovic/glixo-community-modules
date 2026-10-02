@@ -1,0 +1,5 @@
+/dist/
+/generated/wit/**
+!/generated/wit/export_provider/
+!/generated/wit/export_provider/export_glixo_llm_provider_compat_provider/
+!/generated/wit/export_provider/export_glixo_llm_provider_compat_provider/provider.go

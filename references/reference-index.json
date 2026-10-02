@@ -1,0 +1,337 @@
+{
+  "schemaVersion": 1,
+  "contractRevision": "guest-v3",
+  "sourceOfTruth": "This public repository",
+  "statusLegend": {
+    "supported": "All declared compiler and contract checks pass; host acceptance is listed separately.",
+    "preview": "The source builds, but at least one contract or host acceptance gate is open.",
+    "planned": "No executable guest project is published yet."
+  },
+  "references": [
+    {
+      "id": "ollama-provider",
+      "kind": "executable",
+      "languages": [
+        "csharp",
+        "go",
+        "rust",
+        "typescript"
+      ],
+      "status": "preview",
+      "owner": "provider-sdk",
+      "contract": "glixo:llm-provider-compat/provider-compat@3.0.0 + glixo:http/broker@3.0.0",
+      "hostAcceptance": "pending",
+      "scaffold": {
+        "sourcePath": "references/ollama-provider/{language}",
+        "manifestPath": "references/ollama-provider/{language}/glixo.extension.json",
+        "projectManifestPath": "references/ollama-provider/{language}/glixo.project.json",
+        "sharedPaths": [
+          {
+            "destination": "shared/test-vectors/ollama",
+            "sourcePath": "references/_shared/test-vectors/ollama"
+          }
+        ],
+        "substitutions": {
+          "{{PACKAGE_ID}}": "package.id",
+          "{{NAME}}": "package.name",
+          "{{PUBLISHER}}": "package.publisher"
+        }
+      }
+    },
+    {
+      "id": "workspace-health",
+      "kind": "executable",
+      "languages": [
+        "csharp",
+        "go",
+        "rust",
+        "typescript"
+      ],
+      "status": "preview",
+      "owner": "references",
+      "contract": "glixo:contribution/contribution@1.0.0",
+      "hostAcceptance": "pending",
+      "scaffold": {
+        "sourcePath": "references/workspace-health/{language}",
+        "manifestPath": "references/workspace-health/{language}/glixo.extension.json",
+        "projectManifestPath": "references/workspace-health/{language}/glixo.project.json",
+        "sharedPaths": [
+          {
+            "destination": "shared/goldens/workspace-health",
+            "sourcePath": "references/_shared/goldens/workspace-health"
+          }
+        ],
+        "substitutions": {
+          "{{PACKAGE_ID}}": "package.id",
+          "{{NAME}}": "package.name",
+          "{{PUBLISHER}}": "package.publisher"
+        }
+      }
+    },
+    {
+      "id": "workflow-text-stats",
+      "kind": "executable",
+      "languages": [
+        "csharp",
+        "go",
+        "rust",
+        "typescript"
+      ],
+      "status": "preview",
+      "owner": "provider-sdk",
+      "contract": "glixo:contribution/contribution@1.0.0 + tool.invoke + installed workflow-extension-node binding",
+      "hostAcceptance": "pending",
+      "scaffold": {
+        "sourcePath": "references/workflow-text-stats/{language}",
+        "manifestPath": "references/workflow-text-stats/{language}/glixo.extension.json",
+        "projectManifestPath": "references/workflow-text-stats/{language}/glixo.project.json",
+        "sharedPaths": [
+          {
+            "destination": "shared/goldens/workflow-text-stats",
+            "sourcePath": "references/_shared/goldens/workflow-text-stats"
+          }
+        ],
+        "substitutions": {
+          "{{PACKAGE_ID}}": "package.id",
+          "{{NAME}}": "package.name",
+          "{{PUBLISHER}}": "package.publisher"
+        }
+      }
+    },
+    {
+      "id": "document-index",
+      "kind": "executable",
+      "languages": [
+        "csharp",
+        "go",
+        "rust",
+        "typescript"
+      ],
+      "status": "preview",
+      "owner": "references",
+      "contract": "glixo:contribution/contribution@1.0.0 + host-scoped workspace query",
+      "hostAcceptance": "pending",
+      "scaffold": {
+        "sourcePath": "references/document-index/{language}",
+        "manifestPath": "references/document-index/{language}/glixo.extension.json",
+        "projectManifestPath": "references/document-index/{language}/glixo.project.json",
+        "sharedPaths": [
+          {
+            "destination": "shared/goldens/document-index",
+            "sourcePath": "references/_shared/goldens/document-index"
+          }
+        ],
+        "substitutions": {
+          "{{PACKAGE_ID}}": "package.id",
+          "{{NAME}}": "package.name",
+          "{{PUBLISHER}}": "package.publisher"
+        }
+      }
+    },
+    {
+      "id": "workspace-storage",
+      "kind": "executable",
+      "languages": [
+        "csharp",
+        "go",
+        "rust",
+        "typescript"
+      ],
+      "status": "preview",
+      "owner": "references",
+      "contract": "glixo:contribution/contribution@1.0.0 + prefix-scoped storage.extension",
+      "hostAcceptance": "pending",
+      "scaffold": {
+        "sourcePath": "references/workspace-storage/{language}",
+        "manifestPath": "references/workspace-storage/{language}/glixo.extension.json",
+        "projectManifestPath": "references/workspace-storage/{language}/glixo.project.json",
+        "sharedPaths": [
+          {
+            "destination": "shared/goldens/workspace-storage",
+            "sourcePath": "references/_shared/goldens/workspace-storage"
+          }
+        ],
+        "substitutions": {
+          "{{PACKAGE_ID}}": "package.id",
+          "{{NAME}}": "package.name",
+          "{{PUBLISHER}}": "package.publisher"
+        }
+      }
+    },
+    {
+      "id": "issue-lookup-mcp",
+      "kind": "executable",
+      "languages": [
+        "csharp",
+        "go",
+        "rust",
+        "typescript"
+      ],
+      "status": "preview",
+      "owner": "references",
+      "contract": "glixo:contribution/contribution@1.0.0 + glixo:http/broker@3.0.0 + approved local http.connection Streamable HTTP",
+      "hostAcceptance": "pending",
+      "scaffold": {
+        "sourcePath": "references/issue-lookup-mcp/{language}",
+        "manifestPath": "references/issue-lookup-mcp/{language}/glixo.extension.json",
+        "projectManifestPath": "references/issue-lookup-mcp/{language}/glixo.project.json",
+        "sharedPaths": [
+          {
+            "destination": "shared/goldens/issue-lookup-mcp",
+            "sourcePath": "references/_shared/goldens/issue-lookup-mcp"
+          }
+        ],
+        "substitutions": {
+          "{{PACKAGE_ID}}": "package.id",
+          "{{NAME}}": "package.name",
+          "{{PUBLISHER}}": "package.publisher"
+        }
+      }
+    },
+    {
+      "id": "mail-watch",
+      "kind": "executable",
+      "languages": [
+        "csharp",
+        "go",
+        "rust",
+        "typescript"
+      ],
+      "status": "preview",
+      "owner": "services",
+      "contract": "glixo:contribution/contribution@1.0.0 + account-scoped Microsoft Graph Mail.ReadBasic + durable mail.received v1 event",
+      "hostAcceptance": "pending",
+      "scaffold": {
+        "sourcePath": "references/mail-watch/{language}",
+        "manifestPath": "references/mail-watch/{language}/glixo.extension.json",
+        "projectManifestPath": "references/mail-watch/{language}/glixo.project.json",
+        "sharedPaths": [
+          {
+            "destination": "configuration.schema.json",
+            "sourcePath": "references/_shared/mail-watch/configuration.schema.json"
+          },
+          {
+            "destination": "event.schema.json",
+            "sourcePath": "references/_shared/mail-watch/event.schema.json"
+          },
+          {
+            "destination": "shared/host-fixture.json",
+            "sourcePath": "references/_shared/mail-watch/host-fixture.json"
+          }
+        ],
+        "substitutions": {
+          "{{PACKAGE_ID}}": "package.id",
+          "{{NAME}}": "package.name",
+          "{{PUBLISHER}}": "package.publisher"
+        }
+      }
+    },
+    {
+      "id": "conversation-insights",
+      "kind": "executable",
+      "languages": [
+        "csharp",
+        "go",
+        "rust",
+        "typescript"
+      ],
+      "status": "preview",
+      "owner": "middleware",
+      "contract": "glixo:contribution/contribution@1.0.0 + glixo:message-middleware/types@1.0.0",
+      "hostAcceptance": "pending",
+      "scaffold": {
+        "sourcePath": "references/conversation-insights/{language}",
+        "manifestPath": "references/conversation-insights/{language}/glixo.extension.json",
+        "projectManifestPath": "references/conversation-insights/{language}/glixo.project.json",
+        "sharedPaths": [
+          {
+            "destination": "shared/goldens/conversation-insights",
+            "sourcePath": "references/_shared/goldens/conversation-insights"
+          }
+        ],
+        "substitutions": {
+          "{{PACKAGE_ID}}": "package.id",
+          "{{NAME}}": "package.name",
+          "{{PUBLISHER}}": "package.publisher"
+        }
+      }
+    },
+    {
+      "id": "prompt-redactor",
+      "kind": "executable",
+      "languages": [
+        "csharp",
+        "go",
+        "rust",
+        "typescript"
+      ],
+      "status": "preview",
+      "owner": "middleware",
+      "contract": "glixo:contribution/contribution@1.0.0 + glixo:message-middleware/types@1.0.0",
+      "hostAcceptance": "pending",
+      "scaffold": {
+        "sourcePath": "references/prompt-redactor/{language}",
+        "manifestPath": "references/prompt-redactor/{language}/glixo.extension.json",
+        "projectManifestPath": "references/prompt-redactor/{language}/glixo.project.json",
+        "sharedPaths": [
+          {
+            "destination": "shared/goldens/prompt-redactor",
+            "sourcePath": "references/_shared/goldens/prompt-redactor"
+          }
+        ],
+        "substitutions": {
+          "{{PACKAGE_ID}}": "package.id",
+          "{{NAME}}": "package.name",
+          "{{PUBLISHER}}": "package.publisher"
+        }
+      }
+    },
+    {
+      "id": "accessible-theme",
+      "kind": "executable",
+      "languages": [
+        "csharp",
+        "go",
+        "rust",
+        "typescript"
+      ],
+      "status": "preview",
+      "owner": "ui",
+      "contract": "glixo:contribution/contribution@1.0.0 + sandboxed-web.v1",
+      "hostAcceptance": "pending",
+      "uiPackage": {
+        "runtime": "sandboxed-web",
+        "sourcePath": "references/_shared/ui/accessible-theme/index.html",
+        "assetPath": "ui/index.html",
+        "actionId": "save-preferences",
+        "placement": "settings.extensions",
+        "build": "static"
+      },
+      "scaffold": {
+        "sourcePath": "references/accessible-theme/{language}",
+        "manifestPath": "references/accessible-theme/{language}/glixo.extension.json",
+        "projectManifestPath": "references/accessible-theme/{language}/glixo.project.json",
+        "sharedPaths": [
+          {
+            "destination": "ui/index.html",
+            "sourcePath": "references/_shared/ui/accessible-theme/index.html"
+          }
+        ],
+        "substitutions": {
+          "{{PACKAGE_ID}}": "package.id",
+          "{{NAME}}": "package.name",
+          "{{PUBLISHER}}": "package.publisher"
+        }
+      }
+    },
+    {
+      "id": "review-checklist",
+      "kind": "checklist",
+      "languages": [],
+      "status": "supported",
+      "owner": "references",
+      "contract": "runtime-free",
+      "hostAcceptance": "not-applicable"
+    }
+  ]
+}

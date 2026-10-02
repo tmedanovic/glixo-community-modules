@@ -1,0 +1,13 @@
+[package]
+name = "glixo-ollama-provider"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wit-bindgen = "=0.62.0"
+serde_json = "=1.0.145"
+glixo-extension-sdk = { path = "../../../packages/extension-sdk/rust" }

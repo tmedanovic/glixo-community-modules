@@ -1,0 +1,19 @@
+{
+  "name": "glixo-extension-references",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "verify": "node scripts/verify-references.mjs && node scripts/verify-manifests.mjs && node scripts/verify-ui-reference.mjs",
+    "verify:ui": "node scripts/verify-ui-reference.mjs",
+    "verify:manifests": "node scripts/verify-manifests.mjs",
+    "verify:evidence": "node scripts/verify-host-evidence.mjs",
+    "verify:sdk-packages": "node scripts/verify-sdk-packages.mjs",
+    "pack:sdk-release": "node scripts/pack-sdk-release.mjs",
+    "test:sdk-package-install": "node --test scripts/sdk-package-install.test.mjs",
+    "build:references": "node scripts/build-references.mjs",
+    "test:build-runner": "node --test scripts/build-references.test.mjs"
+  },
+  "devDependencies": {
+    "ajv": "8.20.0"
+  }
+}

@@ -1,0 +1,13 @@
+[package]
+name = "glixo-conversation-insights"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[lib]
+name = "glixo_contribution_guest"
+crate-type = ["cdylib"]
+
+[dependencies]
+wit-bindgen = "=0.62.0"
+serde_json = "=1.0.145"

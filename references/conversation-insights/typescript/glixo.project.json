@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "components": [
+    {
+      "id": "insights",
+      "source": "src/guest.ts",
+      "recipe": "contribution-typescript-v1",
+      "world": "glixo:contribution/contribution@1.0.0"
+    }
+  ]
+}

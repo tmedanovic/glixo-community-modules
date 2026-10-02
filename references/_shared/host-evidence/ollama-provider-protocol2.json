@@ -1,0 +1,224 @@
+{
+  "schemaVersion": 1,
+  "evidenceId": "ollama-provider-protocol2-framed-conformance",
+  "publicSource": {
+    "repository": "glixo-community-references",
+    "binarySourceSnapshot": "1c53c3478279576e9e012e39708d034d02bbd5a1",
+    "currentManifestSnapshot": "224046912967cd38c6c1ccab6b3be58ab73e8bbd",
+    "contractWorld": "glixo:llm-provider-compat/provider-compat@3.0.0",
+    "note": "Each artifact records its own buildSourceCommit. The TypeScript artifact was built from the exact 1c53 public template recipe; C#, Go, and Rust were built from the provider authoring commits listed per language. The later endpoint-scope spelling correction is manifest-only and does not change guest code or component bytes."
+  },
+  "runtime": {
+    "sourceCommit": "190204d0723125d8e7ba62485596ea5471326bbf",
+    "sha256": "9cbb7da99521d65b88955653d2e2e55aca41fc588d9f1a8b8f4e4a2f86627d30",
+    "protocolVersion": 2,
+    "maxFrameBytes": 2097152,
+    "wasmtimeVersion": "48.0.2"
+  },
+  "driver": {
+    "repository": "glixo-ext-tooling-20261001",
+    "path": "packages/public-api/src/extensions/glixoExtHostDriver.mjs",
+    "sourceCommit": "b4240e8b5428e0c3f847bd128bfea57b68b276ab",
+    "sha256": "99bb228a95f8268343f25e74827d1c05ad9377a6a91ebaa6d796044b772b8571"
+  },
+  "scopes": {
+    "framedFixture": {
+      "result": "passed",
+      "cases": [
+        "describe",
+        "validate-configuration",
+        "list-models",
+        "start-read-output-usage",
+        "tool-call-usage",
+        "cancel-releases-http-stream",
+        "denied-scope"
+      ],
+      "brokerOperations": {
+        "http.start": 10,
+        "http.read": 8,
+        "http.drop": 8,
+        "http.cancel": 1
+      },
+      "fixtureOnly": true,
+      "credentialsUsed": false,
+      "production": false,
+      "persisted": false,
+      "externalNetworkUsed": false
+    },
+    "installedHost": {
+      "status": "not-tested"
+    },
+    "realOllama": {
+      "status": "passed-local-backend",
+      "endpoint": "http://127.0.0.1:11435",
+      "backend": {
+        "product": "Ollama",
+        "version": "0.35.0",
+        "binarySha256": "d6f7d3dd4f5d013553a78c1e78b2521fcf41d43dd2863e4596cdc046fe6036db",
+        "model": "smollm2:135m-instruct-q5_0",
+        "modelDigest": "b4ae22539f3fa19d095f2263e28d6e9874aef13546d9df6f4fb79ed966adc2fe",
+        "modelBlobBytes": 105010673,
+        "reportedCapabilities": ["completion"]
+      },
+      "realInference": true,
+      "languages": {
+        "csharp": { "artifact": "references/ollama-provider/csharp/dist/glixo-extension.component.wasm", "sha256": "297f6329f28cd7e85a033c0f952eb55fcb5a34b57ea58cbd76b8f6877cd30580", "bytes": 5155873, "result": "passed" },
+        "go": { "artifact": "references/ollama-provider/go/dist/glixo-extension.component.wasm", "sha256": "eeb523109b6cd7477cc7b56fb7c31fd3397e67541749da5c73ee19b39c2f5649", "bytes": 4753915, "result": "passed" },
+        "rust": { "artifact": "references/ollama-provider/rust/dist/glixo-extension.component.wasm", "sha256": "e03913d66e06468306e4f84ecc76eea98855d4a321eebb6fa85b41c1fd76c01c", "bytes": 279634, "result": "passed" },
+        "typescript": { "artifact": "references/ollama-provider/typescript/dist/glixo-extension.component.wasm", "sha256": "92528ff92aa3f24b7fef7398575db8b082e08cb7fc40b191b94ed4d131f781b1", "bytes": 12247112, "result": "passed" }
+      },
+      "routes": ["GET /api/tags", "POST /api/show", "POST /api/chat"],
+      "httpConnectionScope": {
+        "endpoints": ["ollama"],
+        "methods": ["GET", "POST"],
+        "paths": ["/api/tags", "/api/show", "/api/chat"]
+      },
+      "inMemoryApprovedEndpointHandle": true,
+      "productionApprovalFlowTested": false,
+      "installedExtensionLifecycle": false,
+      "accountGrantUxTested": false,
+      "persisted": false,
+      "credentialsUsed": false,
+      "externalNetworkUsed": false,
+      "networkScope": "loopback only",
+      "evidenceCommit": "122d2d0ba1e1dd2eeb426ac3d2b28604fd908b63",
+      "executedScratchBridgeSha256": "cad59c31f61ac20d1bc2e162ca46cca90af68c0eac2b99a64a853c7cc0cc9440",
+      "executionBridgeSourceStatus": "scratch bridge source was not committed; exact tested bridge bytes are identified by this digest",
+      "trackedHarness": {
+        "syntax": "passed",
+        "bridgeBuild": "passed",
+        "liveRerun": "not-run",
+        "reason": "The recorded live run used a scratch bridge/runner; the committed parameterized harness was not replayed live."
+      },
+      "limits": [
+        "This tested one completion-only 135M model at a loopback endpoint; it does not qualify remote Ollama, authentication, tool calls, vision, or thinking.",
+        "The broker handle was issued directly in an in-memory grant store; installed approval persistence, settings UI, package acceptance, and account grant UX were not tested."
+      ]
+    }
+  },
+  "languages": {
+    "csharp": {
+      "artifact": "references/ollama-provider/csharp/dist/glixo-extension.component.wasm",
+      "sha256": "297f6329f28cd7e85a033c0f952eb55fcb5a34b57ea58cbd76b8f6877cd30580",
+      "bytes": 5155873,
+      "result": "passed",
+      "buildSourceCommit": "e2909b57ba7643ad22320595e22f6275d042dcfd",
+      "recipeId": "ollama-provider-csharp-v3",
+      "toolchain": {
+        "dotnetSdk": "10.0.301",
+        "componentizeDotnet": "0.8.0-preview00011",
+        "witBindgenCsharp": "0.58.0"
+      },
+      "checks": [
+        "dotnet restore Glixo.OllamaProvider.csproj --runtime wasi-wasm --locked-mode",
+        "dotnet build Glixo.OllamaProvider.csproj --configuration Release --runtime wasi-wasm --no-restore",
+        "node scripts/copy-artifact.mjs bin/Release/net10.0/wasi-wasm/native/Glixo.OllamaProvider.wasm dist/glixo-extension.component.wasm",
+        "wasm-tools component wit dist/glixo-extension.component.wasm"
+      ]
+    },
+    "go": {
+      "artifact": "references/ollama-provider/go/dist/glixo-extension.component.wasm",
+      "sha256": "eeb523109b6cd7477cc7b56fb7c31fd3397e67541749da5c73ee19b39c2f5649",
+      "bytes": 4753915,
+      "result": "passed",
+      "buildSourceCommit": "f2246eb8dab6b7449ec642bf2ec83fe2706bcb89",
+      "recipeId": "ollama-provider-go-v3",
+      "toolchain": {
+        "go": "1.27.1",
+        "componentizeGo": "0.4.3",
+        "goBytecodeAlliancePkg": "0.2.3"
+      },
+      "checks": [
+        "componentize-go --wit-path wit --world provider-compat bindings --output generated/wit --format --pkg-name github.com/glixo-community/ollama-provider-go/generated/wit --export-pkg-name github.com/glixo-community/ollama-provider-go/generated/wit/export_provider",
+        "componentize-go --wit-path wit --world provider-compat build --output dist/glixo-extension.component.wasm",
+        "wasm-tools component wit dist/glixo-extension.component.wasm",
+        "go test ./..."
+      ]
+    },
+    "rust": {
+      "artifact": "references/ollama-provider/rust/dist/glixo-extension.component.wasm",
+      "sha256": "e03913d66e06468306e4f84ecc76eea98855d4a321eebb6fa85b41c1fd76c01c",
+      "bytes": 279634,
+      "result": "passed",
+      "buildSourceCommit": "f2246eb8dab6b7449ec642bf2ec83fe2706bcb89",
+      "recipeId": "ollama-provider-rust-v3",
+      "toolchain": {
+        "rustc": "1.96.0",
+        "cargo": "1.96.0",
+        "witBindgen": "0.62.0",
+        "wasmTools": "1.239.0",
+        "target": "wasm32-wasip2"
+      },
+      "checks": [
+        "cargo build --locked --release --target wasm32-wasip2 --target-dir target",
+        "node scripts/copy-artifact.mjs target/wasm32-wasip2/release/glixo_ollama_provider.wasm dist/glixo-extension.component.wasm",
+        "wasm-tools component wit dist/glixo-extension.component.wasm",
+        "cargo test --locked"
+      ]
+    },
+    "typescript": {
+      "artifact": "references/ollama-provider/typescript/dist/glixo-extension.component.wasm",
+      "sha256": "92528ff92aa3f24b7fef7398575db8b082e08cb7fc40b191b94ed4d131f781b1",
+      "bytes": 12247112,
+      "result": "passed",
+      "buildSourceCommit": "1c53c3478279576e9e012e39708d034d02bbd5a1",
+      "recipeId": "ollama-provider-typescript-v3",
+      "toolchain": {
+        "node": "22.14.0",
+        "npm": "10.9.2",
+        "typescript": "6.0.3",
+        "jco": "1.35.0",
+        "componentizeJs": "0.23.0",
+        "esbuild": "0.28.2"
+      },
+      "checks": [
+        "npm ci --ignore-scripts (packages/extension-sdk/typescript; npm 10.9.2)",
+        "npm run build (packages/extension-sdk/typescript)",
+        "npm ci --ignore-scripts --install-links (ollama-provider/typescript; npm 10.9.2)",
+        "npm audit --json (ollama-provider/typescript; 0 vulnerabilities)",
+        "npm run typecheck (ollama-provider/typescript)",
+        "npm run build (ollama-provider/typescript)",
+        "wasm-tools component wit dist/glixo-extension.component.wasm"
+      ]
+    }
+  },
+  "typescriptBuildDependencyAudit": {
+    "baseline": {
+      "npm": "11.6.2",
+      "vulnerablePackageCount": 4,
+      "severities": {
+        "moderate": 3,
+        "critical": 1
+      },
+      "chain": [
+        "@bytecodealliance/jco@1.35.0",
+        "@bytecodealliance/componentize-js@0.22.0",
+        "@bytecodealliance/weval@0.4.1",
+        "decompress@4.2.1"
+      ],
+      "criticalAdvisory": "GHSA-mp2f-45pm-3cg9 / CVE-2026-53486",
+      "fixedRelease": "No fixed release for upstream decompress 4.2.1; the package is unmaintained."
+    },
+    "remediation": {
+      "directPin": "@bytecodealliance/preview2-shim@0.25.0",
+      "nestedOverride": {
+        "@bytecodealliance/jco": {
+          "@bytecodealliance/componentize-js": "0.23.0"
+        }
+      },
+      "resolvedWeval": "@bytecodealliance/weval@0.5.0",
+      "decompressor": "decompress absent from resolved lockfile",
+      "npm": "10.9.2"
+    },
+    "verification": {
+      "cleanCi": "passed",
+      "audit": "passed",
+      "vulnerabilities": 0,
+      "typecheck": "passed",
+      "componentBuild": "passed",
+      "componentBytes": 12247112,
+      "componentSha256": "92528ff92aa3f24b7fef7398575db8b082e08cb7fc40b191b94ed4d131f781b1"
+    },
+    "exploitRelevance": "Build-time dependency chain only; archive extraction in the authoring/build process could affect files outside its extraction directory. The wasm artifact does not bundle npm dependencies."
+  }
+}

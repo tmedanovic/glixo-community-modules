@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>preview</LangVersion>
+    <PackageId>Glixo.ExtensionSdk</PackageId>
+    <Version>0.1.0</Version>
+    <Description>Typed guest-side helpers for Glixo WebAssembly extensions.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://docs.glixo.dev</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/tmedanovic/glixo-community-modules</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>glixo;extension;wasm;guest-sdk</PackageTags>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="../README.md" Pack="true" PackagePath="/" Link="README.md" />
+  </ItemGroup>
+</Project>

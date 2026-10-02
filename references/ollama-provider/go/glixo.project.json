@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "language": "go",
+  "components": [
+    {
+      "id": "provider",
+      "language": "go",
+      "recipe": "ollama-provider-go-v3",
+      "artifact": "dist/glixo-extension.component.wasm"
+    }
+  ]
+}
