@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <RuntimeIdentifier>wasi-wasm</RuntimeIdentifier>
+    <UseAppHost>false</UseAppHost>
+    <PublishTrimmed>true</PublishTrimmed>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <SelfContained>true</SelfContained>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>preview</LangVersion>
+    <AssemblyName>Glixo.Contribution</AssemblyName>
+    <RootNamespace>Glixo.Reference.IssueLookup</RootNamespace>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <WitGeneratedFilesRoot>generated/wit</WitGeneratedFilesRoot>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="tests/**/*.cs" />
+    <Compile Remove="vendor/**/*.cs" />
+    <PackageReference Include="BytecodeAlliance.Componentize.DotNet.Wasm.SDK" Version="0.8.0-preview00011" />
+    <PackageReference Include="runtime.win-x64.Microsoft.DotNet.ILCompiler.LLVM" Version="10.0.0-rc.1.26306.1" />
+    <ProjectReference Include="../../../packages/extension-sdk/csharp/Glixo.ExtensionSdk/Glixo.ExtensionSdk.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Wit Remove="**/*.wit" />
+    <Wit Include="wit" World="contribution" />
+  </ItemGroup>
+</Project>

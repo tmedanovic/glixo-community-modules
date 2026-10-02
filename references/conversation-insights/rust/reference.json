@@ -1,0 +1,11 @@
+{
+  "referenceId": "conversation-insights",
+  "language": "rust",
+  "status": "preview",
+  "contractRevision": "glixo:message-middleware/types@1.0.0",
+  "build": {
+    "recipeId": "contribution-rust-v1"
+  },
+  "hostAcceptance": "pending",
+  "placeholder": false
+}

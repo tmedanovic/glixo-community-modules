@@ -1,0 +1,65 @@
+{
+  "$schema": "https://schemas.glixo.dev/extension-manifest/v2.json",
+  "schemaVersion": 2,
+  "id": "community.glixo.ollama-provider-rust",
+  "version": "0.1.0",
+  "metadata": {
+    "name": "Ollama provider reference (Rust)",
+    "description": "Preview Ollama LLM provider implemented as a Rust WebAssembly component.",
+    "license": "MIT"
+  },
+  "compatibility": {
+    "host": ">=0.9.0 <1.0.0",
+    "schema": 2,
+    "witWorld": "glixo:llm-provider-compat/provider-compat@3.0.0"
+  },
+  "components": [
+    {
+      "id": "provider",
+      "cell": "server",
+      "runtime": "wasm-component",
+      "artifact": "dist/glixo-extension.component.wasm",
+      "world": "glixo:llm-provider-compat/provider-compat@3.0.0"
+    }
+  ],
+  "configurations": [
+    {
+      "id": "provider-account",
+      "scope": "account",
+      "schema": "schemas/account.json",
+      "schemaDigest": "sha256:5aaa75f7217711b2dc33c71aad0d61c8ef6cae1579ed3ccbb11739ffbb86d29c"
+    }
+  ],
+  "permissions": {
+    "requested": [
+      {
+        "id": "http.connection",
+        "scope": {
+          "endpoints": [
+            "ollama"
+          ],
+          "methods": [
+            "GET",
+            "POST"
+          ],
+          "paths": [
+            "/api/tags",
+            "/api/show",
+            "/api/chat"
+          ]
+        },
+        "reason": "Connect to the host-approved Ollama endpoint for model discovery, capability lookup, and chat."
+      }
+    ]
+  },
+  "contributions": {
+    "llmProviders": [
+      {
+        "id": "default",
+        "component": "provider",
+        "configuration": "provider-account",
+        "world": "glixo:llm-provider-compat/provider-compat@3.0.0"
+      }
+    ]
+  }
+}

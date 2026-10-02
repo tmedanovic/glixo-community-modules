@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "language": "rust",
+  "components": [
+    {
+      "id": "issue-lookup",
+      "language": "rust",
+      "recipe": "contribution-rust-v1",
+      "artifact": "dist/glixo-extension.component.wasm"
+    }
+  ]
+}
+

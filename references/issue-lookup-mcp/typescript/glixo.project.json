@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "language": "typescript",
+  "components": [
+    {
+      "id": "issue-lookup",
+      "language": "typescript",
+      "recipe": "contribution-typescript-v1",
+      "artifact": "dist/glixo-extension.component.wasm"
+    }
+  ]
+}
