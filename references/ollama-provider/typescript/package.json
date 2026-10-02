@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "tsc --project tsconfig.json && esbuild dist/js/provider.js --bundle --format=esm --external:glixo:* --outfile=dist/bundle.js && jco componentize dist/bundle.js --wit wit --world-name provider-compat --disable all --cwd . --out dist/glixo-extension.component.wasm",
-    "typecheck": "tsc --noEmit --project tsconfig.json"
+    "typecheck": "tsc --noEmit --project tsconfig.json",
+    "test:finish-reason": "tsc --project tsconfig.json && node --test test/finish-reason.test.mjs"
   },
   "dependencies": {
     "@glixo/extension-sdk": "file:../../../packages/extension-sdk/typescript"

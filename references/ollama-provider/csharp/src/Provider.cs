@@ -39,6 +39,8 @@ public static class ProviderExportsImpl
         public bool TerminalSent { get; set; }
         public bool Cancelled { get; set; }
         public int ToolIndex { get; set; }
+        public bool ToolCallsSeen { get; set; }
+        public L.ProviderEvent? PendingTerminal { get; set; }
     }
 
     private static readonly ConcurrentDictionary<uint, Session> Sessions = new();
@@ -376,6 +378,13 @@ public static class ProviderExportsImpl
     {
         if (!Sessions.TryGetValue(handle, out var session)) throw new WitException<string>("provider_stream_missing", 0);
         if (session.TerminalSent) return null;
+        if (session.PendingTerminal is { } pendingTerminal)
+        {
+            session.PendingTerminal = null;
+            session.TerminalSent = true;
+            session.Stream.Dispose();
+            return pendingTerminal;
+        }
         if (session.Cancelled)
         {
             session.TerminalSent = true;
@@ -412,19 +421,20 @@ public static class ProviderExportsImpl
                         var call = calls[0].GetProperty("function");
                         var name = call.GetProperty("name").GetString();
                         var args = call.TryGetProperty("arguments", out var arguments) ? arguments.GetRawText() : "{}";
-                        if (!string.IsNullOrWhiteSpace(name)) return Event(session.RequestId, L.ContentPart.ToolCallDetails(new($"{session.RequestId}:ollama:{session.ToolIndex++}", name, args, true)));
+                        if (!string.IsNullOrWhiteSpace(name))
+                        {
+                            session.ToolCallsSeen = true;
+                            if (root.TryGetProperty("done", out var toolDone) && toolDone.ValueKind == JsonValueKind.True)
+                                session.PendingTerminal = TerminalEvent(session, root);
+                            return Event(session.RequestId, L.ContentPart.ToolCallDetails(new($"{session.RequestId}:ollama:{session.ToolIndex++}", name, args, true)));
+                        }
                     }
                 }
                 if (root.TryGetProperty("done", out var done) && done.ValueKind == JsonValueKind.True)
                 {
                     session.TerminalSent = true;
                     session.Stream.Dispose();
-                    var input = Count(root, "prompt_eval_count"); var output = Count(root, "eval_count");
-                    var hasUsage = root.TryGetProperty("prompt_eval_count", out _) || root.TryGetProperty("eval_count", out _);
-                    var usage = hasUsage ? new L.Usage(input, output, null, null, input + output) : (L.Usage?)null;
-                    var reason = root.TryGetProperty("done_reason", out var reasonValue) ? reasonValue.GetString() : "stop";
-                    var finish = reason switch { "length" => L.FinishReason.Length(), "tool" or "tool_calls" => L.FinishReason.Tool(), null or "" or "stop" => L.FinishReason.Stop(), _ => L.FinishReason.Unknown(new(reason!, null)) };
-                    return Event(session.RequestId, usage: usage, finish: finish);
+                    return TerminalEvent(session, root);
                 }
             }
         }
@@ -434,6 +444,22 @@ public static class ProviderExportsImpl
             session.Stream.Dispose();
             return Event(session.RequestId, finish: L.FinishReason.Error(), error: new("ollama_stream_error", ex.Message.Length > 256 ? ex.Message[..256] : ex.Message, false, null));
         }
+    }
+
+    private static L.ProviderEvent TerminalEvent(Session session, JsonElement root)
+    {
+        var input = Count(root, "prompt_eval_count"); var output = Count(root, "eval_count");
+        var hasUsage = root.TryGetProperty("prompt_eval_count", out _) || root.TryGetProperty("eval_count", out _);
+        var usage = hasUsage ? new L.Usage(input, output, null, null, input + output) : (L.Usage?)null;
+        var reason = root.TryGetProperty("done_reason", out var reasonValue) ? reasonValue.GetString() : "stop";
+        var finish = session.ToolCallsSeen ? L.FinishReason.Tool() : reason switch
+        {
+            "length" => L.FinishReason.Length(),
+            "tool" or "tool_calls" => L.FinishReason.Tool(),
+            null or "" or "stop" => L.FinishReason.Stop(),
+            _ => L.FinishReason.Unknown(new(reason!, null)),
+        };
+        return Event(session.RequestId, usage: usage, finish: finish);
     }
 
     private static uint Count(JsonElement obj, string property) => obj.TryGetProperty(property, out var value) && value.TryGetUInt32(out var count) ? count : 0;

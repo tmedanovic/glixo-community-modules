@@ -27,7 +27,7 @@ impl Broker for HostBroker {
     fn cancel(&mut self, handle: u32) { glixo::http::broker::http_cancel(handle); }
     fn drop_response(&mut self, handle: u32) { glixo::http::broker::http_drop(handle); }
 }
-struct Session { stream: NdjsonStream<HostBroker>, request_id: String, done: bool, terminal_sent: bool, cancelled: bool, tool_index: u32 }
+struct Session { stream: NdjsonStream<HostBroker>, request_id: String, done: bool, terminal_sent: bool, cancelled: bool, tool_index: u32, tool_calls_seen: bool, pending_terminal: Option<glixo::llm_types::types::ProviderEvent> }
 thread_local! { static STREAMS: RefCell<HashMap<u32, Session>> = RefCell::new(HashMap::new()); }
 static NEXT_STREAM: AtomicU32 = AtomicU32::new(1);
 const DEFAULT_CONTEXT_WINDOW_TOKENS: u32 = 8192;
@@ -201,7 +201,7 @@ impl exports::glixo::llm_provider_compat::provider::Guest for OllamaProvider {
         let status = stream.status()?;
         if !(200..=299).contains(&status) { stream.close(); return Err(format!("ollama_http_{status}")); }
         let handle = NEXT_STREAM.fetch_add(1, Ordering::Relaxed).max(1);
-        STREAMS.with(|streams| { streams.borrow_mut().insert(handle, Session { stream, request_id: req.request_id, done: false, terminal_sent: false, cancelled: false, tool_index: 0 }); });
+        STREAMS.with(|streams| { streams.borrow_mut().insert(handle, Session { stream, request_id: req.request_id, done: false, terminal_sent: false, cancelled: false, tool_index: 0, tool_calls_seen: false, pending_terminal: None }); });
         Ok(handle)
     }
     // docs:snippet-end provider-request:rust
@@ -210,6 +210,7 @@ impl exports::glixo::llm_provider_compat::provider::Guest for OllamaProvider {
             let mut all = all.borrow_mut();
             let session = all.get_mut(&handle).ok_or_else(|| "provider_stream_missing".to_owned())?;
             if session.terminal_sent { return Ok(None); }
+            if let Some(pending) = session.pending_terminal.take() { session.terminal_sent = true; session.done = true; session.stream.close(); return Ok(Some(pending)); }
             if session.cancelled { session.terminal_sent = true; return Ok(Some(glixo::llm_types::types::ProviderEvent { finish: Some(glixo::llm_types::types::FinishReason::Cancelled), ..event(&session.request_id) })); }
             loop {
                 if session.done { session.terminal_sent = true; session.stream.close(); return Ok(Some(glixo::llm_types::types::ProviderEvent { finish: Some(glixo::llm_types::types::FinishReason::Stop), ..event(&session.request_id) })); }
@@ -221,17 +222,14 @@ impl exports::glixo::llm_provider_compat::provider::Guest for OllamaProvider {
                 if let Some(text) = msg["content"].as_str().filter(|s| !s.is_empty()) { return Ok(Some(event_with_part(&session.request_id, glixo::llm_types::types::ContentPart::Text(text.into())))); }
                 if let Some(call) = msg["tool_calls"].as_array().and_then(|a| a.first()) {
                     let name = call["function"]["name"].as_str().unwrap_or("");
-                    if !name.is_empty() { let args = call["function"]["arguments"].to_string(); let id = format!("{}:ollama:{}", session.request_id, session.tool_index); session.tool_index += 1;
+                    if !name.is_empty() { session.tool_calls_seen = true; let args = call["function"]["arguments"].to_string(); let id = format!("{}:ollama:{}", session.request_id, session.tool_index); session.tool_index += 1;
+                        if record["done"].as_bool() == Some(true) { session.pending_terminal = Some(terminal_event(&session.request_id, &record, session.tool_calls_seen)); }
                         let detail = glixo::llm_types::types::ToolCallDetails { id, name: name.into(), arguments_fragment: Some(args), complete: true };
                         return Ok(Some(event_with_part(&session.request_id, glixo::llm_types::types::ContentPart::ToolCallDetails(detail)))); }
                 }
                 if record["done"].as_bool() == Some(true) {
                     session.done = true; session.terminal_sent = true; session.stream.close();
-                    let input = record["prompt_eval_count"].as_u64().unwrap_or(0).min(u32::MAX as u64) as u32;
-                    let output = record["eval_count"].as_u64().unwrap_or(0).min(u32::MAX as u64) as u32;
-                    let usage = glixo::llm_types::types::Usage { input_tokens: input, output_tokens: output, cached_tokens: None, reasoning_tokens: None, total_tokens: if record["prompt_eval_count"].is_number() && record["eval_count"].is_number() { Some(input.saturating_add(output)) } else { None } };
-                    let finish = match record["done_reason"].as_str().unwrap_or("stop") { "length" => glixo::llm_types::types::FinishReason::Length, "stop" | "" => glixo::llm_types::types::FinishReason::Stop, "tool" | "tool_calls" => glixo::llm_types::types::FinishReason::Tool, other => glixo::llm_types::types::FinishReason::Unknown(glixo::llm_types::types::UnknownRepresentation { name: other.into(), payload_json: None }) };
-                    return Ok(Some(glixo::llm_types::types::ProviderEvent { usage: Some(usage), finish: Some(finish), ..event(&session.request_id) }));
+                    return Ok(Some(terminal_event(&session.request_id, &record, session.tool_calls_seen)));
                 }
             }
         })
@@ -239,5 +237,41 @@ impl exports::glixo::llm_provider_compat::provider::Guest for OllamaProvider {
     fn cancel(handle: u32) { STREAMS.with(|all| { if let Some(session) = all.borrow_mut().get_mut(&handle) { if !session.terminal_sent { session.stream.cancel(); session.cancelled = true; } } }); }
     fn drop(handle: u32) { STREAMS.with(|all| { if let Some(mut session) = all.borrow_mut().remove(&handle) { session.stream.close(); } }); }
 }
+
+fn terminal_event(request_id: &str, record: &Value, tool_calls_seen: bool) -> glixo::llm_types::types::ProviderEvent {
+    let input = record["prompt_eval_count"].as_u64().unwrap_or(0).min(u32::MAX as u64) as u32;
+    let output = record["eval_count"].as_u64().unwrap_or(0).min(u32::MAX as u64) as u32;
+    let usage = glixo::llm_types::types::Usage { input_tokens: input, output_tokens: output, cached_tokens: None, reasoning_tokens: None, total_tokens: if record["prompt_eval_count"].is_number() && record["eval_count"].is_number() { Some(input.saturating_add(output)) } else { None } };
+    let finish = finish_reason(record["done_reason"].as_str(), tool_calls_seen);
+    glixo::llm_types::types::ProviderEvent { usage: Some(usage), finish: Some(finish), ..event(request_id) }
+}
+
+fn finish_reason(reason: Option<&str>, tool_calls_seen: bool) -> glixo::llm_types::types::FinishReason {
+    if tool_calls_seen { return glixo::llm_types::types::FinishReason::Tool; }
+    match reason.unwrap_or("stop") {
+        "length" => glixo::llm_types::types::FinishReason::Length,
+        "stop" | "" => glixo::llm_types::types::FinishReason::Stop,
+        "tool" | "tool_calls" => glixo::llm_types::types::FinishReason::Tool,
+        other => glixo::llm_types::types::FinishReason::Unknown(glixo::llm_types::types::UnknownRepresentation { name: other.into(), payload_json: None }),
+    }
+}
+
+#[cfg(test)]
+mod finish_reason_tests {
+    use super::finish_reason;
+    use super::glixo::llm_types::types::FinishReason;
+
+    #[test]
+    fn tool_call_turn_overrides_ollama_stop_reason() {
+        assert!(matches!(finish_reason(Some("stop"), true), FinishReason::Tool));
+    }
+
+    #[test]
+    fn non_tool_turn_keeps_ollama_finish_reason() {
+        assert!(matches!(finish_reason(Some("stop"), false), FinishReason::Stop));
+        assert!(matches!(finish_reason(Some("length"), false), FinishReason::Length));
+    }
+}
+
 
 export!(OllamaProvider);
