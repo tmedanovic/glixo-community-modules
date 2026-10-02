@@ -69,12 +69,27 @@ function exportVerifiedComponents(project, projectManifest, recipeId, reference,
   const components = projectManifest.components;
   if (!Array.isArray(components) || !components.length) throw new Error('glixo.project.json has no components to export');
   const componentIds = new Set();
+  let selected = 0;
   for (const component of components) {
     const componentId = safePathSegment(component.id, 'component id');
     if (componentIds.has(componentId)) throw new Error(`duplicate component id ${componentId}`);
     componentIds.add(componentId);
-    if (component.language && component.language !== language) throw new Error(`${componentId} language does not match ${language}`);
-    if (component.recipe !== recipeId) throw new Error(`${componentId} recipe does not match ${recipeId}`);
+    const declaredRecipe = support.recipes?.[component.recipe];
+    if (!declaredRecipe) throw new Error(`${componentId}: project recipe is not in the pinned SDK registry`);
+    if (component.language !== undefined && component.language !== declaredRecipe.language) {
+      throw new Error(`${componentId} language does not match its declared recipe`);
+    }
+    if (component.world !== undefined && component.world !== declaredRecipe.world) {
+      throw new Error(`${componentId} world does not match its declared recipe`);
+    }
+    if (component.source !== undefined) {
+      const sourcePath = insideProject(project, component.source, `${componentId}.source`);
+      const sourceStat = lstatSync(sourcePath);
+      if (!sourceStat.isFile() || sourceStat.isSymbolicLink()) throw new Error(`${componentId}: source must be a regular project file`);
+    }
+    if (component.recipe !== recipeId) continue;
+    selected += 1;
+    if (declaredRecipe.language !== language) throw new Error(`${componentId} recipe targets ${declaredRecipe.language}, not ${language}`);
     const verifiedArtifact = projectManifestArtifact(recipeId);
     if (component.artifact && component.artifact !== verifiedArtifact) {
       throw new Error(`${componentId}: declared artifact does not match the verified recipe output`);
@@ -102,6 +117,7 @@ function exportVerifiedComponents(project, projectManifest, recipeId, reference,
       sha256: createHash('sha256').update(bytes).digest('hex'),
     });
   }
+  if (selected === 0) throw new Error(`glixo.project.json does not select recipe ${recipeId}`);
 }
 
 function projectManifestArtifact(recipeId) {
@@ -238,7 +254,7 @@ for (const reference of index.references.filter((item) => item.kind === 'executa
         const projectManifestPath = join(project, 'glixo.project.json');
         if (!existsSync(projectManifestPath)) throw new Error('glixo.project.json is missing; verified component export requires declared component identities');
         const projectManifest = JSON.parse(readFileSync(projectManifestPath, 'utf8'));
-        if (projectManifest.schemaVersion !== 1 || projectManifest.language !== language) {
+        if (projectManifest.schemaVersion !== 1 || (projectManifest.language !== undefined && projectManifest.language !== language)) {
           throw new Error('glixo.project.json schema or language does not match the build');
         }
         exportVerifiedComponents(project, projectManifest, recipeId, reference, language);
