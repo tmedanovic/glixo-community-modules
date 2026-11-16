@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework><Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="src/Handler.cs" />
+    <ProjectReference Include="../../../packages/extension-sdk/csharp/Glixo.ExtensionSdk/Glixo.ExtensionSdk.csproj" />
+  </ItemGroup>
+</Project>

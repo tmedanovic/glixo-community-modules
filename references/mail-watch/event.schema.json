@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["messageId", "receivedAt"],
+  "properties": {
+    "messageId": { "type": "string", "minLength": 1, "maxLength": 2000 },
+    "receivedAt": { "type": "string", "format": "date-time" },
+    "sender": { "type": "string", "maxLength": 320 }
+  }
+}

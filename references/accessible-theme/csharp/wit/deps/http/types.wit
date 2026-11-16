@@ -1,0 +1,37 @@
+package glixo:http@3.0.0;
+
+/// A response-safe, user-approved local HTTP endpoint capability. `handle` is
+/// opaque host authority and is valid only in the invocation it was issued
+/// for. `base-url` is configuration data, not authority by itself.
+interface types {
+  record endpoint-grant {
+    name: string,
+    handle: string,
+    base-url: string,
+  }
+
+  record header {
+    name: string,
+    value: string,
+  }
+
+  /// A typed HTTP request. The host independently checks every field against
+  /// the installed package declaration, current grant, and optional endpoint
+  /// handle; guest-supplied URLs are never authority.
+  record http-request {
+    url: string,
+    method: string,
+    headers: list<header>,
+    body: option<list<u8>>,
+    content-type: option<string>,
+    timeout-ms: option<u32>,
+    max-response-bytes: option<u32>,
+    accepted-status-min: option<u16>,
+    accepted-status-max: option<u16>,
+    endpoint-handle: option<string>,
+    /// Name of an invocation-scoped secret slot, never plaintext or a lease id.
+    secret-handle: option<string>,
+    auth-header: option<string>,
+    auth-scheme: option<string>,
+  }
+}

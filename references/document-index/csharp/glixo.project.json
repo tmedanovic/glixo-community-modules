@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "language": "csharp",
+  "components": [
+    {
+      "id": "search",
+      "language": "csharp",
+      "recipe": "contribution-csharp-v1",
+      "artifact": "dist/glixo-extension.component.wasm"
+    }
+  ]
+}

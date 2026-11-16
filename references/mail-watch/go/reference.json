@@ -1,0 +1,10 @@
+{
+  "referenceId": "mail-watch",
+  "language": "go",
+  "contractRevision": "glixo:contribution/contribution@1.0.0+glixo:http/broker@3.0.0+graph-mail.read.basic",
+  "build": { "recipeId": "contribution-go-v1" },
+  "checks": ["mail-watch/host-fixture.json"],
+  "status": "preview",
+  "hostAcceptance": "pending",
+  "placeholder": false
+}

@@ -1,0 +1,75 @@
+name: Validate extension references
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: node scripts/ci-compiler-pin.mjs --all
+      - run: npm run test:build-runner
+      - run: npm run verify:sdk-packages
+      - run: npm run test:sdk-package-install
+      - run: npm run verify
+
+  guest-builds:
+    needs: inventory
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [csharp, go, rust, typescript]
+    runs-on: ${{ matrix.language == 'csharp' && 'windows-latest' || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+      - id: pins
+        env:
+          EXTENSION_LANGUAGE: ${{ matrix.language }}
+        shell: bash
+        run: node scripts/ci-compiler-pin.mjs "$EXTENSION_LANGUAGE" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-dotnet@v4
+        if: matrix.language == 'csharp'
+        with:
+          dotnet-version: ${{ steps.pins.outputs.compiler }}
+      - uses: actions/setup-go@v5
+        if: matrix.language == 'go'
+        with:
+          go-version: ${{ steps.pins.outputs.compiler }}
+      - uses: dtolnay/rust-toolchain@stable
+        if: matrix.language == 'rust'
+        with:
+          toolchain: ${{ steps.pins.outputs.compiler }}
+          targets: wasm32-wasip2
+      - name: Install pinned guest tools
+        env:
+          EXTENSION_LANGUAGE: ${{ matrix.language }}
+        run: node scripts/ci-install-guest-tools.mjs
+      - name: Test Go SDK and clean consumer import
+        if: matrix.language == 'go'
+        shell: bash
+        run: |
+          (cd packages/extension-sdk/go && go test ./...)
+          (cd packages/extension-sdk/go-import-consumer && go test ./...)
+      - name: Build and check all ${{ matrix.language }} references
+        run: node scripts/build-references.mjs --language=${{ matrix.language }} --export-dir=${{ runner.temp }}/glixo-reference-components-${{ matrix.language }}
+      - name: Retain verified ${{ matrix.language }} components
+        uses: actions/upload-artifact@v4
+        with:
+          name: extension-components-${{ matrix.language }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/glixo-reference-components-${{ matrix.language }}/
+          if-no-files-found: error
+          retention-days: 14

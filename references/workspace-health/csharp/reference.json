@@ -1,0 +1,10 @@
+{
+  "referenceId": "workspace-health",
+  "language": "csharp",
+  "contractRevision": "glixo:contribution/contribution@1.0.0",
+  "build": { "recipeId": "contribution-csharp-v1" },
+  "checks": ["workspace-health/partial-sample.json"],
+  "status": "preview",
+  "hostAcceptance": "pending",
+  "placeholder": false
+}

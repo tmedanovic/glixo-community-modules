@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "contract": "glixo.extension-ui-placements.v1",
+  "description": "Host-owned UI placements for installed extension contributions. Only supported placements are accepted by current package validation.",
+  "budgets": {
+    "actionPayloadBytes": 32768,
+    "actionsPerSecond": 5,
+    "bridgeMessagesPerSecond": 20,
+    "bridgeMessageBytes": 65536,
+    "maxAssets": 32,
+    "maxAssetBytes": 1048576,
+    "maxTreeDepth": 32,
+    "maxTreeNodes": 4096,
+    "maxTextBytes": 65536
+  },
+  "placements": [
+    {
+      "id": "context-menu.message",
+      "status": "supported",
+      "contributions": ["contextMenuItems", "actions"],
+      "renderers": ["host-menu"],
+      "context": ["sessionId", "projectId"],
+      "platforms": ["web", "ios", "android"],
+      "limits": { "maxItems": 12, "maxLabelBytes": 96, "maxSurfaceWidth": 0, "maxSurfaceHeight": 0 }
+    },
+    {
+      "id": "context-menu.project",
+      "status": "supported",
+      "contributions": ["contextMenuItems", "actions"],
+      "renderers": ["host-menu"],
+      "context": ["sessionId", "projectId"],
+      "platforms": ["web", "ios", "android"],
+      "limits": { "maxItems": 12, "maxLabelBytes": 96, "maxSurfaceWidth": 0, "maxSurfaceHeight": 0 }
+    },
+    {
+      "id": "context-menu.file",
+      "status": "supported",
+      "contributions": ["contextMenuItems", "actions"],
+      "renderers": ["host-menu"],
+      "context": ["sessionId"],
+      "platforms": ["web", "ios", "android"],
+      "limits": { "maxItems": 12, "maxLabelBytes": 96, "maxSurfaceWidth": 0, "maxSurfaceHeight": 0 }
+    },
+    {
+      "id": "code.sidebar",
+      "status": "supported",
+      "contributions": ["sidebarViews", "viewPatches", "surfaces"],
+      "renderers": ["a2ui", "sandboxed-web"],
+      "context": ["sessionId", "projectId", "workspaceId", "machineId"],
+      "platforms": { "a2ui": ["web", "ios", "android"], "sandboxed-web": ["web"] },
+      "limits": { "maxItems": 16, "maxLabelBytes": 160, "maxSurfaceWidth": 420, "maxSurfaceHeight": 960 }
+    },
+    {
+      "id": "code.sidebar.footer",
+      "status": "supported",
+      "contributions": ["viewPatches", "surfaces"],
+      "renderers": ["a2ui", "sandboxed-web"],
+      "context": ["sessionId", "projectId", "workspaceId", "machineId"],
+      "platforms": { "a2ui": ["web", "ios", "android"], "sandboxed-web": ["web"] },
+      "limits": { "maxItems": 8, "maxLabelBytes": 160, "maxSurfaceWidth": 420, "maxSurfaceHeight": 240 }
+    },
+    {
+      "id": "suite.nav.primary",
+      "status": "supported",
+      "contributions": ["actions"],
+      "renderers": ["host-navigation"],
+      "context": ["projectId"],
+      "platforms": ["web", "ios", "android"],
+      "limits": { "maxItems": 16, "maxLabelBytes": 48, "maxSurfaceWidth": 0, "maxSurfaceHeight": 0 }
+    },
+    {
+      "id": "command-palette",
+      "status": "supported",
+      "contributions": ["actions"],
+      "renderers": ["host-command-palette"],
+      "context": ["sessionId", "projectId"],
+      "platforms": ["web", "ios", "android"],
+      "limits": { "maxItems": 64, "maxLabelBytes": 96, "maxSurfaceWidth": 640, "maxSurfaceHeight": 720 }
+    },
+    {
+      "id": "code.message.footer",
+      "status": "supported",
+      "contributions": ["actions"],
+      "renderers": ["host-message-actions"],
+      "context": ["sessionId", "projectId"],
+      "platforms": ["web", "ios", "android"],
+      "limits": { "maxItems": 4, "maxLabelBytes": 32, "maxSurfaceWidth": 320, "maxSurfaceHeight": 48 }
+    },
+    {
+      "id": "settings.extensions",
+      "status": "supported",
+      "contributions": ["settingsPanels", "surfaces"],
+      "renderers": ["a2ui", "sandboxed-web", "host-form"],
+      "context": ["projectId"],
+      "platforms": { "a2ui": ["web", "ios", "android"], "sandboxed-web": ["web"], "host-form": ["web", "ios", "android"] },
+      "limits": { "maxItems": 16, "maxLabelBytes": 160, "maxSurfaceWidth": 720, "maxSurfaceHeight": 960 }
+    },
+    {
+      "id": "settings.extensions.header",
+      "status": "supported",
+      "contributions": ["viewPatches", "surfaces"],
+      "renderers": ["a2ui", "sandboxed-web"],
+      "context": ["projectId"],
+      "platforms": { "a2ui": ["web", "ios", "android"], "sandboxed-web": ["web"] },
+      "limits": { "maxItems": 4, "maxLabelBytes": 160, "maxSurfaceWidth": 720, "maxSurfaceHeight": 180 }
+    },
+    {
+      "id": "settings.appearance",
+      "status": "planned",
+      "contributions": ["themes"],
+      "renderers": ["host-theme"],
+      "context": ["accountId"],
+      "platforms": ["web", "ios", "android"],
+      "limits": { "maxItems": 16, "maxLabelBytes": 96, "maxSurfaceWidth": 0, "maxSurfaceHeight": 0 }
+    },
+    {
+      "id": "os.theme",
+      "status": "planned",
+      "contributions": ["themes"],
+      "renderers": ["host-theme"],
+      "context": ["accountId"],
+      "platforms": ["web", "ios", "android"],
+      "limits": { "maxItems": 16, "maxLabelBytes": 96, "maxSurfaceWidth": 0, "maxSurfaceHeight": 0 }
+    },
+    {
+      "id": "code.composer",
+      "status": "planned",
+      "contributions": ["actions", "surfaces"],
+      "renderers": ["host-composer-actions"],
+      "context": ["sessionId", "projectId", "draftHandle"],
+      "platforms": ["web", "ios", "android"],
+      "limits": { "maxItems": 4, "maxLabelBytes": 48, "maxSurfaceWidth": 320, "maxSurfaceHeight": 64 }
+    },
+    {
+      "id": "code.main-panel",
+      "status": "planned",
+      "contributions": ["surfaces"],
+      "renderers": ["a2ui", "sandboxed-web"],
+      "context": ["sessionId", "projectId", "workspaceId", "machineId"],
+      "platforms": { "a2ui": ["web", "ios", "android"], "sandboxed-web": ["web"] },
+      "limits": { "maxItems": 8, "maxLabelBytes": 160, "maxSurfaceWidth": 1600, "maxSurfaceHeight": 1200 }
+    },
+    {
+      "id": "code.bottom-panel",
+      "status": "planned",
+      "contributions": ["surfaces"],
+      "renderers": ["a2ui", "sandboxed-web"],
+      "context": ["sessionId", "projectId", "workspaceId", "machineId"],
+      "platforms": { "a2ui": ["web", "ios", "android"], "sandboxed-web": ["web"] },
+      "limits": { "maxItems": 8, "maxLabelBytes": 160, "maxSurfaceWidth": 1600, "maxSurfaceHeight": 640 }
+    },
+    {
+      "id": "code.status",
+      "status": "planned",
+      "contributions": ["actions"],
+      "renderers": ["host-status-indicator"],
+      "context": ["sessionId", "projectId"],
+      "platforms": ["web", "ios", "android"],
+      "limits": { "maxItems": 8, "maxLabelBytes": 64, "maxSurfaceWidth": 360, "maxSurfaceHeight": 40 }
+    },
+    {
+      "id": "code.notifications",
+      "status": "planned",
+      "contributions": ["actions"],
+      "renderers": ["host-notification-action"],
+      "context": ["sessionId", "projectId", "eventId"],
+      "platforms": ["web", "ios", "android"],
+      "limits": { "maxItems": 8, "maxLabelBytes": 96, "maxSurfaceWidth": 420, "maxSurfaceHeight": 160 }
+    },
+    {
+      "id": "workflow.configuration",
+      "status": "planned",
+      "contributions": ["workflowNodes", "settingsPanels"],
+      "renderers": ["a2ui", "host-form"],
+      "context": ["projectId"],
+      "platforms": ["web", "ios", "android"],
+      "limits": { "maxItems": 32, "maxLabelBytes": 160, "maxSurfaceWidth": 720, "maxSurfaceHeight": 960 }
+    }
+  ]
+}

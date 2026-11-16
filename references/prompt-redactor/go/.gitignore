@@ -1,0 +1,7 @@
+dist/
+generated/wit/*
+!generated/wit/export_provider/
+generated/wit/export_provider/*
+!generated/wit/export_provider/export_glixo_contribution_guest/
+generated/wit/export_provider/export_glixo_contribution_guest/*
+!generated/wit/export_provider/export_glixo_contribution_guest/guest.go

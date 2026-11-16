@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "components": [
+    {
+      "id": "redactor",
+      "source": "src/GuestImpl.cs",
+      "recipe": "contribution-csharp-v1",
+      "world": "glixo:contribution/contribution@1.0.0"
+    }
+  ]
+}

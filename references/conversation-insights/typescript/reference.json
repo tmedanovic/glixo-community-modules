@@ -1,0 +1,11 @@
+{
+  "referenceId": "conversation-insights",
+  "language": "typescript",
+  "status": "preview",
+  "contractRevision": "glixo:message-middleware/types@1.0.0",
+  "build": {
+    "recipeId": "contribution-typescript-v1"
+  },
+  "hostAcceptance": "pending",
+  "placeholder": false
+}

@@ -1,0 +1,11 @@
+{
+  "components": [
+    {
+      "recipe": "contribution-typescript-v1",
+      "language": "typescript",
+      "artifact": "dist/glixo-extension.component.wasm",
+      "id": "panel-actions"
+    }
+  ],
+  "schemaVersion": 1
+}

@@ -1,0 +1,11 @@
+{
+  "referenceId": "prompt-redactor",
+  "language": "go",
+  "status": "preview",
+  "contractRevision": "glixo:message-middleware/types@1.0.0",
+  "build": {
+    "recipeId": "contribution-go-v1"
+  },
+  "hostAcceptance": "pending",
+  "placeholder": false
+}

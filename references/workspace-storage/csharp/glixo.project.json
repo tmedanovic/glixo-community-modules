@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "language": "csharp",
+  "components": [
+    { "id": "storage", "language": "csharp", "recipe": "contribution-csharp-v1", "artifact": "dist/glixo-extension.component.wasm" }
+  ]
+}

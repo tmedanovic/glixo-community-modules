@@ -1,0 +1,10 @@
+{
+  "referenceId": "document-index",
+  "language": "typescript",
+  "contractRevision": "glixo:contribution/contribution@1.0.0",
+  "build": { "recipeId": "contribution-typescript-v1" },
+  "checks": ["document-index/path-substring.json"],
+  "status": "preview",
+  "hostAcceptance": "pending",
+  "placeholder": false
+}

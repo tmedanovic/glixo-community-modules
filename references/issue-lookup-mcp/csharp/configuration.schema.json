@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "endpointName"
+  ],
+  "properties": {
+    "endpointName": {
+      "type": "string",
+      "enum": [
+        "issues"
+      ]
+    }
+  }
+}

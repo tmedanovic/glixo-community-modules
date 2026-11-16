@@ -1,0 +1,10 @@
+{
+  "referenceId": "workflow-text-stats",
+  "language": "typescript",
+  "contractRevision": "glixo:contribution/contribution@1.0.0",
+  "build": { "recipeId": "contribution-typescript-v1" },
+  "checks": ["workflow-text-stats/cases.json"],
+  "status": "preview",
+  "hostAcceptance": "pending",
+  "placeholder": false
+}

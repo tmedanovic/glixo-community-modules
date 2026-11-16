@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Workspace Storage test operation",
+  "oneOf": [
+    { "type": "object", "additionalProperties": false, "required": ["operation", "key"], "properties": { "operation": { "const": "get" }, "key": { "$ref": "#/$defs/key" } } },
+    { "type": "object", "additionalProperties": false, "required": ["operation", "key", "value"], "properties": { "operation": { "const": "set" }, "key": { "$ref": "#/$defs/key" }, "value": { "type": "string", "maxLength": 4096 } } },
+    { "type": "object", "additionalProperties": false, "required": ["operation"], "properties": { "operation": { "const": "list" }, "prefix": { "$ref": "#/$defs/key" } } },
+    { "type": "object", "additionalProperties": false, "required": ["operation", "key"], "properties": { "operation": { "const": "delete" }, "key": { "$ref": "#/$defs/key" } } }
+  ],
+  "$defs": { "key": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" } }
+}

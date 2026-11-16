@@ -1,0 +1,54 @@
+package glixo:message-middleware@1.0.0;
+
+// Typed domain model for the JSON carried in the generic contribution guest ABI.
+interface types {
+    enum operation {
+        committed,
+        before-provider,
+        completed,
+        transform-response,
+    }
+
+    record part {
+        id: string,
+        kind: string,
+        // Null unless this stage's current grant authorizes reading content.
+        text: option<string>,
+        media-type: option<string>,
+        approximate-bytes: option<u64>,
+        tool-call-id: option<string>,
+        tool-name: option<string>,
+        schema-id: option<string>,
+    }
+
+    record message {
+        id: string,
+        role: string,
+        parts: list<part>,
+        is-host-authority: bool,
+        tool-result-call-ids: list<string>,
+    }
+
+    record conversation {
+        messages: list<message>,
+        available-tool-names: list<string>,
+    }
+
+    record text-patch {
+        message-id: string,
+        part-id: string,
+        text: string,
+    }
+
+    // Observer output is aggregate metrics only. The host rejects string-valued JSON,
+    // prompt excerpts, and oversized/deep results. Transform output contains text-patches.
+    record request-metadata {
+        schema-version: u32,
+        operation: string,
+        invocation-id: string,
+    }
+
+    record result-metadata {
+        audit-description: option<string>,
+    }
+}

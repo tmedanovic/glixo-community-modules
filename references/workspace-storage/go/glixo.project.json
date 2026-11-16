@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "language": "go",
+  "components": [
+    { "id": "storage", "language": "go", "recipe": "contribution-go-v1", "artifact": "dist/glixo-extension.component.wasm" }
+  ]
+}

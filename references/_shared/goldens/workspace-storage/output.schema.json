@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Workspace Storage result",
+  "oneOf": [
+    { "type": "object", "additionalProperties": false, "required": ["operation", "key", "value"], "properties": { "operation": { "const": "get" }, "key": { "type": "string" }, "value": { "type": ["string", "null"] } } },
+    { "type": "object", "additionalProperties": false, "required": ["operation", "key", "stored"], "properties": { "operation": { "const": "set" }, "key": { "type": "string" }, "stored": { "const": true } } },
+    { "type": "object", "additionalProperties": false, "required": ["operation", "prefix", "keys"], "properties": { "operation": { "const": "list" }, "prefix": { "type": "string" }, "keys": { "type": "array", "maxItems": 100, "items": { "type": "string" } } } },
+    { "type": "object", "additionalProperties": false, "required": ["operation", "key", "deleted"], "properties": { "operation": { "const": "delete" }, "key": { "type": "string" }, "deleted": { "type": "boolean" } } }
+  ]
+}

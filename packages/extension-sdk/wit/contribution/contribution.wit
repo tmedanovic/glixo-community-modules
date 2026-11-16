@@ -1,0 +1,23 @@
+package glixo:contribution@1.0.0;
+
+// Values are JSON governed by the contribution's manifest schemas. Identity,
+// configuration and resource handles are supplied by the host, never the frame.
+interface broker {
+    state-get: func(key: string) -> result<option<string>, string>;
+    state-set: func(key: string, value: string) -> result<_, string>;
+    state-list: func(prefix: string) -> result<list<string>, string>;
+    state-delete: func(key: string) -> result<bool, string>;
+    log: func(level: string, message: string) -> result<_, string>;
+    workspace-search: func(handle: string, query: string, limit: u32) -> result<string, string>;
+    workspace-read: func(handle: string, path: string, max-bytes: u32) -> result<string, string>;
+}
+
+interface guest {
+    invoke: func(request-json: string) -> result<string, string>;
+}
+
+world contribution {
+    import glixo:http/broker@3.0.0;
+    import broker;
+    export guest;
+}

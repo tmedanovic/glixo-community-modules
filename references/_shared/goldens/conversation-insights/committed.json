@@ -1,0 +1,24 @@
+{
+  "input": {
+    "schemaVersion": 1,
+    "operation": "committed",
+    "committedMessage": {
+      "role": "user",
+      "toolCallCount": 0,
+      "toolResultCount": 0,
+      "attachmentCount": 1
+    }
+  },
+  "expected": {
+    "observation": {
+      "schemaVersion": 1,
+      "messageCount": 1,
+      "userMessageCount": 1,
+      "assistantMessageCount": 0,
+      "toolCallCount": 0,
+      "toolResultCount": 0,
+      "attachmentCount": 1
+    },
+    "auditDescription": "insights-recorded"
+  }
+}

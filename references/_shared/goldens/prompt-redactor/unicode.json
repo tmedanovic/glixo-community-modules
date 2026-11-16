@@ -1,0 +1,52 @@
+{
+  "configuration": {
+    "rules": [
+      {
+        "match": "東京",
+        "replacement": "[city]"
+      }
+    ]
+  },
+  "input": {
+    "schemaVersion": 1,
+    "operation": "before-provider",
+    "conversation": {
+      "messages": [
+        {
+          "id": "m-user",
+          "role": "user",
+          "isHostAuthority": false,
+          "parts": [
+            {
+              "id": "p-text",
+              "kind": "text",
+              "text": "訪問 東京"
+            }
+          ]
+        },
+        {
+          "id": "m-system",
+          "role": "system",
+          "isHostAuthority": true,
+          "parts": [
+            {
+              "id": "p-system",
+              "kind": "text",
+              "text": "東京"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "expected": {
+    "textPatches": [
+      {
+        "messageId": "m-user",
+        "partId": "p-text",
+        "text": "訪問 [city]"
+      }
+    ],
+    "auditDescription": "redaction-applied"
+  }
+}

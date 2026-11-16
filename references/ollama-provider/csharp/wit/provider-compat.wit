@@ -1,0 +1,38 @@
+package glixo:llm-provider-compat@3.0.0;
+
+/// Pull-stream compatibility world. Compatibility toolchains must never import
+/// `glixo:llm-provider-async`.
+interface provider-host {
+  secret-use: func(name: string) -> result<string, string>;
+  scoped-state-get: func(key: string) -> result<option<string>, string>;
+  log: func(level: string, message: string);
+  now-unix-ms: func() -> u64;
+  random-bytes: func(len: u32) -> list<u8>;
+}
+
+interface provider {
+  use glixo:llm-types/types@3.0.0.{
+    configuration-report,
+    llm-request,
+    provider-context,
+    provider-descriptor,
+    provider-event,
+  };
+
+  describe: func(context: provider-context) -> result<provider-descriptor, string>;
+  /// Dynamic configuration remains JSON because JSON is the data format.
+  validate-configuration: func(config-json: string, context: provider-context) -> result<configuration-report, string>;
+  list-models: func(context: provider-context) -> result<list<string>, string>;
+  /// start returns a stream handle. next returns one typed event or none after
+  /// the single terminal. Cancel vs next is one winner. drop releases the handle.
+  start: func(request: llm-request, context: provider-context) -> result<u32, string>;
+  next: func(handle: u32) -> result<option<provider-event>, string>;
+  cancel: func(handle: u32);
+  drop: func(handle: u32);
+}
+
+world provider-compat {
+  import provider-host;
+  import glixo:http/broker@3.0.0;
+  export provider;
+}

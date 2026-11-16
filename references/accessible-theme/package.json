@@ -1,0 +1,15 @@
+{
+  "name": "@glixo/extension-ui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Theme-aware, accessible browser controls and the sandboxed Glixo extension UI bridge types.",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./theme": "./src/theme.ts",
+    "./components": "./src/components.ts",
+    "./extension-ui.css": "./src/extension-ui.css"
+  }
+}

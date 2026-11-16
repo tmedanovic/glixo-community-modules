@@ -1,0 +1,20 @@
+package glixo:http@3.0.0;
+
+interface broker {
+  use types.{http-request, header};
+
+  /// Opens a validated request and returns an invocation-local response handle.
+  /// The upstream body remains open and is read incrementally.
+  http-start: func(request: http-request) -> result<u32, string>;
+  /// Returns the upstream status after headers arrive.
+  http-status: func(handle: u32) -> result<u16, string>;
+  /// Returns safe response metadata headers needed by HTTP protocols such as MCP.
+  /// The host filters credential-bearing headers and enforces count/size bounds.
+  http-response-headers: func(handle: u32) -> result<list<header>, string>;
+  /// Reads no more than `max-bytes`; none means the response has ended.
+  http-read: func(handle: u32, max-bytes: u32) -> result<option<list<u8>>, string>;
+  /// Cancels in-flight upstream work and makes the handle unreadable.
+  http-cancel: func(handle: u32);
+  /// Releases completed, failed, or abandoned response state.
+  http-drop: func(handle: u32);
+}

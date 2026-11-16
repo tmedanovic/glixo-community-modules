@@ -1,0 +1,135 @@
+package glixo:llm-types@3.0.0;
+
+/// Canonical typed LLM request and event model. Compatibility and native-async
+/// worlds import this package. JSON is allowed only where JSON is the data
+/// format (tool schemas/arguments, dynamic configuration, unknown payloads).
+interface types {
+  use glixo:http/types@3.0.0.{endpoint-grant};
+
+  record unknown-representation {
+    name: string,
+    payload-json: option<string>,
+  }
+
+  record usage {
+    input-tokens: u32,
+    output-tokens: u32,
+    cached-tokens: option<u32>,
+    reasoning-tokens: option<u32>,
+    total-tokens: option<u32>,
+  }
+
+  variant finish-reason {
+    stop,
+    length,
+    tool,
+    cancelled,
+    content-filter,
+    error,
+    unknown(unknown-representation),
+  }
+
+  record tool-call-details {
+    id: string,
+    name: string,
+    arguments-fragment: option<string>,
+    complete: bool,
+  }
+
+  record structured-output {
+    schema-id: string,
+    json: string,
+  }
+
+  variant content-part {
+    text(string),
+    tool-call(string),
+    tool-call-details(tool-call-details),
+    tool-result(string),
+    reasoning(string),
+    structured-output(structured-output),
+    media-ref(string),
+    citation(string),
+    annotation(string),
+    unknown(unknown-representation),
+  }
+
+  record tool-definition {
+    name: string,
+    description: string,
+    /// JSON Schema for the tool. JSON is the data format.
+    schema-json: string,
+  }
+
+  record message {
+    role: string,
+    parts: list<content-part>,
+  }
+
+  record sampling-options {
+    temperature: option<f32>,
+    top-p: option<f32>,
+    max-output-tokens: option<u32>,
+  }
+
+  record response-format {
+    kind: string,
+    schema-json: option<string>,
+  }
+
+  record llm-request {
+    request-id: string,
+    model: string,
+    messages: list<message>,
+    tools: list<tool-definition>,
+    response-format: option<response-format>,
+    sampling: option<sampling-options>,
+    /// Explicit extensibility. JSON is the data format for unknown fields
+    /// and host-only fixture flags (deny/trap/timeout/partial/fidelity/upstream).
+    extensions-json: option<string>,
+  }
+
+  /// Host-resolved configuration and approved local endpoint capabilities for
+  /// this account/app/package/grant generation. The host omits unapproved
+  /// endpoints; values are refreshed for every provider invocation.
+  record provider-context {
+    configuration-json: string,
+    endpoints: list<endpoint-grant>,
+  }
+
+  record provider-capability {
+    name: string,
+    optional: bool,
+  }
+
+  record provider-descriptor {
+    id: string,
+    name: string,
+    version: string,
+    models: list<string>,
+    capabilities: list<provider-capability>,
+  }
+
+  record configuration-report {
+    valid: bool,
+    diagnostics: list<string>,
+  }
+
+  record typed-error {
+    code: string,
+    message: string,
+    retryable: bool,
+    retry-after-ms: option<u32>,
+  }
+
+  record provider-event {
+    request-id: string,
+    part: option<content-part>,
+    usage: option<usage>,
+    finish: option<finish-reason>,
+    warning: option<string>,
+    error: option<typed-error>,
+    provider-request-id: option<string>,
+    provider-response-id: option<string>,
+  }
+}

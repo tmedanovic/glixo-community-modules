@@ -1,0 +1,15 @@
+{
+  "status": "preview",
+  "checks": [
+    "ui/index.html",
+    "save-preferences"
+  ],
+  "referenceId": "accessible-theme",
+  "build": {
+    "recipeId": "contribution-csharp-v1"
+  },
+  "hostAcceptance": "pending",
+  "contractRevision": "glixo:contribution/contribution@1.0.0 + sandboxed-web.v1",
+  "language": "csharp",
+  "placeholder": false
+}

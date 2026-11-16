@@ -1,0 +1,8 @@
+{
+  "rules": [
+    {
+      "match": "example@example.com",
+      "replacement": "[email]"
+    }
+  ]
+}

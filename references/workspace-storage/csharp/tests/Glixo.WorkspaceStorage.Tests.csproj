@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\src\StorageHandler.cs" Link="StorageHandler.cs" />
+    <ProjectReference Include="../../../../packages/extension-sdk/csharp/Glixo.ExtensionSdk/Glixo.ExtensionSdk.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,11 @@
+{
+  "referenceId": "ollama-provider",
+  "language": "csharp",
+  "contractRevision": "glixo:llm-provider-compat/provider-compat@3.0.0+glixo:http/broker@3.0.0",
+  "build": { "recipeId": "ollama-provider-csharp-v3" },
+  "checks": ["ollama/chat-text.ndjson", "ollama/chat-tool-call.ndjson"],
+  "status": "preview",
+  "hostAcceptance": "pending",
+  "placeholder": false
+}
+

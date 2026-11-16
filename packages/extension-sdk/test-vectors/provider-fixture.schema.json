@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.glixo.dev/extension-sdk/provider-fixture.schema.json",
+  "title": "Glixo provider protocol fixture",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "provider", "cases"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "provider": { "type": "string", "minLength": 1 },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "request", "response"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "request": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["method", "path"],
+            "properties": {
+              "method": { "enum": ["GET", "POST"] },
+              "path": { "type": "string", "pattern": "^/" },
+              "json": { "type": "object" }
+            }
+          },
+          "response": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["status", "contentType", "bodyFile"],
+            "properties": {
+              "status": { "type": "integer", "minimum": 100, "maximum": 599 },
+              "contentType": { "type": "string", "minLength": 1 },
+              "bodyFile": { "type": "string", "minLength": 1 }
+            }
+          },
+          "expected": { "type": "object" }
+        }
+      }
+    }
+  }
+}

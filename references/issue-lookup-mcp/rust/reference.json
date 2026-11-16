@@ -1,0 +1,11 @@
+{
+  "referenceId": "issue-lookup-mcp",
+  "language": "rust",
+  "contractRevision": "glixo:contribution/contribution@1.0.0+glixo:http/broker@3.0.0+mcp-streamable-http-2026-07-28",
+  "build": { "recipeId": "contribution-rust-v1" },
+  "checks": ["issue-lookup-mcp/stateless-streamable-http.json"],
+  "status": "preview",
+  "hostAcceptance": "pending",
+  "placeholder": false
+}
+

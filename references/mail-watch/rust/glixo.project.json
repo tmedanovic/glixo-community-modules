@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "language": "rust",
+  "components": [
+    {
+      "language": "rust",
+      "world": "glixo:contribution/contribution@1.0.0",
+      "id": "mail-watch",
+      "recipe": "contribution-rust-v1",
+      "artifact": "dist/glixo-extension.component.wasm"
+    }
+  ]
+}

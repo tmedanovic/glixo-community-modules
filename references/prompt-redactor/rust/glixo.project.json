@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "components": [
+    {
+      "id": "redactor",
+      "source": "src/lib.rs",
+      "recipe": "contribution-rust-v1",
+      "world": "glixo:contribution/contribution@1.0.0"
+    }
+  ]
+}

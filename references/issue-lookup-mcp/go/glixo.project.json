@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "language": "go",
+  "components": [
+    {
+      "id": "issue-lookup",
+      "language": "go",
+      "recipe": "contribution-go-v1",
+      "artifact": "dist/glixo-extension.component.wasm"
+    }
+  ]
+}
+

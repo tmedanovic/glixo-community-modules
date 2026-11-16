@@ -1,0 +1,55 @@
+{
+  "description": "Stateless Streamable HTTP uses an approved endpoint handle plus routing headers; there is no initialize handshake or Mcp-Session-Id.",
+  "endpointPath": "/mcp",
+  "request": {
+    "httpMethod": "POST",
+    "headers": {
+      "Content-Type": "application/json",
+      "MCP-Protocol-Version": "2026-07-28",
+      "Mcp-Method": "tools/call",
+      "Mcp-Name": "issues.lookup",
+      "Accept": "application/json"
+    },
+    "body": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "tools/call",
+      "params": {
+        "name": "issues.lookup",
+        "arguments": {
+          "issueKey": "DEMO-17"
+        },
+        "_meta": {
+          "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+          "io.modelcontextprotocol/clientInfo": {
+            "name": "glixo-issue-lookup",
+            "version": "0.1.0"
+          }
+        }
+      }
+    }
+  },
+  "expectedResponse": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "bounded issue metadata"
+          }
+        ]
+      }
+    }
+  },
+  "limits": {
+    "maxResponseBytes": 131072,
+    "timeoutMs": 15000,
+    "maxIssueResults": 10
+  }
+}

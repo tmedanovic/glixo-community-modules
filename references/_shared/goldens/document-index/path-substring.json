@@ -1,0 +1,18 @@
+{
+  "description": "Host search matches a case-insensitive relative-path substring; guest sorts results and reads only bounded excerpts.",
+  "query": "docs/",
+  "limit": 3,
+  "hostSearchResult": {
+    "items": [
+      { "path": "docs/guide.md", "bytes": 1200 },
+      { "path": "docs/api.md", "bytes": 600 }
+    ],
+    "truncated": false
+  },
+  "hostReadResults": {
+    "docs/guide.md": "# Guide\nUse the host-scoped workspace handle.",
+    "docs/api.md": "# API\nQueries return bounded, sorted results."
+  },
+  "expectedPaths": ["docs/api.md", "docs/guide.md"],
+  "expectedMaxExcerptBytes": 96
+}
