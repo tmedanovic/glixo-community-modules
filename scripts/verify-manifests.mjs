@@ -112,25 +112,27 @@ function requireContributionPermission(manifest, permissionId, scopeKey, require
   checkedContributionPermissions += 1;
 }
 
+// A package declares contributions only as contributions.implements[]; the contract id selects the permission.
+const UI_CONTRACTS = new Set(['ui-surface', 'sandboxed-web-ui', 'a2ui-surface', 'theme']);
+
 function validateContributionPermissions(manifest, label) {
-  const contributions = manifest.contributions ?? {};
-  for (const item of contributions.surfaces ?? []) {
-    requireContributionPermission(manifest, 'ui.surface', 'contributions', [item.id], label);
-    requireContributionPermission(manifest, 'ui.surface', 'placements', item.placements ?? [], label);
-  }
-  for (const item of contributions.actions ?? []) {
-    requireContributionPermission(manifest, 'host.action', 'actions', [item.id], label);
-  }
-  for (const item of contributions.tools ?? []) {
-    requireContributionPermission(manifest, 'tool.invoke', 'tools', [item.id], label);
-  }
-  for (const item of contributions.dataSources ?? []) {
-    requireContributionPermission(manifest, 'data.query', 'sources', [item.id], label);
-  }
-  for (const item of contributions.backgroundServices ?? []) {
-    requireContributionPermission(manifest, 'service.activate', 'services', [item.id], label);
-    if (item.archetype) {
-      requireContributionPermission(manifest, 'service.activate', 'archetypes', [item.archetype], label);
+  for (const item of manifest.contributions?.implements ?? []) {
+    const contract = String(item.contract ?? '').split('@')[0];
+    const fields = item.fields ?? {};
+    if (UI_CONTRACTS.has(contract)) {
+      requireContributionPermission(manifest, 'ui.surface', 'contributions', [item.id], label);
+      requireContributionPermission(manifest, 'ui.surface', 'placements', fields.placements ?? [], label);
+    } else if (contract === 'action') {
+      requireContributionPermission(manifest, 'host.action', 'action', [item.id], label);
+    } else if (contract === 'tool') {
+      requireContributionPermission(manifest, 'tool.invoke', 'tool', [item.id], label);
+    } else if (contract === 'data-source') {
+      requireContributionPermission(manifest, 'data.query', 'sources', [item.id], label);
+    } else if (contract === 'background-service') {
+      requireContributionPermission(manifest, 'service.activate', 'services', [item.id], label);
+      if (fields.archetype) {
+        requireContributionPermission(manifest, 'service.activate', 'archetypes', [fields.archetype], label);
+      }
     }
   }
 }

@@ -97,7 +97,7 @@ fn rejects_missing_authority_and_preserves_opaque_handle_bytes() {
         search_result: response,
         ..Default::default()
     };
-    let mut missing = json!({"kind":"tools","contributionId":"inspect","configuration":{},"input":{},"context":{"sessionId":"s","resourceHandles":{}}});
+    let mut missing = json!({"kind":"tool","contributionId":"inspect","configuration":{},"input":{},"context":{"sessionId":"s","resourceHandles":{}}});
     assert!(handle(&missing.to_string(), &mut workspace).is_err());
     missing["context"]["resourceHandles"]["workspace"] = json!(" opaque host handle ");
     handle(&missing.to_string(), &mut workspace).unwrap();

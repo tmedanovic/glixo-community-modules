@@ -150,8 +150,10 @@ for (const language of languages) {
     || uiComponent.artifact !== 'ui/index.html' || uiComponent.digest !== digest) {
     fail(`${language}: browser component must use the digest-bound static HTML asset`);
   }
-  const surface = manifest.contributions?.surfaces?.find((item) => item.id === 'themed-custom-panel');
-  if (!surface || surface.uiTier !== 'sandboxed-web' || surface.origin !== 'opaque-extension'
+  const implementations = manifest.contributions?.implements ?? [];
+  const surfaceEntry = implementations.find((item) => item.contract === 'sandboxed-web-ui@1' && item.id === 'themed-custom-panel');
+  const surface = surfaceEntry && { ...surfaceEntry.fields, component: surfaceEntry.component };
+  if (!surfaceEntry || surfaceEntry.runtime !== 'sandboxed-web' || surface.uiTier !== 'sandboxed-web' || surface.origin !== 'opaque-extension'
     || surface.component !== 'panel-ui' || !surface.placements?.includes('settings.extensions')
     || surface.actions?.length !== 1 || surface.actions[0]?.id !== 'save-preferences'
     || surface.assets?.length !== 1 || surface.assets[0]?.digest !== digest) {
@@ -160,8 +162,9 @@ for (const language of languages) {
   if (!guestComponent || guestComponent.runtime !== 'wasm-component' || guestComponent.world !== 'glixo:contribution/contribution@1.0.0') {
     fail(`${language}: action guest must be a separate contribution-world WASM component`);
   }
-  const action = manifest.contributions?.actions?.find((item) => item.id === 'save-preferences');
-  if (!action || action.component !== 'panel-actions' || !action.placements?.includes('settings.extensions')) {
+  const actionEntry = implementations.find((item) => item.contract === 'action@1' && item.id === 'save-preferences');
+  const action = actionEntry && { ...actionEntry.fields, component: actionEntry.component };
+  if (!action || actionEntry.runtime !== 'wasm-component' || action.component !== 'panel-actions' || !action.placements?.includes('settings.extensions')) {
     fail(`${language}: save-preferences must route to the contribution guest at the panel placement`);
   }
   if (action?.context !== 'project') fail(`${language}: persistent settings action must require the host-stamped project context`);
@@ -175,7 +178,7 @@ for (const language of languages) {
     fail(`${language}: ui.surface permission must be scoped to themed-custom-panel at settings.extensions`);
   }
   const hostAction = permissions.find((permission) => permission.id === 'host.action');
-  if (!hostAction?.scope?.actions?.includes('save-preferences')) {
+  if (!hostAction?.scope?.action?.includes('save-preferences')) {
     fail(`${language}: host.action permission must be scoped to save-preferences`);
   }
   const recipe = `contribution-${language}-v1`;

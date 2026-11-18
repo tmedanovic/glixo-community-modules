@@ -29,23 +29,27 @@
     { "id": "mail-watch", "scope": "account", "schema": "configuration.schema.json", "schemaDigest": "sha256:bb7c0fe55b80eafc277be22cc0fc901e5ff265da895ec28974bb5ae820db7f08" }
   ],
   "contributions": {
-    "backgroundServices": [
+    "implements": [
       {
         "id": "mail-watch",
+        "contract": "background-service@1",
+        "runtime": "wasm-component",
         "component": "mail-watch",
         "configuration": "mail-watch",
         "world": "glixo:contribution/contribution@1.0.0",
-        "cell": "server",
-        "archetype": "scheduled",
-        "schedule": { "intervalMs": 60000 },
-        "activation": "grant",
-        "quota": 1,
-        "retry": 3,
-        "idempotent": true,
-        "health": "export",
-        "shutdown": "graceful",
-        "timeoutMs": 5000,
-        "export": "guest.invoke"
+        "fields": {
+          "cell": "server",
+          "archetype": "scheduled",
+          "schedule": { "intervalMs": 60000 },
+          "activation": "grant",
+          "quota": 1,
+          "retry": 3,
+          "idempotent": true,
+          "health": "export",
+          "shutdown": "graceful",
+          "timeoutMs": 5000,
+          "export": "guest.invoke"
+        }
       }
     ]
   }

@@ -52,7 +52,7 @@ func (emptyState) Delete(string) (bool, error) { return false, nil }
 var _ state.Store = emptyState{}
 
 func request(operation string, checkpoint *Checkpoint) Request {
-	return Request{Kind:"backgroundServices", ContributionID:ContributionID, Configuration:&Configuration{MaxPagesPerWake:5}, Input:Input{Operation:operation, Checkpoint:checkpoint}, Context:&Context{ResourceHandles:map[string]string{"oauth":"secret-slot-lease"}}}
+	return Request{Kind:"background-service", ContributionID:ContributionID, Configuration:&Configuration{MaxPagesPerWake:5}, Input:Input{Operation:operation, Checkpoint:checkpoint}, Context:&Context{ResourceHandles:map[string]string{"oauth":"secret-slot-lease"}}}
 }
 
 func TestInitializeSuppressesExistingMessages(t *testing.T) {
@@ -88,7 +88,7 @@ func TestUnsafeNextLinkIsRejectedBeforeRequest(t *testing.T) {
 
 func TestHealthAndStopNeedNoOAuthLease(t *testing.T) {
 	for _, operation := range []string{"health", "stop"} {
-		result, err := Handle(Request{Kind:"backgroundServices", ContributionID:ContributionID, Input:Input{Operation:operation}}, newFixtureBroker(), emptyState{})
+		result, err := Handle(Request{Kind:"background-service", ContributionID:ContributionID, Input:Input{Operation:operation}}, newFixtureBroker(), emptyState{})
 		if err != nil || len(result.Events) != 0 { t.Fatalf("%s: %#v %v", operation, result, err) }
 	}
 }

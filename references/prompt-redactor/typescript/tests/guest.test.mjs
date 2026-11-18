@@ -28,12 +28,12 @@ test("guest patches only non-authority user text", () => {
 });
 
 test("generic guest ABI returns a direct string or a bounded primitive WIT error", () => {
-  const request = JSON.stringify({ kind: "messageMiddleware", contributionId: "prompt-redactor", configuration: { rules }, input: {
+  const request = JSON.stringify({ kind: "message-middleware", contributionId: "prompt-redactor", configuration: { rules }, input: {
     schemaVersion: 1, operation: "before-provider", conversation: { messages: [] }
   } });
   assert.equal(typeof guest.invoke(request), "string");
   assert.throws(() => guest.invoke("not-json"), (error) => error === "guest_envelope_invalid");
-  const invalidConfiguration = JSON.stringify({ kind: "messageMiddleware", contributionId: "prompt-redactor", configuration: {}, input: {
+  const invalidConfiguration = JSON.stringify({ kind: "message-middleware", contributionId: "prompt-redactor", configuration: {}, input: {
     schemaVersion: 1, operation: "before-provider", conversation: { messages: [] }
   } });
   assert.throws(() => guest.invoke(invalidConfiguration), (error) => error === "redaction_rules_invalid");

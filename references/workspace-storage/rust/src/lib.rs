@@ -42,7 +42,7 @@ fn ensure_fields(input: &Map<String, Value>, allowed: &[&str]) -> Result<(), Str
 // docs:snippet-start workspace-storage-handler:rust
 pub fn handle_storage(envelope: &Value, state: &mut impl ScopedState) -> Result<Value, String> {
     let envelope = object(envelope)?;
-    if field(envelope, "kind") != Some("tools") || field(envelope, "contributionId") != Some(CONTRIBUTION_ID) {
+    if field(envelope, "kind") != Some("tool") || field(envelope, "contributionId") != Some(CONTRIBUTION_ID) {
         return Err("contribution_mismatch".into());
     }
     let input = object(envelope.get("input").ok_or_else(|| "input_object_required".to_string())?)?;
@@ -108,7 +108,7 @@ mod tests {
     fn request(operation: &str, fields: Value) -> Value {
         let mut input = fields.as_object().cloned().unwrap_or_default();
         input.insert("operation".into(), json!(operation));
-        json!({"kind":"tools","contributionId":"storage","input":Value::Object(input)})
+        json!({"kind":"tool","contributionId":"storage","input":Value::Object(input)})
     }
     #[test]
     fn storage_round_trip_stays_in_test_namespace_and_sorts() {

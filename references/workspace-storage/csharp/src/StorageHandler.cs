@@ -16,7 +16,7 @@ public static class StorageHandler
         using var document = JsonDocument.Parse(requestJson);
         var envelope = document.RootElement;
         if (envelope.ValueKind != JsonValueKind.Object
-            || ReadString(envelope, "kind") != "tools"
+            || ReadString(envelope, "kind") != "tool"
             || ReadString(envelope, "contributionId") != ContributionId)
             throw new InvalidOperationException("contribution_mismatch");
         if (!envelope.TryGetProperty("input", out var input) || input.ValueKind != JsonValueKind.Object)

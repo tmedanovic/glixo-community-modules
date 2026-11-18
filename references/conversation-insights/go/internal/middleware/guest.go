@@ -50,7 +50,7 @@ func Invoke(requestJSON string) (string,error) {
     var envelope object
     if err:=decoder.Decode(&envelope); err!=nil { return "",errors.New("guest_envelope_invalid") }
     if _,err:=decoder.Token(); err!=io.EOF { return "",errors.New("guest_envelope_invalid") }
-    if envelope["kind"]!="messageMiddleware" || envelope["contributionId"]!="conversation-insights" { return "",errors.New("guest_envelope_invalid") }
+    if envelope["kind"]!="message-middleware" || envelope["contributionId"]!="conversation-insights" { return "",errors.New("guest_envelope_invalid") }
     input:=asObject(envelope["input"]); if input==nil { return "",errors.New("guest_envelope_invalid") }
     result,err:=Analyze(input); if err!=nil { return "",err }
     body,err:=json.Marshal(result); if err!=nil { return "",errors.New("guest_result_invalid") }; return string(body),nil

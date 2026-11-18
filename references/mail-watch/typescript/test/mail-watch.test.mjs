@@ -40,7 +40,7 @@ class FixtureBroker {
 const state = { get() { return undefined; }, set() {}, list() { return []; }, delete() { return false; } };
 function request(operation, checkpoint, extra = {}) {
   return {
-    kind: 'backgroundServices', contributionId: 'mail-watch',
+    kind: 'background-service', contributionId: 'mail-watch',
     configuration: { maxPagesPerWake: 5 },
     input: { operation, checkpoint },
     context: { resourceHandles: { oauth: 'secret-slot-lease' } },
@@ -107,7 +107,7 @@ test('an unsafe next link is rejected before a second broker request', () => {
 
 test('lifecycle health and stop do not acquire Graph credentials', () => {
   for (const operation of ['health', 'stop']) {
-    const result = handleMailWatch({ kind: 'backgroundServices', contributionId: 'mail-watch', input: { operation } }, new FixtureBroker([]), state);
+    const result = handleMailWatch({ kind: 'background-service', contributionId: 'mail-watch', input: { operation } }, new FixtureBroker([]), state);
     assert.equal(result.health, 'healthy');
     assert.deepEqual(result.events, []);
   }

@@ -3,7 +3,7 @@ import test from 'node:test';
 import { handleWorkspaceHealth } from '../dist/js/handler.js';
 
 const request = (input = {}, resourceHandles = { workspace: 'host-issued' }) => ({
-  kind: 'tools', contributionId: 'inspect', input, context: { resourceHandles },
+  kind: 'tool', contributionId: 'inspect', input, context: { resourceHandles },
 });
 
 test('workspace health sorts a bounded sample and does not claim complete totals when truncated', () => {

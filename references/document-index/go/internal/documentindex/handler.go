@@ -34,7 +34,7 @@ func Handle(requestJSON string, reader workspace.Reader) (string, error) {
 	if err := json.Unmarshal([]byte(requestJSON), &envelope); err != nil {
 		return "", errors.New("guest_envelope_invalid")
 	}
-	if envelope.Kind != "dataSources" || envelope.ContributionID != "search" {
+	if envelope.Kind != "data-source" || envelope.ContributionID != "search" {
 		return "", errors.New("contribution_mismatch")
 	}
 	handle, hasHandle := envelope.Context.ResourceHandles["workspace"]

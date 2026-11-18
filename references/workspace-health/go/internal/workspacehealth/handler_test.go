@@ -122,8 +122,8 @@ func TestCompleteInventoryAndUTF8ByteOrdinalOrder(t *testing.T) {
 func TestRejectsMissingHandleInvalidBoundsMalformedItemsAndUnsafeIntegers(t *testing.T) {
 	reader := &fakeWorkspace{searchResult: encode(t, map[string]any{"items": []any{}, "truncated": false})}
 	for _, request := range []map[string]any{
-		{"kind": "tools", "contributionId": "inspect", "configuration": map[string]any{}, "input": map[string]any{}, "context": map[string]any{"resourceHandles": map[string]string{}}},
-		{"kind": "tools", "contributionId": "inspect", "configuration": map[string]any{}, "input": map[string]any{"maxFiles": 101}, "context": map[string]any{"resourceHandles": map[string]string{"workspace": "h"}}},
+		{"kind": "tool", "contributionId": "inspect", "configuration": map[string]any{}, "input": map[string]any{}, "context": map[string]any{"resourceHandles": map[string]string{}}},
+		{"kind": "tool", "contributionId": "inspect", "configuration": map[string]any{}, "input": map[string]any{"maxFiles": 101}, "context": map[string]any{"resourceHandles": map[string]string{"workspace": "h"}}},
 	} {
 		if _, err := Handle(withSession(t, encode(t, request)), reader); err == nil {
 			t.Fatalf("expected rejection for %#v", request)

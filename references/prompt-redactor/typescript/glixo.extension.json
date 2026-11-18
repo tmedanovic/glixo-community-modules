@@ -20,7 +20,7 @@
   "permissions": {
     "requested": [
       {
-        "id": "message.content.read",
+        "id": "message.read",
         "reason": "Read eligible outgoing user text so the guest can create redaction patches."
       },
       {
@@ -30,19 +30,21 @@
     ]
   },
   "contributions": {
-    "messageMiddleware": [
+    "implements": [
       {
         "id": "prompt-redactor",
+        "contract": "message-middleware@1",
+        "runtime": "wasm-component",
         "component": "redactor",
         "world": "glixo:contribution/contribution@1.0.0",
-        "hooks": [
-          "before-provider"
-        ],
-        "order": -100,
-        "failurePolicy": "block",
-        "timeoutMs": 1000,
-        "maxBytes": 65536,
-        "configuration": "redaction-rules"
+        "configuration": "redaction-rules",
+        "fields": {
+          "hooks": ["before-provider"],
+          "order": -100,
+          "failurePolicy": "block",
+          "timeoutMs": 1000,
+          "maxBytes": 65536
+        }
       }
     ]
   },

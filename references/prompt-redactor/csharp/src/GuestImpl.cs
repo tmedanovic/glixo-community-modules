@@ -10,7 +10,7 @@ public static class GuestExportsImpl
     {
         using var envelope = JsonDocument.Parse(requestJson);
         var root = envelope.RootElement;
-        if (Text(root, "kind") != "messageMiddleware" || Text(root, "contributionId") != "prompt-redactor")
+        if (Text(root, "kind") != "message-middleware" || Text(root, "contributionId") != "prompt-redactor")
             throw new InvalidOperationException("guest_envelope_invalid");
         var configuration = root.TryGetProperty("configuration", out var config) ? config : default;
         return JsonSerializer.Serialize(Redact(root.GetProperty("input"), configuration), GuestJsonContext.Default.RedactorResponse);

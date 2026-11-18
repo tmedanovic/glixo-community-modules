@@ -65,7 +65,7 @@ export const guest = {
     try { parsed = JSON.parse(requestJson); }
     catch { throw "guest_envelope_invalid"; }
     const envelope = object(parsed);
-    if (!envelope || envelope.kind !== "messageMiddleware" || envelope.contributionId !== "prompt-redactor") {
+    if (!envelope || envelope.kind !== "message-middleware" || envelope.contributionId !== "prompt-redactor") {
       throw "guest_envelope_invalid";
     }
     try { return JSON.stringify(redact(envelope.input, envelope.configuration)); }

@@ -19,7 +19,7 @@ export interface MailCheckpoint {
 }
 
 export interface MailServiceRequest {
-  readonly kind: 'backgroundServices';
+  readonly kind: 'background-service';
   readonly contributionId: string;
   readonly configuration?: { readonly maxPagesPerWake?: number };
   readonly input: {
@@ -51,7 +51,7 @@ export function handleMailWatch(
   broker: Broker,
   _state: ScopedState,
 ): MailServiceResult {
-  if (request.kind !== 'backgroundServices' || request.contributionId !== CONTRIBUTION_ID) {
+  if (request.kind !== 'background-service' || request.contributionId !== CONTRIBUTION_ID) {
     throw new Error('contribution_mismatch');
   }
   const operation = request.input?.operation;

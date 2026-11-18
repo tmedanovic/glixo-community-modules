@@ -21,7 +21,7 @@ test('shared Unicode and minimum-length cases match', () => {
 });
 
 test('rejects bad options and oversized text', () => {
-  const request = (input) => JSON.stringify({ kind: 'tools', contributionId: 'text-stats', configuration: {}, input, context: { sessionId: 's', resourceHandles: {}, endpoints: [] } });
+  const request = (input) => JSON.stringify({ kind: 'tool', contributionId: 'text-stats', configuration: {}, input, context: { sessionId: 's', resourceHandles: {}, endpoints: [] } });
   assert.throws(() => handleWorkflowTextStats(request({ text: 'x', minimumWordLength: 0 })), (error) => error === 'minimum_word_length_out_of_range');
   assert.throws(() => handleWorkflowTextStats(request({ text: 'x'.repeat(65_537) })), (error) => error === 'text_too_long');
 });

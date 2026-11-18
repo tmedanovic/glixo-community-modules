@@ -21,22 +21,12 @@
     "requested": [
       {
         "id": "http.connection",
-        "scope": {
-          "endpoints": [
-            "issues"
-          ],
-          "methods": [
-            "POST"
-          ],
-          "paths": [
-            "/mcp"
-          ]
-        },
+        "scope": { "endpoints": ["issues"], "methods": ["POST"], "paths": ["/mcp"] },
         "reason": "Call only the locally approved issues MCP endpoint using its invocation-scoped opaque connection handle."
       },
       {
         "id": "tool.invoke",
-        "scope": { "tools": ["issue-lookup"] },
+        "scope": { "tool": ["issue-lookup"] },
         "reason": "Expose only the declared bounded issue-lookup tool for explicit invocation."
       }
     ]
@@ -50,48 +40,42 @@
     }
   ],
   "contributions": {
-    "tools": [
+    "implements": [
       {
         "id": "issue-lookup",
+        "contract": "tool@1",
+        "runtime": "wasm-component",
         "component": "issue-lookup",
         "configuration": "issue-lookup",
-        "description": "Look up a bounded issue summary from the approved issues MCP connection.",
-        "inputSchema": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "issueKey"
-          ],
-          "properties": {
-            "issueKey": {
-              "type": "string",
-              "pattern": "^[A-Z][A-Z0-9]{0,9}-[1-9][0-9]{0,8}(?![\\s\\S])",
-              "maxLength": 20
+        "fields": {
+          "description": "Look up a bounded issue summary from the approved issues MCP connection.",
+          "inputSchema": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["issueKey"],
+            "properties": {
+              "issueKey": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9]{0,9}-[1-9][0-9]{0,8}(?![\\s\\S])",
+                "maxLength": 20
+              }
             }
-          }
-        },
-        "outputSchema": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "issueKey",
-            "summary"
-          ],
-          "properties": {
-            "issueKey": {
-              "type": "string"
-            },
-            "summary": {
-              "type": "string",
-              "maxLength": 65536
+          },
+          "outputSchema": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["issueKey", "summary"],
+            "properties": {
+              "issueKey": { "type": "string" },
+              "summary": { "type": "string", "maxLength": 65536 }
             }
-          }
-        },
-        "safety": "readonly",
-        "timeoutMs": 15000,
-        "cancellable": true,
-        "idempotent": true,
-        "export": "guest.invoke"
+          },
+          "safety": "readonly",
+          "timeoutMs": 15000,
+          "cancellable": true,
+          "idempotent": true,
+          "export": "guest.invoke"
+        }
       }
     ]
   }

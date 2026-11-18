@@ -35,65 +35,51 @@
       {
         "id": "http.connection",
         "scope": {
-          "endpoints": [
-            "ollama"
-          ],
-          "methods": [
-            "GET",
-            "POST"
-          ],
-          "paths": [
-            "/api/tags",
-            "/api/show",
-            "/api/chat"
-          ]
+          "endpoints": ["ollama"],
+          "methods": ["GET", "POST"],
+          "paths": ["/api/tags", "/api/show", "/api/chat"]
         },
         "reason": "Connect to the host-approved Ollama endpoint for model discovery, capability lookup, and chat."
       }
     ]
   },
   "contributions": {
-    "llmProviders": [
+    "implements": [
       {
         "id": "default",
+        "contract": "llm-provider@1",
+        "runtime": "wasm-component",
         "component": "provider",
-        "configuration": "provider-account",
         "world": "glixo:llm-provider-compat/provider-compat@3.0.0",
-        "familyId": "builtin.llm/ollama",
-        "authMethods": [
-          {
-            "id": "endpoint",
-            "label": "Ollama server",
-            "kind": "credential",
-            "flow": "connect-existing-service",
-            "protocol": "none",
-            "transports": [
-              "host-managed"
-            ],
-            "supportedEnvironments": [
-              "code-web-server"
-            ],
-            "requiredCapabilities": [],
-            "credentialBindings": [],
-            "billing": "free-local",
-            "usage": {
-              "tokens": "always",
-              "limitWindows": "none",
-              "spend": "none",
-              "balance": "none"
-            },
-            "manageUrl": null,
-            "runtimes": []
-          }
-        ],
-        "execution": {
-          "target": "server",
-          "supportedEnvironments": [
-            "code-web-server"
+        "configuration": "provider-account",
+        "fields": {
+          "familyId": "builtin.llm/ollama",
+          "authMethods": [
+            {
+              "id": "endpoint",
+              "label": "Ollama server",
+              "kind": "credential",
+              "flow": "connect-existing-service",
+              "protocol": "none",
+              "transports": ["host-managed"],
+              "supportedEnvironments": ["code-web-server"],
+              "requiredCapabilities": [],
+              "credentialBindings": [],
+              "billing": "free-local",
+              "usage": {
+                "tokens": "always",
+                "limitWindows": "none",
+                "spend": "none",
+                "balance": "none"
+              },
+              "runtimes": []
+            }
           ],
-          "requiredCapabilities": [
-            "llm.execution.server"
-          ]
+          "execution": {
+            "target": "server",
+            "supportedEnvironments": ["code-web-server"],
+            "requiredCapabilities": ["llm.execution.server"]
+          }
         }
       }
     ]

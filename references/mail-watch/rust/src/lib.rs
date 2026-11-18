@@ -91,7 +91,7 @@ pub fn handle_mail_watch<B: Broker>(
     broker: &mut B,
     _state: &mut dyn ScopedState,
 ) -> Result<ServiceResult, String> {
-    if request.kind != "backgroundServices" || request.contribution_id != CONTRIBUTION_ID {
+    if request.kind != "background-service" || request.contribution_id != CONTRIBUTION_ID {
         return Err("contribution_mismatch".into());
     }
     let operation = request.input.operation.as_str();
@@ -272,7 +272,7 @@ mod tests {
 
     fn service_request(operation: &str, checkpoint: Option<Checkpoint>) -> ServiceRequest {
         ServiceRequest {
-            kind: "backgroundServices".into(), contribution_id: CONTRIBUTION_ID.into(),
+            kind: "background-service".into(), contribution_id: CONTRIBUTION_ID.into(),
             configuration: Some(Configuration { max_pages_per_wake: Some(5) }),
             input: Input { operation: operation.into(), checkpoint },
             context: Some(Context { resource_handles: Some(HashMap::from([("oauth".into(), "secret-slot-lease".into())])) }),
@@ -321,7 +321,7 @@ mod tests {
     #[test]
     fn lifecycle_health_stop_need_no_credentials() {
         for operation in ["health", "stop"] {
-            let request = ServiceRequest { kind: "backgroundServices".into(), contribution_id: CONTRIBUTION_ID.into(), configuration: None, input: Input { operation: operation.into(), checkpoint: None }, context: None };
+            let request = ServiceRequest { kind: "background-service".into(), contribution_id: CONTRIBUTION_ID.into(), configuration: None, input: Input { operation: operation.into(), checkpoint: None }, context: None };
             let mut broker = FixtureBroker::new(vec![]);
             assert!(handle_mail_watch(&request, &mut broker, &mut EmptyState).unwrap().events.is_empty());
             assert!(broker.requests.is_empty());

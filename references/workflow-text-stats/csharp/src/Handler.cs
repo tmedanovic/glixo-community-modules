@@ -18,7 +18,7 @@ public static class Handler
         {
             using var document = JsonDocument.Parse(requestJson, new JsonDocumentOptions { MaxDepth = 24 });
             var root = document.RootElement;
-            if (root.GetProperty("kind").GetString() != "tools" || root.GetProperty("contributionId").GetString() != "text-stats")
+            if (root.GetProperty("kind").GetString() != "tool" || root.GetProperty("contributionId").GetString() != "text-stats")
                 throw new InvalidOperationException("contribution_mismatch");
 
             var input = root.GetProperty("input");

@@ -12,7 +12,7 @@ public static class Handler
     {
         using var request = JsonDocument.Parse(requestJson, new JsonDocumentOptions { MaxDepth = 32 });
         var root = request.RootElement;
-        if (root.GetProperty("kind").GetString() != "tools" || root.GetProperty("contributionId").GetString() != "inspect")
+        if (root.GetProperty("kind").GetString() != "tool" || root.GetProperty("contributionId").GetString() != "inspect")
             throw new InvalidOperationException("contribution_mismatch");
         var handle = WorkspaceHandle(root);
         var limit = OptionalInteger(root.GetProperty("input"), "maxFiles", 100, 1, 100);

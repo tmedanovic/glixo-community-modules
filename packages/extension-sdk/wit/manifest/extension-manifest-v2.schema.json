@@ -5,6 +5,26 @@
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaVersion", "id", "version", "metadata"],
+  "allOf": [{
+    "if": {
+      "required": ["contributions"],
+      "properties": { "contributions": {
+        "required": ["implements"],
+        "properties": { "implements": { "type": "array", "contains": {
+          "type": "object", "required": ["contract"], "properties": { "contract": { "pattern": "^agent-runtime@" } }
+        } } }
+      } }
+    },
+    "then": {
+      "required": ["permissions"],
+      "properties": { "permissions": {
+        "required": ["requested"],
+        "properties": { "requested": { "contains": {
+          "type": "object", "required": ["id"], "properties": { "id": { "const": "agent.run" } }
+        } } }
+      } }
+    }
+  }],
   "properties": {
     "$schema": { "type": "string" },
     "schemaVersion": { "type": "integer", "const": 2 },
@@ -30,9 +50,77 @@
       "type": "array",
       "items": { "$ref": "#/$defs/ExtensionConfigurationRef" }
     },
-    "contributions": { "$ref": "#/$defs/ExtensionContributions" }
+    "contributions": { "$ref": "#/$defs/ExtensionContributions" },
+    "nativeDependencies": { "type": "array", "items": { "$ref": "#/$defs/ExtensionNativeDependency" } }
   },
   "$defs": {
+    "ExtensionNativeDependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["packageId", "version", "required", "serviceAbi", "capabilities", "artifacts"],
+      "properties": {
+        "packageId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+" },
+        "required": { "type": "boolean" },
+        "serviceAbi": { "type": "string", "anyOf": [
+          { "const": "glixo.shift-jira-import.v1" },
+          { "const": "glixo.shift-microsoft-import.v1" },
+          { "const": "glixo.shift-confluence-read.v1" },
+          { "pattern": "^[a-z0-9][a-z0-9.-]*:[a-z0-9][a-z0-9.-]*/[a-z0-9][a-z0-9.-]*@\\d+\\.\\d+\\.\\d+$" }
+        ] },
+        "capabilities": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^[a-z][a-z0-9]*(\\.[a-z][a-z0-9]*)*$" } },
+        "artifacts": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/ExtensionNativeDependencyArtifact" } }
+      }
+    },
+    "ExtensionNativeDependencyArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rid", "url", "sha256"],
+      "properties": {
+        "rid": { "type": "string", "pattern": "^[a-z0-9]+-[a-z0-9]+$" },
+        "url": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      }
+    },
+    "JiraAssignedImportNativeOperation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operationId", "nativeDependencyId", "serviceAbi"],
+      "properties": {
+        "operationId": { "const": "jira.assigned.import.step" },
+        "nativeDependencyId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
+        "serviceAbi": { "const": "glixo.shift-jira-import.v1" }
+      }
+    },
+    "MicrosoftImportNativeOperation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operationId", "nativeDependencyId", "serviceAbi"],
+      "properties": {
+        "operationId": { "enum": ["outlook.mail.import.step", "outlook.calendar.import.step", "teams.messages.import.step"] },
+        "nativeDependencyId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
+        "serviceAbi": { "const": "glixo.shift-microsoft-import.v1" }
+      }
+    },
+    "ConfluenceQueryNativeOperation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operationId", "nativeDependencyId", "serviceAbi"],
+      "properties": {
+        "operationId": { "const": "confluence.context.query" },
+        "nativeDependencyId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
+        "serviceAbi": { "const": "glixo.shift-confluence-read.v1" }
+      }
+    },
+    "InstalledEntityActionCompatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recordType", "inputName"],
+      "properties": {
+        "recordType": { "$ref": "https://schemas.glixo.dev/extensions/ui/entity-action-context.json#/$defs/ExtensionEntityTypeSelector" },
+        "inputName": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$", "not": { "enum": ["constructor", "prototype", "__proto__"] } }
+      }
+    },
     "ExtensionMetadata": {
       "type": "object",
       "additionalProperties": false,
@@ -172,132 +260,81 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "llmProviders": { "type": "array", "items": { "$ref": "#/$defs/LlmProviderContributionRef" } },
-        "storageProviders": { "type": "array", "items": { "$ref": "#/$defs/ContributionRef" } },
-        "skills": { "type": "array", "items": { "$ref": "#/$defs/ContributionRef" } },
-        "themes": { "type": "array", "items": { "$ref": "#/$defs/SurfaceContribution" } },
-        "a2ui": { "type": "array", "items": { "$ref": "#/$defs/SurfaceContribution" } },
-        "sandboxedWebUi": { "type": "array", "items": { "$ref": "#/$defs/SurfaceContribution" } },
-        "actions": { "type": "array", "items": { "$ref": "#/$defs/ActionContribution" } },
-        "surfaces": { "type": "array", "items": { "$ref": "#/$defs/SurfaceContribution" } },
-        "tools": { "type": "array", "items": { "$ref": "#/$defs/ToolContribution" } },
-        "mcp": { "type": "array", "items": { "$ref": "#/$defs/McpContribution" } },
-        "dataSources": { "type": "array", "items": { "$ref": "#/$defs/DataSourceContribution" } },
-        "backgroundServices": { "type": "array", "items": { "$ref": "#/$defs/BackgroundServiceContribution" } },
-        "messageMiddleware": { "type": "array", "items": { "$ref": "#/$defs/MessageMiddlewareContribution" } }
+        "implements": { "type": "array", "items": { "$ref": "#/$defs/ImplementsEntry" } }
       }
     },
-    "DataSourceContribution": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["id", "component", "querySchema", "resultSchema", "pagination", "freshnessMs", "provenance", "cache", "cancellable", "redaction", "maxResults"],
-      "properties": {
-        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
-        "component": { "type": "string", "minLength": 1 },
-        "configuration": { "type": "string" },
-        "world": { "type": "string" },
-        "cell": { "type": "string", "enum": ["server", "desktop", "os", "mobile", "browser"] },
-        "targetApplications": {
-          "type": "array",
-          "items": { "type": "string", "pattern": "^app\\.[a-z0-9][a-z0-9.-]{1,127}$" }
-        },
-        "querySchema": { "type": "object" },
-        "resultSchema": { "type": "object" },
-        "pagination": { "type": "string", "enum": ["none", "page", "cursor", "stream"] },
-        "freshnessMs": { "type": "integer", "minimum": 1 },
-        "provenance": { "type": "boolean" },
-        "cache": { "type": "string", "enum": ["none", "private", "shared"] },
-        "cancellable": { "type": "boolean" },
-        "redaction": { "type": "string", "enum": ["none", "secrets", "pii"] },
-        "maxResults": { "type": "integer", "minimum": 1, "maximum": 1000 },
-        "timeoutMs": { "type": "integer", "minimum": 1 },
-        "export": { "type": "string", "minLength": 1 }
-      }
+    "ContractReference": {
+      "type": "string",
+      "description": "<contract-id>@<major>, for example llm-provider@1. The contract id names a definition under contracts/extensions/contracts/<contract-id>.contract.json.",
+      "pattern": "^[a-z][a-z0-9-]*@[1-9][0-9]*$"
     },
-    "MessageMiddlewareContribution": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["id", "component", "hooks", "order", "failurePolicy"],
-      "properties": {
-        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
-        "component": { "type": "string", "minLength": 1 },
-        "world": { "type": "string", "const": "glixo:contribution/contribution@1.0.0" },
-        "configuration": { "type": "string", "minLength": 1 },
-        "targetApplications": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^app\\.[a-z0-9][a-z0-9.-]{1,127}$" } },
-        "hooks": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "enum": ["before-provider", "completed", "committed", "transform-response"] } },
-        "order": { "type": "integer", "minimum": -1000, "maximum": 1000 },
-        "failurePolicy": { "type": "string", "enum": ["block", "continue"] },
-        "timeoutMs": { "type": "integer", "minimum": 1, "maximum": 30000 },
-        "maxBytes": { "type": "integer", "minimum": 1, "maximum": 131072 }
-      }
-    },
-    "BackgroundServiceContribution": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["id", "component", "archetype", "activation", "quota", "retry", "idempotent", "health", "shutdown"],
-      "properties": {
-        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
-        "component": { "type": "string", "minLength": 1 },
-        "configuration": { "type": "string" },
-        "world": { "type": "string" },
-        "cell": { "type": "string", "enum": ["server", "desktop", "os", "mobile", "browser"] },
-        "archetype": { "type": "string", "enum": ["event-handler", "scheduled", "webhook-ingest"] },
-        "schedule": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["intervalMs"],
-          "properties": {
-            "intervalMs": { "type": "integer", "minimum": 1000, "maximum": 86400000 }
-          }
-        },
-        "activation": { "type": "string", "enum": ["install", "grant", "manual"] },
-        "quota": { "type": "integer", "minimum": 1, "maximum": 64 },
-        "retry": { "type": "integer", "minimum": 0, "maximum": 8 },
-        "idempotent": { "type": "boolean" },
-        "health": { "type": "string", "enum": ["none", "export", "event"] },
-        "shutdown": { "type": "string", "enum": ["graceful", "immediate"] },
-        "timeoutMs": { "type": "integer", "minimum": 1, "maximum": 30000 },
-        "export": { "type": "string", "minLength": 1 }
-      },
-      "allOf": [
-        { "if": { "properties": { "archetype": { "const": "scheduled" } }, "required": ["archetype"] }, "then": { "required": ["schedule"] }, "else": { "not": { "required": ["schedule"] } } }
+    "ImplementsRuntime": {
+      "type": "string",
+      "description": "How the host executes an implementation. workflow, declarative-http and sandboxed-process are accepted by this schema but rejected by the validator until the host ships them.",
+      "enum": [
+        "wasm-component", "workflow", "declarative-http", "sandboxed-process", "mcp", "piece",
+        "tools-host", "native-operation", "local-process", "sandboxed-web", "declarative"
       ]
     },
-    "ToolContribution": {
+    "ImplementsEntry": {
       "type": "object",
+      "description": "One implementation of a versioned extension contract. contributions.implements is the only way to declare contributions. fields carries the contract-specific contributionFields and is validated against the contract definition, entry carries runtime-specific wiring (for example workflowPackage and operations).",
       "additionalProperties": false,
-      "required": ["id", "description", "inputSchema", "outputSchema"],
+      "required": ["id", "contract", "runtime"],
       "properties": {
         "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
-        "component": { "type": "string" },
-        "configuration": { "type": "string" },
+        "contract": { "$ref": "#/$defs/ContractReference" },
+        "runtime": { "$ref": "#/$defs/ImplementsRuntime" },
+        "component": { "type": "string", "minLength": 1 },
         "world": { "type": "string" },
-        "targetApplications": {
-          "type": "array",
-          "items": { "type": "string", "pattern": "^app\\.[a-z0-9][a-z0-9.-]{1,127}$" }
-        },
-        "description": { "type": "string", "minLength": 1 },
-        "inputSchema": { "type": "object" },
-        "outputSchema": { "type": "object" },
-        "safety": { "type": "string", "enum": ["readonly", "mutating", "privileged"] },
-        "timeoutMs": { "type": "integer", "minimum": 1 },
-        "cancellable": { "type": "boolean" },
-        "idempotent": { "type": "boolean" },
-        "export": { "type": "string", "minLength": 1 },
-        "confirmation": { "type": "string", "enum": ["install", "invoke"] }
+        "entry": { "type": "object" },
+        "fields": { "type": "object" },
+        "configuration": { "type": "string" },
+        "permissions": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+        "targetApplications": { "type": "array", "maxItems": 16, "items": { "type": "string", "pattern": "^app\\.[a-z0-9][a-z0-9.-]{1,127}$" } },
+        "context": { "type": "string", "enum": ["machine", "project", "session"] }
+      },
+      "allOf": [{
+        "if": { "properties": { "runtime": { "enum": ["wasm-component", "sandboxed-web", "local-process"] } }, "required": ["runtime"] },
+        "then": { "required": ["component"] }
+      }]
+    },
+    "StatusButtonRunAction": {
+      "type": "object", "additionalProperties": false, "required": ["runWorkflow"],
+      "properties": { "runWorkflow": { "type": "string", "pattern": "^winst_[A-Za-z0-9]+$" } }
+    },
+    "StatusButtonPanelAction": {
+      "type": "object", "additionalProperties": false, "required": ["openPanel"],
+      "properties": { "openPanel": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" } }
+    },
+    "StatusButtonSimpleAction": {
+      "anyOf": [{ "$ref": "#/$defs/StatusButtonRunAction" }, { "$ref": "#/$defs/StatusButtonPanelAction" }]
+    },
+    "StatusButtonMenuEntry": {
+      "type": "object", "additionalProperties": false, "required": ["id", "label", "action"], "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 96 },
+        "action": { "$ref": "#/$defs/StatusButtonSimpleAction" }
       }
     },
-    "McpContribution": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["id", "transport"],
-      "properties": {
-        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
-        "component": { "type": "string" },
-        "configuration": { "type": "string" },
-        "transport": { "type": "string", "enum": ["remote-http", "wasm-component", "stdio"] },
-        "endpoint": { "type": "string", "minLength": 1 },
-        "command": { "type": "string", "minLength": 1 }
+    "StatusButtonMenuAction": {
+      "type": "object", "additionalProperties": false, "required": ["menu"],
+      "properties": { "menu": { "type": "array", "minItems": 1, "maxItems": 12, "items": { "$ref": "#/$defs/StatusButtonMenuEntry" } } }
+    },
+    "StatusButtonAction": {
+      "anyOf": [{ "$ref": "#/$defs/StatusButtonSimpleAction" }, { "$ref": "#/$defs/StatusButtonMenuAction" }]
+    },
+    "StatusButtonBinding": {
+      "type": "object", "additionalProperties": false, "required": ["instanceId", "key"], "properties": {
+        "instanceId": { "type": "string", "pattern": "^winst_[A-Za-z0-9]+$" },
+        "key": { "type": "string", "pattern": "^[a-z][a-z0-9_.-]{0,63}$" }
+      }
+    },
+    "StatusButtonIcon": {
+      "type": "object", "additionalProperties": false, "required": ["default"], "properties": {
+        "default": { "type": "string", "pattern": "^[a-z][a-z0-9-]{0,63}$" },
+        "byState": { "type": "object", "maxProperties": 32, "propertyNames": { "pattern": "^[a-z][a-z0-9_.-]{0,63}$" }, "additionalProperties": { "type": "string", "pattern": "^[a-z][a-z0-9-]{0,63}$" } },
+        "userSelectable": { "type": "boolean" }
       }
     },
     "PackageCompositionKind": {
@@ -337,15 +374,6 @@
         }
       }
     },
-    "UiContributionRef": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["kind", "id"],
-      "properties": {
-        "kind": { "type": "string", "enum": ["configuration", "data", "action"] },
-        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" }
-      }
-    },
     "UiLimits": {
       "type": "object",
       "additionalProperties": false,
@@ -366,99 +394,6 @@
         "requiresRuntime": { "type": "boolean", "const": false }
       }
     },
-    "DeclarativeSurfaceContribution": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["id", "uiTier", "placements"],
-      "properties": {
-        "id": { "type": "string" },
-        "uiTier": { "type": "string", "const": "declarative" },
-        "title": { "type": "string" },
-        "placements": { "type": "array", "items": { "type": "string" } },
-        "configuration": { "type": "string" },
-        "data": { "type": "array", "items": { "$ref": "#/$defs/UiContributionRef" } },
-        "actions": { "type": "array", "items": { "$ref": "#/$defs/UiContributionRef" } },
-        "limits": { "$ref": "#/$defs/UiLimits" },
-        "compatibility": { "$ref": "#/$defs/UiContributionCompatibility" },
-        "targetApplications": { "type": "array", "items": { "type": "string" } },
-        "context": { "type": "string" }
-      }
-    },
-    "A2uiSurfaceContribution": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["id", "uiTier", "placements", "assets"],
-      "properties": {
-        "id": { "type": "string" },
-        "uiTier": { "type": "string", "const": "a2ui" },
-        "title": { "type": "string" },
-        "placements": { "type": "array", "items": { "type": "string" } },
-        "assets": { "type": "array", "items": { "$ref": "#/$defs/UiAsset" } },
-        "configuration": { "type": "string" },
-        "data": { "type": "array", "items": { "$ref": "#/$defs/UiContributionRef" } },
-        "actions": { "type": "array", "items": { "$ref": "#/$defs/UiContributionRef" } },
-        "limits": { "$ref": "#/$defs/UiLimits" },
-        "compatibility": { "$ref": "#/$defs/UiContributionCompatibility" },
-        "targetApplications": { "type": "array", "items": { "type": "string" } },
-        "context": { "type": "string" }
-      }
-    },
-    "SandboxedWebSurfaceContribution": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["id", "uiTier", "placements", "origin", "component"],
-      "properties": {
-        "id": { "type": "string" },
-        "uiTier": { "type": "string", "const": "sandboxed-web" },
-        "title": { "type": "string" },
-        "placements": { "type": "array", "items": { "type": "string" } },
-        "origin": { "type": "string", "const": "opaque-extension" },
-        "component": { "type": "string" },
-        "assets": { "type": "array", "items": { "$ref": "#/$defs/UiAsset" } },
-        "configuration": { "type": "string" },
-        "data": { "type": "array", "items": { "$ref": "#/$defs/UiContributionRef" } },
-        "actions": { "type": "array", "items": { "$ref": "#/$defs/UiContributionRef" } },
-        "limits": { "$ref": "#/$defs/UiLimits" },
-        "compatibility": { "$ref": "#/$defs/UiContributionCompatibility" },
-        "targetApplications": { "type": "array", "items": { "type": "string" } },
-        "context": { "type": "string" }
-      }
-    },
-    "ThemeSurfaceContribution": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["id", "uiTier", "placements", "assets"],
-      "properties": {
-        "id": { "type": "string" },
-        "uiTier": { "type": "string", "const": "theme" },
-        "title": { "type": "string" },
-        "placements": { "type": "array", "items": { "type": "string" } },
-        "assets": { "type": "array", "items": { "$ref": "#/$defs/UiAsset" } },
-        "limits": { "$ref": "#/$defs/UiLimits" },
-        "compatibility": { "$ref": "#/$defs/UiContributionCompatibility" },
-        "targetApplications": { "type": "array", "items": { "type": "string" } },
-        "context": { "type": "string" }
-      }
-    },
-    "NativePrivilegedSurfaceContribution": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["id", "uiTier", "placements", "component", "origin"],
-      "properties": {
-        "id": { "type": "string" },
-        "uiTier": { "type": "string", "const": "native-privileged" },
-        "title": { "type": "string" },
-        "placements": { "type": "array", "items": { "type": "string" } },
-        "origin": { "type": "string", "const": "host-product" },
-        "component": { "type": "string", "pattern": "^host\\.surface\\.[a-z0-9][a-z0-9.-]{1,127}$" },
-        "configuration": { "type": "string" },
-        "data": { "type": "array", "items": { "$ref": "#/$defs/UiContributionRef" } },
-        "actions": { "type": "array", "items": { "$ref": "#/$defs/UiContributionRef" } },
-        "compatibility": { "$ref": "#/$defs/UiContributionCompatibility" },
-        "targetApplications": { "type": "array", "items": { "type": "string" } },
-        "context": { "type": "string" }
-      }
-    },
     "ActionTarget": {
       "type": "object",
       "additionalProperties": false,
@@ -477,184 +412,82 @@
         "disabledReason": { "type": "string" }
       }
     },
+    "ProviderFamilyBrandingDeclaration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["monochromeSvg", "colorPng", "accentColor"],
+      "properties": {
+        "monochromeSvg": { "$ref": "#/$defs/ProviderMonochromeSvgAsset" },
+        "colorPng": { "$ref": "#/$defs/ProviderColorPngAsset" },
+        "accentColor": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" }
+      }
+    },
+    "ProviderMonochromeSvgAsset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "mediaType", "digest"],
+      "properties": {
+        "path": { "type": "string", "pattern": "^(?!/)(?!.*\\.\\.)(?!.*//)[A-Za-z0-9](?:[A-Za-z0-9._/-]*[A-Za-z0-9._-])?$" },
+        "mediaType": { "type": "string", "const": "image/svg+xml" },
+        "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      }
+    },
+    "ProviderColorPngAsset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "mediaType", "digest"],
+      "properties": {
+        "path": { "type": "string", "pattern": "^(?!/)(?!.*\\.\\.)(?!.*//)[A-Za-z0-9](?:[A-Za-z0-9._/-]*[A-Za-z0-9._-])?$" },
+        "mediaType": { "type": "string", "const": "image/png" },
+        "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      }
+    },
     "ProviderFamilyId": {
       "type": "string",
       "pattern": "^[a-z0-9][a-z0-9.-]{1,127}/[a-z0-9][a-z0-9.-]{0,63}$"
     },
     "ProviderEnvironmentId": {
       "type": "string",
-      "enum": [
-        "glixo-ai-browser",
-        "code-web-server",
-        "tauri-windows",
-        "tauri-macos",
-        "tauri-linux",
-        "android-companion",
-        "android-paired",
-        "ios"
-      ]
+      "enum": ["glixo-ai-browser", "code-web-server", "tauri-windows", "tauri-macos", "tauri-linux", "android-companion", "android-paired", "ios"]
     },
     "ProviderCapabilityId": {
       "oneOf": [
         {
           "type": "string",
-          "enum": [
-            "provider.credentials.write",
-            "provider.oauth.pkce",
-            "provider.oauth.browser-relay",
-            "host.browser.popup",
-            "host.browser.system",
-            "host.deep-link.callback",
-            "provider.oauth.device-code",
-            "host.secure-secret-store",
-            "provider.cli-proxy",
-            "llm.execution.browser",
-            "llm.execution.server",
-            "llm.execution.on-device",
-            "llm.execution.paired-device",
-            "llm.execution.extension",
-            "network.https-egress"
-          ]
+          "enum": ["provider.credentials.write", "provider.oauth.pkce", "provider.oauth.browser-relay", "host.browser.popup", "host.browser.system", "host.deep-link.callback", "provider.oauth.device-code", "host.secure-secret-store", "provider.cli-proxy", "llm.execution.browser", "llm.execution.server", "llm.execution.on-device", "llm.execution.paired-device", "llm.execution.extension", "network.https-egress"]
         },
-        {
-          "type": "string",
-          "pattern": "^[a-z0-9][a-z0-9.-]{1,127}/[a-z0-9][a-z0-9.-]{0,63}$"
-        }
+        { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}/[a-z0-9][a-z0-9.-]{0,63}$" }
       ]
     },
     "ProviderAuthMethod": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "id",
-        "label",
-        "kind",
-        "flow",
-        "protocol",
-        "transports",
-        "supportedEnvironments",
-        "requiredCapabilities",
-        "credentialBindings",
-        "billing",
-        "usage",
-        "manageUrl",
-        "runtimes"
-      ],
+      "required": ["id", "label", "kind", "flow", "protocol", "transports", "supportedEnvironments", "requiredCapabilities", "credentialBindings", "billing", "usage", "manageUrl", "runtimes"],
       "properties": {
-        "id": {
-          "type": "string",
-          "pattern": "^[a-z0-9][a-z0-9.-]{0,63}$"
-        },
-        "label": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 80
-        },
-        "description": {
-          "type": "string",
-          "maxLength": 300
-        },
-        "kind": {
-          "type": "string",
-          "enum": [
-            "oauth",
-            "credential"
-          ]
-        },
-        "flow": {
-          "type": "string",
-          "enum": [
-            "manual-entry",
-            "browser-authorization",
-            "system-browser-authorization",
-            "device-authorization",
-            "connect-existing-service"
-          ]
-        },
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{0,63}$" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "description": { "type": "string", "maxLength": 300 },
+        "kind": { "type": "string", "enum": ["oauth", "credential"] },
+        "flow": { "type": "string", "enum": ["manual-entry", "browser-authorization", "system-browser-authorization", "device-authorization", "connect-existing-service"] },
         "protocol": {
           "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "none",
-                "api-key",
-                "oauth2-authorization-code",
-                "oauth2-authorization-code-pkce",
-                "oauth2-device-authorization",
-                "cli-proxy",
-                "provider.openrouter-pkce-key-exchange",
-                "provider.openai-codex-oauth",
-                "provider.gemini-oauth",
-                "provider.managed-cliproxy-oauth"
-              ]
-            },
-            {
-              "type": "string",
-              "pattern": "^[a-z0-9][a-z0-9.-]{1,127}/[a-z0-9][a-z0-9.-]{0,63}$"
-            }
+            { "type": "string", "enum": ["none", "api-key", "oauth2-authorization-code", "oauth2-authorization-code-pkce", "oauth2-device-authorization", "cli-proxy", "provider.openrouter-pkce-key-exchange", "provider.openai-codex-oauth", "provider.gemini-oauth", "provider.managed-cliproxy-oauth"] },
+            { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}/[a-z0-9][a-z0-9.-]{0,63}$" }
           ]
         },
         "transports": {
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "enum": [
-              "host-managed",
-              "credential-form",
-              "browser-popup",
-              "browser-relay-popup",
-              "system-browser",
-              "deep-link",
-              "native-app-link",
-              "device-code"
-            ]
-          }
+          "items": { "type": "string", "enum": ["host-managed", "credential-form", "browser-popup", "browser-relay-popup", "system-browser", "deep-link", "native-app-link", "device-code"] }
         },
-        "supportedEnvironments": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": {
-            "$ref": "#/$defs/ProviderEnvironmentId"
-          }
-        },
-        "requiredCapabilities": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "$ref": "#/$defs/ProviderCapabilityId"
-          }
-        },
-        "credentialBindings": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
-          }
-        },
-        "billing": {
-          "type": "string",
-          "enum": ["subscription", "pay-as-you-go", "prepaid", "free-local", "user-declared"]
-        },
-        "usage": {
-          "$ref": "#/$defs/ProviderUsageDeclaration"
-        },
-        "manageUrl": {
-          "type": ["string", "null"],
-          "format": "uri",
-          "pattern": "^https://[^\\s]+$"
-        },
-        "runtimes": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "pattern": "^[a-z0-9][a-z0-9.-]{1,127}:[a-z0-9][a-z0-9.-]{1,127}$"
-          }
-        }
+        "supportedEnvironments": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/ProviderEnvironmentId" } },
+        "requiredCapabilities": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/ProviderCapabilityId" } },
+        "credentialBindings": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$" } },
+        "billing": { "type": "string", "enum": ["subscription", "pay-as-you-go", "prepaid", "free-local", "user-declared"] },
+        "usage": { "$ref": "#/$defs/ProviderUsageDeclaration" },
+        "manageUrl": { "type": ["string", "null"], "format": "uri", "pattern": "^https://[^\\s]+$" },
+        "runtimes": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}:[a-z0-9][a-z0-9.-]{1,127}$" } }
       }
     },
     "ProviderUsageDeclaration": {
@@ -663,261 +496,116 @@
       "required": ["tokens", "limitWindows", "spend", "balance"],
       "properties": {
         "tokens": { "const": "always" },
-        "limitWindows": {
-          "oneOf": [
-            { "type": "string", "enum": ["none", "built-in"] },
-            { "type": "string", "pattern": "^needs:[a-z0-9][A-Za-z0-9.-]{0,63}$" }
-          ]
-        },
+        "limitWindows": { "oneOf": [{ "type": "string", "enum": ["none", "built-in"] }, { "type": "string", "pattern": "^needs:[a-z0-9][A-Za-z0-9.-]{0,63}$" }] },
         "spend": { "type": "string", "enum": ["none", "built-in", "needs:adminKey", "cloudBilling"] },
         "balance": { "type": "string", "enum": ["none", "built-in", "needs:adminKey"] }
+      }
+    },
+    "GitProviderCredentialField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "type"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "type": { "type": "string", "enum": ["url", "secret", "text", "oauth"] },
+        "required": { "type": "boolean" },
+        "secret": { "type": "boolean" },
+        "helpText": { "type": "string", "maxLength": 300 },
+        "defaultValue": { "type": "string", "maxLength": 256 }
+      },
+      "allOf": [
+        { "if": { "properties": { "secret": { "const": true } }, "required": ["secret"] }, "then": { "not": { "required": ["defaultValue"] } } }
+      ]
+    },
+    "GitProviderAuthMethod": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "kind", "flow", "protocol", "transports", "supportedEnvironments", "requiredCapabilities", "credentialBindings", "credentialFields"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{0,63}$" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "description": { "type": "string", "maxLength": 300 },
+        "kind": { "type": "string", "enum": ["oauth", "credential"] },
+        "flow": { "type": "string", "enum": ["manual-entry", "browser-authorization", "system-browser-authorization", "device-authorization", "connect-existing-service"] },
+        "protocol": { "oneOf": [
+          { "type": "string", "enum": ["none", "api-key", "oauth2-authorization-code", "oauth2-authorization-code-pkce", "oauth2-device-authorization", "cli-proxy", "provider.openrouter-pkce-key-exchange", "provider.openai-codex-oauth", "provider.gemini-oauth", "provider.managed-cliproxy-oauth"] },
+          { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}/[a-z0-9][a-z0-9.-]{0,63}$" }
+        ] },
+        "transports": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "enum": ["host-managed", "credential-form", "browser-popup", "browser-relay-popup", "system-browser", "deep-link", "native-app-link", "device-code"] } },
+        "supportedEnvironments": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/ProviderEnvironmentId" } },
+        "requiredCapabilities": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/ProviderCapabilityId" } },
+        "credentialBindings": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$" } },
+        "credentialFields": { "type": "array", "items": { "$ref": "#/$defs/GitProviderCredentialField" } }
+      }
+    },
+    "GitProviderInstanceDeclaration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "defaultUrl": { "type": "string", "format": "uri", "pattern": "^https://" },
+        "label": { "type": "string", "maxLength": 80 },
+        "urlLabel": { "type": "string", "maxLength": 80 },
+        "placeholder": { "type": "string", "maxLength": 160 },
+        "allowCustomUrl": { "type": "boolean" }
+      }
+    },
+    "GitProviderCapabilityId": {
+      "type": "string",
+      "oneOf": [
+        { "type": "string", "enum": ["repositories.read", "repositories.clone", "api.read", "api.write", "pullRequests.read", "pullRequests.write", "ci.read", "mcp"] },
+        { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}/[a-z0-9][a-z0-9.-]{0,63}$" }
+      ]
+    },
+    "GitProviderMcpResourceBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "resourceType", "headerName", "headerValuePrefix", "credentialBinding"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{0,63}$" },
+        "resourceType": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{0,63}$" },
+        "url": { "type": "string", "format": "uri", "maxLength": 2048, "pattern": "^(?!.*[?#\u005c\u005c\u005cs])https://[^/?#@]+(?:/[^?#]*)?$" },
+        "relativePath": { "type": "string", "minLength": 1, "maxLength": 2048, "pattern": "^/(?!/)(?!\\.{1,2}(?:/|$))(?!.*\\/\\.{1,2}(?:/|$))(?!.*[?#\u005c\u005c\u005cs]).*$" },
+        "headerName": { "type": "string", "pattern": "^[!#$%&'*+.^_`|~0-9A-Za-z-]{1,256}$" },
+        "headerValuePrefix": { "type": "string", "maxLength": 64 },
+        "credentialBinding": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$" },
+        "required": { "type": "boolean" },
+        "requiredScopes": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 128 } },
+        "audience": { "type": "string", "minLength": 1, "maxLength": 256 }
+      },
+      "oneOf": [
+        { "required": ["url"], "not": { "required": ["relativePath"] } },
+        { "required": ["relativePath"], "not": { "required": ["url"] } }
+      ]
+    },
+    "GitProviderMcpDeclaration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resourceBindings"],
+      "properties": {
+        "resourceBindings": { "type": "array", "items": { "$ref": "#/$defs/GitProviderMcpResourceBinding" } }
       }
     },
     "ProviderExecutionDeclaration": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "target",
-        "supportedEnvironments",
-        "requiredCapabilities"
-      ],
+      "required": ["target", "supportedEnvironments", "requiredCapabilities"],
       "properties": {
-        "target": {
-          "type": "string",
-          "enum": [
-            "browser-sandbox",
-            "server",
-            "on-device",
-            "paired-device",
-            "extension-host"
-          ]
-        },
-        "supportedEnvironments": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": {
-            "$ref": "#/$defs/ProviderEnvironmentId"
-          }
-        },
-        "requiredCapabilities": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "$ref": "#/$defs/ProviderCapabilityId"
-          }
-        }
+        "target": { "type": "string", "enum": ["browser-sandbox", "server", "on-device", "paired-device", "extension-host"] },
+        "supportedEnvironments": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/ProviderEnvironmentId" } },
+        "requiredCapabilities": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/ProviderCapabilityId" } }
       }
     },
     "LlmAccountStatusDeclaration": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "interfaceVersion"
-      ],
+      "required": ["interfaceVersion"],
       "properties": {
-        "interfaceVersion": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 64
-        },
-        "requiredScopes": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 128
-          }
-        },
-        "requiredCapabilities": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "$ref": "#/$defs/ProviderCapabilityId"
-          }
-        },
-        "credentialBindings": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
-          }
-        }
+        "interfaceVersion": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "requiredScopes": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 128 } },
+        "requiredCapabilities": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/ProviderCapabilityId" } },
+        "credentialBindings": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$" } }
       }
-    },
-    "LlmProviderContributionRef": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "familyId",
-        "authMethods",
-        "execution"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$"
-        },
-        "familyId": {
-          "$ref": "#/$defs/ProviderFamilyId"
-        },
-        "authMethods": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "$ref": "#/$defs/ProviderAuthMethod"
-          }
-        },
-        "execution": {
-          "$ref": "#/$defs/ProviderExecutionDeclaration"
-        },
-        "component": {
-          "type": "string"
-        },
-        "configuration": {
-          "type": "string"
-        },
-        "world": {
-          "type": "string"
-        },
-        "targetApplications": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "pattern": "^app\\.[a-z0-9][a-z0-9.-]{1,127}$"
-          }
-        },
-        "placements": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "pattern": "^(suite|code|os|settings|command-palette|context-menu)(\\.[a-z0-9][a-z0-9.-]*)*$"
-          }
-        },
-        "context": {
-          "type": "string",
-          "enum": [
-            "machine",
-            "project",
-            "session"
-          ]
-        },
-        "accountStatus": {
-          "$ref": "#/$defs/LlmAccountStatusDeclaration"
-        }
-      }
-    },
-    "ContributionRef": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["id"],
-      "properties": {
-        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
-        "component": { "type": "string" },
-        "configuration": { "type": "string" },
-        "world": { "type": "string" },
-        "targetApplications": {
-          "type": "array",
-          "items": { "type": "string", "pattern": "^app\\.[a-z0-9][a-z0-9.-]{1,127}$" }
-        },
-        "placements": {
-          "type": "array",
-          "items": { "type": "string", "pattern": "^(suite|code|os|settings|command-palette|context-menu)(\\.[a-z0-9][a-z0-9.-]*)*$" }
-        },
-        "context": { "type": "string", "enum": ["machine", "project", "session"] }
-      }
-    },
-    "ActionContribution": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["id"],
-      "properties": {
-        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
-        "title": { "type": "string", "minLength": 1, "maxLength": 80 },
-        "component": { "type": "string" },
-        "configuration": { "type": "string" },
-        "world": { "type": "string" },
-        "targetApplications": {
-          "type": "array",
-          "items": { "type": "string", "pattern": "^app\\.[a-z0-9][a-z0-9.-]{1,127}$" }
-        },
-        "placements": {
-          "type": "array",
-          "items": { "type": "string", "pattern": "^(suite|code|os|settings|command-palette|context-menu)(\\.[a-z0-9][a-z0-9.-]*)*$" }
-        },
-        "context": { "type": "string", "enum": ["machine", "project", "session"] },
-        "parameters": { "type": "object" },
-        "result": { "type": "object" },
-        "enablement": { "$ref": "#/$defs/ActionEnablement" },
-        "target": { "$ref": "#/$defs/ActionTarget" },
-        "timeoutMs": { "type": "integer", "minimum": 1 },
-        "cancellable": { "type": "boolean" }
-      }
-    },
-    "SurfaceContribution": {
-      "type": "object",
-      "description": "Closed UI contribution union discriminated by uiTier. Variant shapes are DeclarativeSurfaceContribution, A2uiSurfaceContribution, SandboxedWebSurfaceContribution, ThemeSurfaceContribution, and NativePrivilegedSurfaceContribution. Invalid tier/placement/origin/reference combinations fail before assets load. native-privileged requires signed-host-product composition, not trustTier.",
-      "additionalProperties": false,
-      "required": ["id", "uiTier"],
-      "properties": {
-        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
-        "component": { "type": "string" },
-        "configuration": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{1,127}$" },
-        "world": { "type": "string" },
-        "targetApplications": {
-          "type": "array",
-          "items": { "type": "string", "pattern": "^app\\.[a-z0-9][a-z0-9.-]{1,127}$" }
-        },
-        "placements": {
-          "type": "array",
-          "minItems": 1,
-          "items": { "type": "string", "pattern": "^(suite|code|os|settings|command-palette|context-menu)(\\.[a-z0-9][a-z0-9.-]*)*$" }
-        },
-        "context": { "type": "string", "enum": ["machine", "project", "session"] },
-        "uiTier": { "$ref": "#/$defs/UiTier" },
-        "title": { "type": "string", "minLength": 1 },
-        "assets": {
-          "type": "array",
-          "maxItems": 32,
-          "items": { "$ref": "#/$defs/UiAsset" }
-        },
-        "data": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/UiContributionRef" }
-        },
-        "actions": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/UiContributionRef" }
-        },
-        "origin": { "$ref": "#/$defs/UiOriginPolicy" },
-        "limits": { "$ref": "#/$defs/UiLimits" },
-        "compatibility": { "$ref": "#/$defs/UiContributionCompatibility" }
-      },
-      "allOf": [
-        {
-          "if": { "properties": { "uiTier": { "const": "native-privileged" } }, "required": ["uiTier"] },
-          "then": { "required": ["component", "origin", "placements"] }
-        },
-        {
-          "if": { "properties": { "uiTier": { "const": "sandboxed-web" } }, "required": ["uiTier"] },
-          "then": { "required": ["component", "origin", "placements"] }
-        },
-        {
-          "if": { "properties": { "uiTier": { "const": "a2ui" } }, "required": ["uiTier"] },
-          "then": { "required": ["assets", "placements"] }
-        },
-        {
-          "if": { "properties": { "uiTier": { "const": "theme" } }, "required": ["uiTier"] },
-          "then": { "required": ["placements", "assets"] }
-        },
-        {
-          "if": { "properties": { "uiTier": { "const": "declarative" } }, "required": ["uiTier"] },
-          "then": { "required": ["placements"] }
-        }
-      ]
     }
   }
 }

@@ -15,7 +15,7 @@ public static class IssueLookup
     {
         using var envelope = JsonDocument.Parse(requestJson);
         var root = envelope.RootElement;
-        if (Text(root, "kind") != "tools" || Text(root, "contributionId") != "issue-lookup")
+        if (Text(root, "kind") != "tool" || Text(root, "contributionId") != "issue-lookup")
             throw new InvalidOperationException("guest_envelope_invalid");
         var input = GetObject(root, "input");
         var issueKey = Text(input, "issueKey");

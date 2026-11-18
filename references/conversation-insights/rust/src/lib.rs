@@ -51,7 +51,7 @@ pub fn analyze(input: &Value) -> Result<Value, String> {
 impl exports::glixo::contribution::guest::Guest for GuestImpl {
     fn invoke(request_json: String) -> Result<String, String> {
         let envelope: Value = serde_json::from_str(&request_json).map_err(|_| "guest_envelope_invalid".to_owned())?;
-        if envelope.get("kind").and_then(Value::as_str) != Some("messageMiddleware")
+        if envelope.get("kind").and_then(Value::as_str) != Some("message-middleware")
             || envelope.get("contributionId").and_then(Value::as_str) != Some("conversation-insights") {
             return Err("guest_envelope_invalid".into());
         }

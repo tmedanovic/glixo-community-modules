@@ -17,7 +17,7 @@ func (b *fixtureBroker) HTTPDrop(uint32) { b.dropped=true }
 
 func envelope(issueKey string) string {
 	encoded, _ := json.Marshal(issueKey)
-	return `{"kind":"tools","contributionId":"issue-lookup","configuration":{"endpointName":"issues"},"input":{"issueKey":` + string(encoded) + `},"context":{"endpoints":[{"name":"issues","handle":"opaque-approved-handle","baseUrl":"https://issues.example.test"}]}}`
+	return `{"kind":"tool","contributionId":"issue-lookup","configuration":{"endpointName":"issues"},"input":{"issueKey":` + string(encoded) + `},"context":{"endpoints":[{"name":"issues","handle":"opaque-approved-handle","baseUrl":"https://issues.example.test"}]}}`
 }
 
 func TestLookupUsesApprovedEndpointAndReturnsBoundedSummary(t *testing.T) {
@@ -32,7 +32,7 @@ func TestLookupUsesApprovedEndpointAndReturnsBoundedSummary(t *testing.T) {
 
 func TestLookupRejectsUnapprovedEndpointAndInvalidKeyWithoutHTTP(t *testing.T) {
 	broker:=&fixtureBroker{}
-	noEndpoint:=`{"kind":"tools","contributionId":"issue-lookup","configuration":{"endpointName":"issues"},"input":{"issueKey":"DEMO-17"},"context":{"endpoints":[]}}`
+	noEndpoint:=`{"kind":"tool","contributionId":"issue-lookup","configuration":{"endpointName":"issues"},"input":{"issueKey":"DEMO-17"},"context":{"endpoints":[]}}`
 	if _,err:=Lookup(noEndpoint,broker);err==nil||err.Error()!="approved_issues_endpoint_missing"{t.Fatalf("unexpected error: %v",err)}
 	if _,err:=Lookup(envelope("bad"),broker);err==nil||err.Error()!="issue_key_invalid"{t.Fatalf("unexpected error: %v",err)}
 	if broker.request.URL!="" { t.Fatal("HTTP started before validation") }

@@ -18,7 +18,7 @@ pub fn handle(request_json: &str) -> Result<String, String> {
         return Err("guest_envelope_invalid".into());
     }
     let request: Value = serde_json::from_str(request_json).map_err(|_| "guest_envelope_invalid")?;
-    if request.get("kind").and_then(Value::as_str) != Some("tools")
+    if request.get("kind").and_then(Value::as_str) != Some("tool")
         || request.get("contributionId").and_then(Value::as_str) != Some("text-stats")
     {
         return Err("contribution_mismatch".into());

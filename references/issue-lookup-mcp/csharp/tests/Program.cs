@@ -4,7 +4,7 @@ using Glixo.ExtensionSdk.Http;
 using Glixo.Reference.IssueLookup;
 
 const string request = """
-{"kind":"tools","contributionId":"issue-lookup","configuration":{"endpointName":"issues"},"input":{"issueKey":"DEMO-17"},"context":{"endpoints":[{"name":"issues","handle":"approved-opaque-handle","baseUrl":"https://issues.example.test"}]}}
+{"kind":"tool","contributionId":"issue-lookup","configuration":{"endpointName":"issues"},"input":{"issueKey":"DEMO-17"},"context":{"endpoints":[{"name":"issues","handle":"approved-opaque-handle","baseUrl":"https://issues.example.test"}]}}
 """;
 
 var broker = new FixtureBroker("""

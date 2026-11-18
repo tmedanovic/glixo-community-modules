@@ -76,7 +76,7 @@ public static class MailWatch
     public static MailServiceResult Handle(MailServiceRequest request, IBroker broker, IScopedState state)
     {
         _ = state;
-        if (request.Kind != "backgroundServices" || request.ContributionId != ContributionId)
+        if (request.Kind != "background-service" || request.ContributionId != ContributionId)
             throw new InvalidOperationException("contribution_mismatch");
         var operation = request.Input.Operation;
         if (operation is not ("initialize" or "wake" or "health" or "stop"))

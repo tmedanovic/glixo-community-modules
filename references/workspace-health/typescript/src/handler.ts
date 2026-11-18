@@ -3,7 +3,7 @@ export interface SearchItem { readonly path: string; readonly bytes: number; }
 export interface SearchResult { readonly items: readonly SearchItem[]; readonly truncated: boolean; }
 export interface WorkspaceReader { search(handle: string, query: string, limit: number): string; }
 export interface HostEnvelope {
-  readonly kind: 'tools';
+  readonly kind: 'tool';
   readonly contributionId: string;
   readonly input: { readonly maxFiles?: number };
   readonly context?: { readonly resourceHandles?: Readonly<Record<string, string>> };
@@ -19,7 +19,7 @@ export interface WorkspaceHealthResult {
 
 // docs:snippet-start workspace-health-handler:typescript
 export function handleWorkspaceHealth(envelope: HostEnvelope, workspace: WorkspaceReader): WorkspaceHealthResult {
-  if (envelope.kind !== 'tools' || envelope.contributionId !== CONTRIBUTION_ID) throw new Error('contribution_mismatch');
+  if (envelope.kind !== 'tool' || envelope.contributionId !== CONTRIBUTION_ID) throw new Error('contribution_mismatch');
   const handle = envelope.context?.resourceHandles?.workspace;
   if (typeof handle !== 'string' || handle.length === 0) throw new Error('workspace_handle_missing');
   const limit = envelope.input?.maxFiles ?? 100;

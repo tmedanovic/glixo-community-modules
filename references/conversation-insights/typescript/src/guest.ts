@@ -78,7 +78,7 @@ export const guest = {
     try { parsed = JSON.parse(requestJson); }
     catch { throw "guest_envelope_invalid"; }
     const envelope = object(parsed);
-    if (!envelope || envelope.kind !== "messageMiddleware" || envelope.contributionId !== "conversation-insights") {
+    if (!envelope || envelope.kind !== "message-middleware" || envelope.contributionId !== "conversation-insights") {
       throw "guest_envelope_invalid";
     }
     try { return JSON.stringify(analyze(envelope.input)); }

@@ -87,7 +87,7 @@ type graphMessage struct {
 // Handle performs a bounded Inbox delta read with the host's scoped HTTP broker.
 // It never reads message bodies, sends mail, or selects a non-Graph origin.
 func Handle(request Request, broker httpbroker.Broker, _ state.Store) (Result, error) {
-	if request.Kind != "backgroundServices" || request.ContributionID != ContributionID {
+	if request.Kind != "background-service" || request.ContributionID != ContributionID {
 		return Result{}, errors.New("contribution_mismatch")
 	}
 	operation := request.Input.Operation

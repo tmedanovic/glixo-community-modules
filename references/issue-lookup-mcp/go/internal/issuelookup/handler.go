@@ -20,7 +20,7 @@ func asObject(value any) object { result, _ := value.(map[string]any); return re
 func stringValue(value any) string { result, _ := value.(string); return result }
 
 func endpoint(request object) (string, string, error) {
-	if request["kind"] != "tools" || request["contributionId"] != "issue-lookup" { return "", "", errors.New("guest_envelope_invalid") }
+	if request["kind"] != "tool" || request["contributionId"] != "issue-lookup" { return "", "", errors.New("guest_envelope_invalid") }
 	if stringValue(asObject(request["configuration"])["endpointName"]) != "issues" { return "", "", errors.New("endpoint_name_must_be_issues") }
 	context := asObject(request["context"])
 	endpoints, _ := context["endpoints"].([]any)

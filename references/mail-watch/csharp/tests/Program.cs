@@ -31,7 +31,7 @@ Require(unsafeBroker.Requests.Count == 1, "unsafe next link is rejected before n
 
 foreach (var operation in new[] { "health", "stop" })
 {
-    var lifecycle = MailWatch.Handle(new MailServiceRequest { Kind = "backgroundServices", ContributionId = "mail-watch", Input = new MailServiceInput { Operation = operation } }, new FixtureBroker(), new EmptyState());
+    var lifecycle = MailWatch.Handle(new MailServiceRequest { Kind = "background-service", ContributionId = "mail-watch", Input = new MailServiceInput { Operation = operation } }, new FixtureBroker(), new EmptyState());
     Require(lifecycle.Events.Count == 0, $"{operation} makes no HTTP call");
 }
 
@@ -39,7 +39,7 @@ Console.WriteLine("Mail Watch C# fixtures passed.");
 
 static MailServiceRequest Request(string operation, MailCheckpoint checkpoint) => new()
 {
-    Kind = "backgroundServices",
+    Kind = "background-service",
     ContributionId = "mail-watch",
     Configuration = new MailServiceConfiguration(),
     Input = new MailServiceInput { Operation = operation, Checkpoint = checkpoint },

@@ -14,7 +14,7 @@ public static class Handler
     {
         using var request = JsonDocument.Parse(requestJson, new JsonDocumentOptions { MaxDepth = 32 });
         var root = request.RootElement;
-        if (root.GetProperty("kind").GetString() != "dataSources"
+        if (root.GetProperty("kind").GetString() != "data-source"
             || root.GetProperty("contributionId").GetString() != "search")
             throw new InvalidOperationException("contribution_mismatch");
         var handle = Inventory.WorkspaceHandle(root);

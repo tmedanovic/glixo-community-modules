@@ -23,7 +23,7 @@ export function handleWorkflowTextStats(requestJson: string): TextStatsResult {
   if (new TextEncoder().encode(requestJson).length > 128 * 1024) throw 'guest_envelope_invalid';
   let envelope: HostEnvelope;
   try { envelope = JSON.parse(requestJson) as HostEnvelope; } catch { throw 'guest_envelope_invalid'; }
-  if (!envelope || envelope.kind !== 'tools' || envelope.contributionId !== CONTRIBUTION_ID) throw 'contribution_mismatch';
+  if (!envelope || envelope.kind !== 'tool' || envelope.contributionId !== CONTRIBUTION_ID) throw 'contribution_mismatch';
   if (!isRecord(envelope.input)) throw 'input_invalid';
   const input = envelope.input;
   if (typeof input.text !== 'string') throw 'text_required';

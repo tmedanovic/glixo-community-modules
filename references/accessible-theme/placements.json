@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "contract": "glixo.extension-ui-placements.v1",
-  "description": "Host-owned UI placements for installed extension contributions. Only supported placements are accepted by current package validation.",
+  "description": "Host-owned UI placements for installed extension contributions. Each `contributions` entry is a contract id (see the extension contracts). Only supported placements are accepted by current package validation.",
   "budgets": {
     "actionPayloadBytes": 32768,
     "actionsPerSecond": 5,
@@ -17,7 +17,7 @@
     {
       "id": "context-menu.message",
       "status": "supported",
-      "contributions": ["contextMenuItems", "actions"],
+      "contributions": ["action"],
       "renderers": ["host-menu"],
       "context": ["sessionId", "projectId"],
       "platforms": ["web", "ios", "android"],
@@ -26,7 +26,7 @@
     {
       "id": "context-menu.project",
       "status": "supported",
-      "contributions": ["contextMenuItems", "actions"],
+      "contributions": ["action"],
       "renderers": ["host-menu"],
       "context": ["sessionId", "projectId"],
       "platforms": ["web", "ios", "android"],
@@ -35,7 +35,7 @@
     {
       "id": "context-menu.file",
       "status": "supported",
-      "contributions": ["contextMenuItems", "actions"],
+      "contributions": ["action"],
       "renderers": ["host-menu"],
       "context": ["sessionId"],
       "platforms": ["web", "ios", "android"],
@@ -44,7 +44,7 @@
     {
       "id": "code.sidebar",
       "status": "supported",
-      "contributions": ["sidebarViews", "viewPatches", "surfaces"],
+      "contributions": ["sidebar-view", "view-patch", "ui-surface", "a2ui-surface", "sandboxed-web-ui"],
       "renderers": ["a2ui", "sandboxed-web"],
       "context": ["sessionId", "projectId", "workspaceId", "machineId"],
       "platforms": { "a2ui": ["web", "ios", "android"], "sandboxed-web": ["web"] },
@@ -53,7 +53,7 @@
     {
       "id": "code.sidebar.footer",
       "status": "supported",
-      "contributions": ["viewPatches", "surfaces"],
+      "contributions": ["view-patch", "ui-surface", "a2ui-surface", "sandboxed-web-ui"],
       "renderers": ["a2ui", "sandboxed-web"],
       "context": ["sessionId", "projectId", "workspaceId", "machineId"],
       "platforms": { "a2ui": ["web", "ios", "android"], "sandboxed-web": ["web"] },
@@ -62,7 +62,7 @@
     {
       "id": "suite.nav.primary",
       "status": "supported",
-      "contributions": ["actions"],
+      "contributions": ["action"],
       "renderers": ["host-navigation"],
       "context": ["projectId"],
       "platforms": ["web", "ios", "android"],
@@ -71,7 +71,7 @@
     {
       "id": "command-palette",
       "status": "supported",
-      "contributions": ["actions"],
+      "contributions": ["action"],
       "renderers": ["host-command-palette"],
       "context": ["sessionId", "projectId"],
       "platforms": ["web", "ios", "android"],
@@ -80,7 +80,7 @@
     {
       "id": "code.message.footer",
       "status": "supported",
-      "contributions": ["actions"],
+      "contributions": ["action"],
       "renderers": ["host-message-actions"],
       "context": ["sessionId", "projectId"],
       "platforms": ["web", "ios", "android"],
@@ -89,7 +89,7 @@
     {
       "id": "settings.extensions",
       "status": "supported",
-      "contributions": ["settingsPanels", "surfaces"],
+      "contributions": ["settings-panel", "ui-surface", "a2ui-surface", "sandboxed-web-ui"],
       "renderers": ["a2ui", "sandboxed-web", "host-form"],
       "context": ["projectId"],
       "platforms": { "a2ui": ["web", "ios", "android"], "sandboxed-web": ["web"], "host-form": ["web", "ios", "android"] },
@@ -98,7 +98,7 @@
     {
       "id": "settings.extensions.header",
       "status": "supported",
-      "contributions": ["viewPatches", "surfaces"],
+      "contributions": ["view-patch", "ui-surface", "a2ui-surface", "sandboxed-web-ui"],
       "renderers": ["a2ui", "sandboxed-web"],
       "context": ["projectId"],
       "platforms": { "a2ui": ["web", "ios", "android"], "sandboxed-web": ["web"] },
@@ -107,7 +107,7 @@
     {
       "id": "settings.appearance",
       "status": "planned",
-      "contributions": ["themes"],
+      "contributions": ["theme"],
       "renderers": ["host-theme"],
       "context": ["accountId"],
       "platforms": ["web", "ios", "android"],
@@ -116,7 +116,7 @@
     {
       "id": "os.theme",
       "status": "planned",
-      "contributions": ["themes"],
+      "contributions": ["theme"],
       "renderers": ["host-theme"],
       "context": ["accountId"],
       "platforms": ["web", "ios", "android"],
@@ -125,7 +125,7 @@
     {
       "id": "code.composer",
       "status": "planned",
-      "contributions": ["actions", "surfaces"],
+      "contributions": ["action", "ui-surface", "a2ui-surface", "sandboxed-web-ui"],
       "renderers": ["host-composer-actions"],
       "context": ["sessionId", "projectId", "draftHandle"],
       "platforms": ["web", "ios", "android"],
@@ -134,7 +134,7 @@
     {
       "id": "code.main-panel",
       "status": "planned",
-      "contributions": ["surfaces"],
+      "contributions": ["ui-surface", "a2ui-surface", "sandboxed-web-ui"],
       "renderers": ["a2ui", "sandboxed-web"],
       "context": ["sessionId", "projectId", "workspaceId", "machineId"],
       "platforms": { "a2ui": ["web", "ios", "android"], "sandboxed-web": ["web"] },
@@ -143,7 +143,7 @@
     {
       "id": "code.bottom-panel",
       "status": "planned",
-      "contributions": ["surfaces"],
+      "contributions": ["ui-surface", "a2ui-surface", "sandboxed-web-ui"],
       "renderers": ["a2ui", "sandboxed-web"],
       "context": ["sessionId", "projectId", "workspaceId", "machineId"],
       "platforms": { "a2ui": ["web", "ios", "android"], "sandboxed-web": ["web"] },
@@ -152,7 +152,7 @@
     {
       "id": "code.status",
       "status": "planned",
-      "contributions": ["actions"],
+      "contributions": ["action"],
       "renderers": ["host-status-indicator"],
       "context": ["sessionId", "projectId"],
       "platforms": ["web", "ios", "android"],
@@ -161,7 +161,7 @@
     {
       "id": "code.notifications",
       "status": "planned",
-      "contributions": ["actions"],
+      "contributions": ["action"],
       "renderers": ["host-notification-action"],
       "context": ["sessionId", "projectId", "eventId"],
       "platforms": ["web", "ios", "android"],
@@ -170,7 +170,7 @@
     {
       "id": "workflow.configuration",
       "status": "planned",
-      "contributions": ["workflowNodes", "settingsPanels"],
+      "contributions": ["tool", "settings-panel"],
       "renderers": ["a2ui", "host-form"],
       "context": ["projectId"],
       "platforms": ["web", "ios", "android"],

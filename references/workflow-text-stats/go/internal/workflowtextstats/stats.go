@@ -43,7 +43,7 @@ func Handle(requestJSON string) (string, error) {
 	if err := decoder.Decode(new(any)); err != io.EOF {
 		return "", errors.New("guest_envelope_invalid")
 	}
-	if request.Kind != "tools" || request.ContributionID != "text-stats" {
+	if request.Kind != "tool" || request.ContributionID != "text-stats" {
 		return "", errors.New("contribution_mismatch")
 	}
 	if len(request.Input.Text) == 0 || bytes.Equal(bytes.TrimSpace(request.Input.Text), []byte("null")) {

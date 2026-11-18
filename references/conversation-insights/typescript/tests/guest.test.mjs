@@ -29,12 +29,12 @@ test("committed observation uses metadata only", () => {
 });
 
 test("generic guest ABI returns a direct string or a bounded primitive WIT error", () => {
-  const request = JSON.stringify({ kind: "messageMiddleware", contributionId: "conversation-insights", configuration: {}, input: {
+  const request = JSON.stringify({ kind: "message-middleware", contributionId: "conversation-insights", configuration: {}, input: {
     schemaVersion: 1, operation: "completed", completion: { actualUsage: { inputTokens: 3 } }
   } });
   assert.equal(typeof guest.invoke(request), "string");
   assert.throws(() => guest.invoke("not-json"), (error) => error === "guest_envelope_invalid");
-  const invalidOperation = JSON.stringify({ kind: "messageMiddleware", contributionId: "conversation-insights", configuration: {}, input: {
+  const invalidOperation = JSON.stringify({ kind: "message-middleware", contributionId: "conversation-insights", configuration: {}, input: {
     schemaVersion: 1, operation: "unsupported"
   } });
   assert.throws(() => guest.invoke(invalidOperation), (error) => error === "operation_unsupported");

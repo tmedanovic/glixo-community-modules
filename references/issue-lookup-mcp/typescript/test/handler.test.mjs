@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { lookupIssue } from "../dist/js/handler.js";
 
 const envelope = (input, endpoints = [{ name: "issues", handle: "opaque-approval", baseUrl: "https://issues.example.test" }]) => ({
-  kind: "tools", contributionId: "issue-lookup", configuration: { endpointName: "issues" }, input,
+  kind: "tool", contributionId: "issue-lookup", configuration: { endpointName: "issues" }, input,
   context: { endpoints }
 });
 

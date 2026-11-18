@@ -26,19 +26,20 @@
     ]
   },
   "contributions": {
-    "messageMiddleware": [
+    "implements": [
       {
         "id": "conversation-insights",
+        "contract": "message-middleware@1",
+        "runtime": "wasm-component",
         "component": "insights",
         "world": "glixo:contribution/contribution@1.0.0",
-        "hooks": [
-          "committed",
-          "completed"
-        ],
-        "order": 100,
-        "failurePolicy": "continue",
-        "timeoutMs": 1000,
-        "maxBytes": 16384
+        "fields": {
+          "hooks": ["committed", "completed"],
+          "order": 100,
+          "failurePolicy": "continue",
+          "timeoutMs": 1000,
+          "maxBytes": 16384
+        }
       }
     ]
   }

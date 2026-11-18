@@ -24,7 +24,7 @@ impl Workspace for FakeWorkspace {
 }
 
 fn request(input: Value, handle: &str) -> String {
-    json!({"kind":"dataSources","contributionId":"search","configuration":{},"input":input,
+    json!({"kind":"data-source","contributionId":"search","configuration":{},"input":input,
         "context":{"sessionId":"test-session","resourceHandles":{"workspace":handle}}})
     .to_string()
 }
@@ -138,7 +138,7 @@ fn rejects_missing_host_handle_and_preserves_handle_as_an_opaque_token() {
         search_result: r#"{"items":[],"truncated":false}"#.into(),
         ..Default::default()
     };
-    let missing = json!({"kind":"dataSources","contributionId":"search","configuration":{},"input":{"query":"x"},"context":{"sessionId":"s","resourceHandles":{}}});
+    let missing = json!({"kind":"data-source","contributionId":"search","configuration":{},"input":{"query":"x"},"context":{"sessionId":"s","resourceHandles":{}}});
     assert!(handle(&missing.to_string(), &mut workspace).is_err());
     handle(&request(json!({"query":"x"}), "opaque "), &mut workspace).unwrap();
     assert_eq!(workspace.searches[0].0, "opaque ");

@@ -11,7 +11,7 @@ fn text<'a>(value: &'a Value, key: &str) -> Option<&'a str> {
 }
 
 fn approved_endpoint(envelope: &Value) -> Result<(String, String), String> {
-    if text(envelope, "kind") != Some("tools") || text(envelope, "contributionId") != Some("issue-lookup") {
+    if text(envelope, "kind") != Some("tool") || text(envelope, "contributionId") != Some("issue-lookup") {
         return Err("guest_envelope_invalid".into());
     }
     if text(envelope.get("configuration").ok_or("guest_envelope_invalid")?, "endpointName") != Some("issues") {
@@ -116,20 +116,20 @@ mod tests {
 
     #[test]
     fn rejects_unapproved_endpoint_before_broker_use() {
-        let envelope = json!({"kind":"tools","contributionId":"issue-lookup","configuration":{"endpointName":"issues"},"input":{"issueKey":"DEMO-17"},"context":{"endpoints":[]}});
+        let envelope = json!({"kind":"tool","contributionId":"issue-lookup","configuration":{"endpointName":"issues"},"input":{"issueKey":"DEMO-17"},"context":{"endpoints":[]}});
         assert_eq!(approved_endpoint(&envelope).unwrap_err(), "approved_issues_endpoint_missing");
         assert_eq!(invoke(&envelope.to_string()).unwrap_err(), "approved_issues_endpoint_missing");
     }
 
     #[test]
     fn validates_issue_key_and_host_envelope() {
-        let envelope = json!({"kind":"tools","contributionId":"issue-lookup","configuration":{"endpointName":"issues"},"input":{"issueKey":"bad"},"context":{"endpoints":[{"name":"issues","handle":"opaque","baseUrl":"https://example.test"}]}});
+        let envelope = json!({"kind":"tool","contributionId":"issue-lookup","configuration":{"endpointName":"issues"},"input":{"issueKey":"bad"},"context":{"endpoints":[{"name":"issues","handle":"opaque","baseUrl":"https://example.test"}]}});
         assert_eq!(invoke(&envelope.to_string()).unwrap_err(), "issue_key_invalid");
     }
 
     #[test]
     fn rejects_terminal_newline_in_issue_key() {
-        let envelope = json!({"kind":"tools","contributionId":"issue-lookup","configuration":{"endpointName":"issues"},"input":{"issueKey":"DEMO-17\n"},"context":{"endpoints":[{"name":"issues","handle":"opaque","baseUrl":"https://example.test"}]}});
+        let envelope = json!({"kind":"tool","contributionId":"issue-lookup","configuration":{"endpointName":"issues"},"input":{"issueKey":"DEMO-17\n"},"context":{"endpoints":[{"name":"issues","handle":"opaque","baseUrl":"https://example.test"}]}});
         assert_eq!(invoke(&envelope.to_string()).unwrap_err(), "issue_key_invalid");
     }
 }

@@ -1,7 +1,7 @@
 {
   "description": "A truncated host file listing is a bounded sample, never a complete project total.",
   "request": {
-    "kind": "tools",
+    "kind": "tool",
     "contributionId": "inspect",
     "configuration": {},
     "input": { "maxFiles": 2 },

@@ -96,7 +96,7 @@ function parseMcpResponse(body: Uint8Array, issueKey: string): JsonObject {
 
 // docs:snippet-start issue-lookup-mcp:typescript
 export function lookupIssue(envelope: HostEnvelope, broker: HttpBroker): JsonObject {
-  if (envelope.kind !== "tools" || envelope.contributionId !== "issue-lookup") throw new Error("guest_envelope_invalid");
+  if (envelope.kind !== "tool" || envelope.contributionId !== "issue-lookup") throw new Error("guest_envelope_invalid");
   const issueKey = parseIssueKey(envelope.input);
   const endpoint = resolveEndpoint(envelope);
   const requestBody = encoder.encode(JSON.stringify({

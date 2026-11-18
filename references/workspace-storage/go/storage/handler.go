@@ -39,7 +39,7 @@ func storageKey(value string) (string, error) {
 func Handle(requestJSON string, store state.Store) (string, error) {
 	var envelope Envelope
 	if err := json.Unmarshal([]byte(requestJSON), &envelope); err != nil { return "", errors.New("request_json_invalid") }
-	if envelope.Kind != "tools" || envelope.ContributionID != ContributionID { return "", errors.New("contribution_mismatch") }
+	if envelope.Kind != "tool" || envelope.ContributionID != ContributionID { return "", errors.New("contribution_mismatch") }
 	var input map[string]json.RawMessage
 	if err := json.Unmarshal(envelope.Input, &input); err != nil || input == nil { return "", errors.New("input_object_required") }
 	var operation string

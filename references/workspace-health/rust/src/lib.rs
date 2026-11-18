@@ -21,7 +21,7 @@ pub fn handle(request_json: &str, reader: &mut impl Workspace) -> Result<String,
     }
     let envelope: GuestEnvelope<Value> =
         serde_json::from_str(request_json).map_err(|_| "guest_envelope_invalid")?;
-    if envelope.kind != "tools" || envelope.contribution_id != "inspect" {
+    if envelope.kind != "tool" || envelope.contribution_id != "inspect" {
         return Err("contribution_mismatch".into());
     }
     if envelope.context.session_id.trim().is_empty() {

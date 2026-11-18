@@ -74,7 +74,7 @@ func withSession(t *testing.T, raw string) string {
 func request(t *testing.T, input map[string]any, handles map[string]string) string {
 	t.Helper()
 	return withSession(t, encode(t, map[string]any{
-		"kind": "dataSources", "contributionId": "search", "configuration": map[string]any{}, "input": input,
+		"kind": "data-source", "contributionId": "search", "configuration": map[string]any{}, "input": input,
 		"context": map[string]any{"resourceHandles": handles},
 	}))
 }

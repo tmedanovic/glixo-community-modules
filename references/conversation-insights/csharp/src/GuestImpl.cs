@@ -9,7 +9,7 @@ public static class GuestExportsImpl
     {
         using var envelope = JsonDocument.Parse(requestJson);
         var root = envelope.RootElement;
-        if (Text(root, "kind") != "messageMiddleware" || Text(root, "contributionId") != "conversation-insights")
+        if (Text(root, "kind") != "message-middleware" || Text(root, "contributionId") != "conversation-insights")
             throw new InvalidOperationException("guest_envelope_invalid");
         return Analyze(root.GetProperty("input"));
     }

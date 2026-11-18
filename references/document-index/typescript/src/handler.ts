@@ -9,7 +9,7 @@ export interface WorkspaceReader {
   read(handle: string, path: string, maxBytes: number): string;
 }
 export interface HostEnvelope {
-  readonly kind: 'dataSources';
+  readonly kind: 'data-source';
   readonly contributionId: string;
   readonly input: { readonly query: string; readonly limit?: number; readonly excerptBytes?: number };
   readonly context?: { readonly resourceHandles?: Readonly<Record<string, string>> };
@@ -19,7 +19,7 @@ export interface DocumentIndexResult { readonly query: string; readonly items: r
 
 // docs:snippet-start document-index-handler:typescript
 export function handleDocumentIndex(envelope: HostEnvelope, workspace: WorkspaceReader): DocumentIndexResult {
-  if (envelope.kind !== 'dataSources' || envelope.contributionId !== CONTRIBUTION_ID) throw new Error('contribution_mismatch');
+  if (envelope.kind !== 'data-source' || envelope.contributionId !== CONTRIBUTION_ID) throw new Error('contribution_mismatch');
   const handle = envelope.context?.resourceHandles?.workspace;
   if (typeof handle !== 'string' || handle.length === 0) throw new Error('workspace_handle_missing');
   const query = envelope.input?.query;
